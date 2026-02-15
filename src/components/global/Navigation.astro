@@ -2,18 +2,18 @@
 const currentPath = Astro.url.pathname;
 
 const links = [
-  { href: '/montessori/', label: 'Home' },
-  { href: '/montessori/vision/', label: 'Vision' },
-  { href: '/montessori/about/', label: 'About' },
-  { href: '/montessori/partners/', label: 'Partners' },
-  { href: '/montessori/resources/', label: 'Resources' },
-  { href: '/montessori/webinars/', label: 'Webinars' },
-  { href: '/montessori/contact/', label: 'Collaborate' },
+  { href: '/', label: 'Home' },
+  { href: '/vision/', label: 'Vision' },
+  { href: '/about/', label: 'About' },
+  { href: '/partners/', label: 'Partners' },
+  { href: '/resources/', label: 'Resources' },
+  { href: '/webinars/', label: 'Webinars' },
+  { href: '/contact/', label: 'Collaborate' },
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/montessori/') {
-    return currentPath === '/montessori/' || currentPath === '/montessori';
+  if (href === '/') {
+    return currentPath === '/' || currentPath === '';
   }
   return currentPath.startsWith(href);
 }

@@ -9,7 +9,7 @@ interface Props {
 const {
   title,
   description,
-  image = '/montessori/images/1.png',
+  image = '/images/1.png',
   canonicalUrl,
 } = Astro.props;
 
@@ -26,7 +26,7 @@ const resolvedUrl = canonicalUrl || Astro.url.href;
 <meta name="description" content={description} />
 <link rel="canonical" href={resolvedUrl} />
 
-<link rel="icon" type="image/png" href="/montessori/images/4.png" />
+<link rel="icon" type="image/png" href="/images/4.png" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />

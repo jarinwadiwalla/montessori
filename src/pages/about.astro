@@ -8,55 +8,19 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   title="About"
   description="Learn about Jarin Wadiwalla and the mission behind Montessori for Adolescents — dedicated to advancing Montessori education for the third plane of development."
   heroTitle="About"
-  heroSubtitle="Body, heart, and spirit care from adolescence to adulthood"
 >
   <div class="container container--narrow">
-    <section class="about-profile">
-      <div class="profile-image-wrapper">
-        <img
-          src="/montessori/images/jarin-profile.jpg"
-          alt="Jarin Wadiwalla"
-          class="profile-image"
-          width="340"
-          height="340"
-        />
-      </div>
-      <div class="profile-text">
-        <h2>Jarin Wadiwalla</h2>
-        <p class="profile-tagline">Support for the lifelong unfolding of the human spirit through sound, community, and education.</p>
-        <p>
-          Jarin's practice focuses on holistic human development throughout life stages. Drawing from
-          Montessori principles, she guides adolescents and adults through significant transitions via
-          education, acoustic therapy, and community-centered bereavement facilitation.
-        </p>
-        <p>
-          Her service offerings encompass individual Acutonics sound therapy sessions, facilitated
-          group grief circles, and Montessori guidance for families and schools.
-        </p>
-      </div>
-    </section>
-
     <section class="about-section">
-      <h2>Education & Credentials</h2>
-      <div class="credentials-grid">
-        <div class="credential-group">
-          <h3>Education</h3>
-          <ul>
-            <li>Adolescent Studies Diploma, Association Montessori Internationale (AMI)</li>
-            <li>Bachelor of Science in Public Relations, University of Texas at Austin</li>
-            <li>Business Foundations Certificate, University of Texas at Austin</li>
-          </ul>
-        </div>
-        <div class="credential-group">
-          <h3>Training & Certifications</h3>
-          <ul>
-            <li>200-hour Registered Yoga Instructor</li>
-            <li>Sound bath facilitation, <em>The Frequency</em></li>
-            <li>Associate Acutonics&reg; Practitioner (expected graduation October 2025)</li>
-            <li>Currently studying reiki, lymphatic massage, gua sha, and EFT tapping</li>
-          </ul>
-        </div>
-      </div>
+      <h2>Jarin Wadiwalla</h2>
+      <p>
+        Jarin's practice focuses on holistic human development throughout life stages. Drawing from
+        Montessori principles, she guides adolescents and adults through significant transitions via
+        education, acoustic therapy, and community-centered bereavement facilitation.
+      </p>
+      <p>
+        Her service offerings encompass individual Acutonics sound therapy sessions, facilitated
+        group grief circles, and Montessori guidance for families and schools.
+      </p>
     </section>
 
     <section class="about-section">
@@ -121,46 +85,6 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
 </PageLayout>
 
 <style>
-  .about-profile {
-    display: flex;
-    gap: var(--space-3xl);
-    align-items: flex-start;
-    margin-bottom: var(--space-4xl);
-  }
-
-  .profile-image-wrapper {
-    flex-shrink: 0;
-  }
-
-  .profile-image {
-    width: 280px;
-    height: 280px;
-    object-fit: cover;
-    border-radius: var(--radius-xl);
-    border: 3px solid var(--color-border);
-  }
-
-  .profile-text h2 {
-    font-size: var(--text-3xl);
-    color: var(--color-earth);
-    margin-bottom: var(--space-sm);
-  }
-
-  .profile-tagline {
-    font-family: var(--font-heading);
-    font-style: italic;
-    color: var(--color-terracotta);
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-lg);
-  }
-
-  .profile-text p {
-    font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-    margin-bottom: var(--space-md);
-  }
-
   .about-section {
     margin-bottom: var(--space-3xl);
   }
@@ -176,42 +100,6 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     line-height: var(--leading-relaxed);
     color: var(--color-text);
     margin-bottom: var(--space-md);
-  }
-
-  .credentials-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-xl);
-  }
-
-  .credential-group {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-  }
-
-  .credential-group h3 {
-    font-size: var(--text-xl);
-    color: var(--color-terracotta);
-    margin-bottom: var(--space-md);
-  }
-
-  .credential-group ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  .credential-group li {
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-    padding-block: var(--space-sm);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .credential-group li:last-child {
-    border-bottom: none;
   }
 
   .principles {
@@ -240,22 +128,5 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
 
   .about-coffee {
     margin-top: var(--space-lg);
-  }
-
-  @media (max-width: 768px) {
-    .about-profile {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .profile-image {
-      width: 220px;
-      height: 220px;
-    }
-
-    .credentials-grid {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

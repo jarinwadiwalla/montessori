@@ -2,8 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://jarinwadiwalla.github.io',
-  base: '/montessori',
+  site: 'https://montessoriforadolescents.com',
   output: 'static',
   integrations: [sitemap()],
   build: {

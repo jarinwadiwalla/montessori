@@ -198,7 +198,7 @@ button {
 
 @font-face {
   font-family: 'Lora';
-  src: url('/montessori/fonts/Lora-Regular.woff2') format('woff2');
+  src: url('/fonts/Lora-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -206,7 +206,7 @@ button {
 
 @font-face {
   font-family: 'Lora';
-  src: url('/montessori/fonts/Lora-SemiBold.woff2') format('woff2');
+  src: url('/fonts/Lora-SemiBold.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -214,7 +214,7 @@ button {
 
 @font-face {
   font-family: 'Lora';
-  src: url('/montessori/fonts/Lora-Italic.woff2') format('woff2');
+  src: url('/fonts/Lora-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -222,7 +222,7 @@ button {
 
 @font-face {
   font-family: 'Inter';
-  src: url('/montessori/fonts/Inter-Regular.woff2') format('woff2');
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -230,7 +230,7 @@ button {
 
 @font-face {
   font-family: 'Inter';
-  src: url('/montessori/fonts/Inter-Medium.woff2') format('woff2');
+  src: url('/fonts/Inter-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -238,7 +238,7 @@ button {
 
 @font-face {
   font-family: 'Inter';
-  src: url('/montessori/fonts/Inter-SemiBold.woff2') format('woff2');
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
