@@ -1,0 +1,261 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import BuyMeACoffee from '../components/shared/BuyMeACoffee.astro';
+import QuoteBanner from '../components/shared/QuoteBanner.astro';
+---
+
+<PageLayout
+  title="About"
+  description="Learn about Jarin Wadiwalla and the mission behind Montessori for Adolescents — dedicated to advancing Montessori education for the third plane of development."
+  heroTitle="About"
+  heroSubtitle="Body, heart, and spirit care from adolescence to adulthood"
+>
+  <div class="container container--narrow">
+    <section class="about-profile">
+      <div class="profile-image-wrapper">
+        <img
+          src="/montessori/images/jarin-profile.jpg"
+          alt="Jarin Wadiwalla"
+          class="profile-image"
+          width="340"
+          height="340"
+        />
+      </div>
+      <div class="profile-text">
+        <h2>Jarin Wadiwalla</h2>
+        <p class="profile-tagline">Support for the lifelong unfolding of the human spirit through sound, community, and education.</p>
+        <p>
+          Jarin's practice focuses on holistic human development throughout life stages. Drawing from
+          Montessori principles, she guides adolescents and adults through significant transitions via
+          education, acoustic therapy, and community-centered bereavement facilitation.
+        </p>
+        <p>
+          Her service offerings encompass individual Acutonics sound therapy sessions, facilitated
+          group grief circles, and Montessori guidance for families and schools.
+        </p>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Education & Credentials</h2>
+      <div class="credentials-grid">
+        <div class="credential-group">
+          <h3>Education</h3>
+          <ul>
+            <li>Adolescent Studies Diploma, Association Montessori Internationale (AMI)</li>
+            <li>Bachelor of Science in Public Relations, University of Texas at Austin</li>
+            <li>Business Foundations Certificate, University of Texas at Austin</li>
+          </ul>
+        </div>
+        <div class="credential-group">
+          <h3>Training & Certifications</h3>
+          <ul>
+            <li>200-hour Registered Yoga Instructor</li>
+            <li>Sound bath facilitation, <em>The Frequency</em></li>
+            <li>Associate Acutonics&reg; Practitioner (expected graduation October 2025)</li>
+            <li>Currently studying reiki, lymphatic massage, gua sha, and EFT tapping</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Our Mission</h2>
+      <p>
+        Montessori for Adolescents exists to advance the understanding and practice of Montessori education
+        for young people aged 12–18. We believe that Maria Montessori's insights into adolescent development
+        are as relevant today as when she first articulated them — perhaps more so.
+      </p>
+      <p>
+        Through webinars, guides, and a growing network of global partners, we aim to support educators,
+        parents, and school leaders in creating environments where adolescents can truly thrive.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Our Approach</h2>
+      <p>
+        We are guided by three core principles:
+      </p>
+      <div class="principles">
+        <div class="principle">
+          <h3>Fidelity to Montessori</h3>
+          <p>
+            We ground our work in Maria Montessori's original writings and vision, particularly her
+            insights into the third plane of development as described in <em>From Childhood to Adolescence</em>.
+          </p>
+        </div>
+        <div class="principle">
+          <h3>Global Perspective</h3>
+          <p>
+            Montessori education is a worldwide movement. We seek out and amplify diverse voices, approaches,
+            and cultural contexts in adolescent Montessori education.
+          </p>
+        </div>
+        <div class="principle">
+          <h3>Practical Wisdom</h3>
+          <p>
+            Theory matters, but so does practice. Our resources are designed to be immediately useful
+            for educators and parents working with adolescents today.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Support Our Work</h2>
+      <p>
+        Montessori for Adolescents is a passion project dedicated to making Montessori wisdom accessible
+        to all. If our resources have been helpful to you, consider supporting our work.
+      </p>
+      <div class="about-coffee">
+        <BuyMeACoffee label="Support Our Work" />
+      </div>
+    </section>
+  </div>
+
+  <QuoteBanner
+    text="The greatest sign of success for a teacher is to be able to say, 'The children are now working as if I did not exist.'"
+    author="Maria Montessori"
+  />
+</PageLayout>
+
+<style>
+  .about-profile {
+    display: flex;
+    gap: var(--space-3xl);
+    align-items: flex-start;
+    margin-bottom: var(--space-4xl);
+  }
+
+  .profile-image-wrapper {
+    flex-shrink: 0;
+  }
+
+  .profile-image {
+    width: 280px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    border: 3px solid var(--color-border);
+  }
+
+  .profile-text h2 {
+    font-size: var(--text-3xl);
+    color: var(--color-earth);
+    margin-bottom: var(--space-sm);
+  }
+
+  .profile-tagline {
+    font-family: var(--font-heading);
+    font-style: italic;
+    color: var(--color-terracotta);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .profile-text p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .about-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .about-section h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-lg);
+    color: var(--color-earth);
+  }
+
+  .about-section p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .credentials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+
+  .credential-group {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+
+  .credential-group h3 {
+    font-size: var(--text-xl);
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-md);
+  }
+
+  .credential-group ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .credential-group li {
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    padding-block: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .credential-group li:last-child {
+    border-bottom: none;
+  }
+
+  .principles {
+    display: grid;
+    gap: var(--space-xl);
+    margin-top: var(--space-xl);
+  }
+
+  .principle {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+
+  .principle h3 {
+    font-size: var(--text-xl);
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-sm);
+  }
+
+  .principle p {
+    font-size: var(--text-base);
+    margin-bottom: 0;
+  }
+
+  .about-coffee {
+    margin-top: var(--space-lg);
+  }
+
+  @media (max-width: 768px) {
+    .about-profile {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .profile-image {
+      width: 220px;
+      height: 220px;
+    }
+
+    .credentials-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

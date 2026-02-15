@@ -1,0 +1,128 @@
+---
+import StripeButton from '../shared/StripeButton.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  presenter: string;
+  duration: string;
+  price: number;
+  stripePaymentLink: string;
+  stripeBuyButtonId?: string;
+  topics: string[];
+}
+
+const {
+  title,
+  description,
+  presenter,
+  duration,
+  price,
+  stripePaymentLink,
+  stripeBuyButtonId,
+  topics,
+} = Astro.props;
+---
+
+<article class="webinar-card">
+  <div class="webinar-header">
+    <h3 class="webinar-title">{title}</h3>
+    <span class="webinar-price">${price}</span>
+  </div>
+  <div class="webinar-meta">
+    <span class="webinar-presenter">{presenter}</span>
+    <span class="webinar-duration">{duration}</span>
+  </div>
+  <p class="webinar-description">{description}</p>
+  <div class="webinar-topics">
+    {topics.map((topic) => (
+      <span class="webinar-topic">{topic}</span>
+    ))}
+  </div>
+  <div class="webinar-action">
+    <StripeButton
+      paymentLink={stripePaymentLink}
+      buyButtonId={stripeBuyButtonId}
+      label={`Purchase — $${price}`}
+    />
+  </div>
+</article>
+
+<style>
+  .webinar-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    transition: box-shadow var(--transition-base);
+  }
+
+  .webinar-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .webinar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  .webinar-title {
+    font-size: var(--text-xl);
+    flex: 1;
+  }
+
+  .webinar-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--color-terracotta);
+    white-space: nowrap;
+  }
+
+  .webinar-meta {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .webinar-presenter {
+    font-size: var(--text-sm);
+    color: var(--color-sage-dark);
+    font-weight: 500;
+  }
+
+  .webinar-duration {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .webinar-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-lg);
+  }
+
+  .webinar-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .webinar-topic {
+    font-size: var(--text-xs);
+    color: var(--color-earth-light);
+    background-color: var(--color-cream-dark);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .webinar-action {
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

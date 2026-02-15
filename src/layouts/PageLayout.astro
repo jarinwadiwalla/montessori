@@ -1,0 +1,27 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import PageHero from '../components/shared/PageHero.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  heroTitle: string;
+  heroSubtitle?: string;
+  image?: string;
+}
+
+const { title, description, heroTitle, heroSubtitle, image } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <PageHero title={heroTitle} subtitle={heroSubtitle} />
+  <div class="page-content">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .page-content {
+    padding-block: var(--space-3xl);
+  }
+</style>

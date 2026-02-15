@@ -1,0 +1,76 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PartnerCard from '../components/partners/PartnerCard.astro';
+import { getCollection } from 'astro:content';
+
+const partners = (await getCollection('partners')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<PageLayout
+  title="Global Partners"
+  description="Meet the educators, researchers, and organizations advancing Montessori adolescent education around the world."
+  heroTitle="Global Partners"
+  heroSubtitle="Educators and organizations united by a shared vision for adolescent development"
+>
+  <div class="container">
+    <div class="partners-grid">
+      {partners.map((partner) => (
+        <PartnerCard
+          name={partner.data.name}
+          title={partner.data.title}
+          organization={partner.data.organization}
+          location={partner.data.location}
+          bio={partner.data.bio}
+          website={partner.data.website}
+        />
+      ))}
+    </div>
+
+    <section class="partners-cta text-center">
+      <h2>Join Our Network</h2>
+      <p>
+        Are you an educator, researcher, or organization working in Montessori adolescent education?
+        We'd love to connect.
+      </p>
+      <a href="/montessori/contact/" class="cta-link">Get in Touch &rarr;</a>
+    </section>
+  </div>
+</PageLayout>
+
+<style>
+  .partners-grid {
+    display: grid;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-4xl);
+  }
+
+  .partners-cta {
+    max-width: 500px;
+    margin-inline: auto;
+    padding-top: var(--space-3xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .partners-cta h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .partners-cta p {
+    color: var(--color-text-light);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .cta-link {
+    font-weight: 600;
+    font-size: var(--text-lg);
+    color: var(--color-terracotta);
+  }
+
+  .cta-link:hover {
+    color: var(--color-terracotta-dark);
+  }
+</style>

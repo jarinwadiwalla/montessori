@@ -1,0 +1,98 @@
+---
+import Button from '../shared/Button.astro';
+---
+
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <img src="/montessori/images/4.png" alt="" class="hero-emblem" width="120" height="120" />
+    <h1 class="hero-title">Montessori for Adolescents</h1>
+    <p class="hero-subtitle">
+      Empowering educators and parents to nurture the adolescent spirit
+      through Montessori philosophy, community, and shared wisdom.
+    </p>
+    <div class="hero-actions">
+      <Button href="/montessori/vision/" variant="primary" size="lg">Our Vision</Button>
+      <Button href="/montessori/webinars/" variant="outline" size="lg">Explore Webinars</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    background-color: var(--color-earth-dark);
+    padding-block: var(--space-5xl);
+    text-align: center;
+    overflow: hidden;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(184, 117, 93, 0.1) 0%,
+      transparent 70%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-emblem {
+    width: 100px;
+    height: 100px;
+    margin-inline: auto;
+    margin-bottom: var(--space-xl);
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+  }
+
+  .hero-title {
+    font-size: var(--text-5xl);
+    color: var(--color-cream);
+    margin-bottom: var(--space-lg);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-lg);
+    color: rgba(250, 247, 242, 0.75);
+    max-width: 620px;
+    margin-inline: auto;
+    margin-bottom: var(--space-2xl);
+    line-height: var(--leading-relaxed);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Override outline button for dark background */
+  .hero-actions :global(.btn--outline) {
+    color: var(--color-cream);
+    border-color: rgba(250, 247, 242, 0.4);
+  }
+
+  .hero-actions :global(.btn--outline:hover) {
+    background-color: rgba(250, 247, 242, 0.1);
+    border-color: var(--color-cream);
+    color: var(--color-cream);
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 60vh;
+      padding-block: var(--space-3xl);
+    }
+  }
+</style>

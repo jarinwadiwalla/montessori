@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/home/HeroSection.astro';
+import FeaturedContent from '../components/home/FeaturedContent.astro';
+import QuoteBlock from '../components/home/QuoteBlock.astro';
+import QuoteBanner from '../components/shared/QuoteBanner.astro';
+---
+
+<BaseLayout
+  title="Montessori for Adolescents"
+  description="Empowering educators and parents to nurture the adolescent spirit through Montessori philosophy, community, and shared wisdom."
+>
+  <HeroSection />
+  <FeaturedContent />
+  <QuoteBlock />
+  <QuoteBanner
+    text="The land is the source of all life, and the children who work on it, producing food, gain a sense of the cosmic order of things."
+    author="Maria Montessori"
+    source="From Childhood to Adolescence"
+  />
+</BaseLayout>

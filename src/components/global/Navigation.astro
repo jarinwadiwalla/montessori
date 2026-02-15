@@ -1,0 +1,102 @@
+---
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: '/montessori/', label: 'Home' },
+  { href: '/montessori/vision/', label: 'Vision' },
+  { href: '/montessori/about/', label: 'About' },
+  { href: '/montessori/partners/', label: 'Partners' },
+  { href: '/montessori/resources/', label: 'Resources' },
+  { href: '/montessori/webinars/', label: 'Webinars' },
+  { href: '/montessori/contact/', label: 'Collaborate' },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/montessori/') {
+    return currentPath === '/montessori/' || currentPath === '/montessori';
+  }
+  return currentPath.startsWith(href);
+}
+---
+
+<nav class="site-nav" aria-label="Main navigation">
+  <ul class="nav-list">
+    {links.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          class:list={['nav-link', { 'is-active': isActive(link.href) }]}
+          aria-current={isActive(link.href) ? 'page' : undefined}
+        >
+          {link.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-link {
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .nav-link:hover {
+    color: var(--color-terracotta);
+    background-color: rgba(184, 117, 93, 0.06);
+  }
+
+  .nav-link.is-active {
+    color: var(--color-terracotta);
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .site-nav {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background-color: var(--color-cream);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-md);
+    }
+
+    .site-nav.is-open {
+      display: block;
+    }
+
+    .nav-list {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .nav-link {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .nav-link:last-child {
+      border-bottom: none;
+    }
+  }
+</style>

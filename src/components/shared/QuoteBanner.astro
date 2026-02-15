@@ -1,0 +1,51 @@
+---
+interface Props {
+  text: string;
+  author: string;
+  source?: string;
+}
+
+const { text, author, source } = Astro.props;
+---
+
+<aside class="quote-banner">
+  <div class="container container--narrow">
+    <blockquote class="quote-banner-content">
+      <p class="quote-text">&ldquo;{text}&rdquo;</p>
+      <footer class="quote-attribution">
+        <cite>
+          <span class="quote-author">{author}</span>
+          {source && <span class="quote-source">, {source}</span>}
+        </cite>
+      </footer>
+    </blockquote>
+  </div>
+</aside>
+
+<style>
+  .quote-banner {
+    background-color: var(--color-earth-dark);
+    padding-block: var(--space-3xl);
+    text-align: center;
+  }
+
+  .quote-text {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-style: italic;
+    color: var(--color-cream);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-lg);
+  }
+
+  .quote-author {
+    color: var(--color-terracotta-light);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .quote-source {
+    color: rgba(250, 247, 242, 0.5);
+    font-style: normal;
+  }
+</style>

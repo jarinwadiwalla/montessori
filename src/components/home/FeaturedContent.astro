@@ -1,0 +1,70 @@
+---
+import Card from '../shared/Card.astro';
+
+const features = [
+  {
+    tag: 'Vision',
+    title: 'The Third Plane of Development',
+    description: 'Discover Montessori\'s profound insights into adolescence — a time of social rebirth, moral development, and the quest for identity.',
+    href: '/montessori/vision/',
+  },
+  {
+    tag: 'Resources',
+    title: 'Guides & Downloads',
+    description: 'Practical, downloadable resources for implementing Montessori principles with adolescents in schools and at home.',
+    href: '/montessori/resources/',
+  },
+  {
+    tag: 'Webinars',
+    title: 'Learn & Connect',
+    description: 'Expert-led webinars exploring topics from adolescent psychology to creating prepared environments for the third plane.',
+    href: '/montessori/webinars/',
+  },
+  {
+    tag: 'Community',
+    title: 'Global Partners',
+    description: 'Connect with Montessori educators and organizations across the globe who share a passion for adolescent development.',
+    href: '/montessori/partners/',
+  },
+];
+---
+
+<section class="featured section">
+  <div class="container">
+    <h2 class="featured-heading text-center">Explore Our Work</h2>
+    <p class="featured-intro text-center">
+      Dedicated to advancing Montessori education for adolescents through research,
+      resources, and global collaboration.
+    </p>
+    <div class="featured-grid">
+      {features.map((feature) => (
+        <Card
+          tag={feature.tag}
+          title={feature.title}
+          description={feature.description}
+          href={feature.href}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured-heading {
+    margin-bottom: var(--space-md);
+  }
+
+  .featured-intro {
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin-inline: auto;
+    margin-bottom: var(--space-3xl);
+    font-size: var(--text-lg);
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-xl);
+  }
+</style>

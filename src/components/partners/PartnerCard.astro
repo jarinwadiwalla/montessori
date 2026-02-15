@@ -1,0 +1,104 @@
+---
+interface Props {
+  name: string;
+  title: string;
+  organization: string;
+  location: string;
+  bio: string;
+  website?: string;
+}
+
+const { name, title, organization, location, bio, website } = Astro.props;
+
+const initials = name.split(' ').map(n => n[0]).join('');
+---
+
+<article class="partner-card">
+  <div class="partner-avatar">
+    <span class="partner-initials">{initials}</span>
+  </div>
+  <div class="partner-info">
+    <h3 class="partner-name">{name}</h3>
+    <p class="partner-title">{title}</p>
+    <p class="partner-org">{organization} &middot; {location}</p>
+    <p class="partner-bio">{bio}</p>
+    {website && (
+      <a href={website} target="_blank" rel="noopener noreferrer" class="partner-link">
+        Visit Website &rarr;
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  .partner-card {
+    display: flex;
+    gap: var(--space-xl);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    transition: box-shadow var(--transition-base);
+  }
+
+  .partner-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .partner-avatar {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    background-color: var(--color-sage);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .partner-initials {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .partner-name {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-xs);
+  }
+
+  .partner-title {
+    font-size: var(--text-sm);
+    color: var(--color-terracotta);
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+  }
+
+  .partner-org {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-md);
+  }
+
+  .partner-bio {
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .partner-link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-terracotta);
+  }
+
+  @media (max-width: 600px) {
+    .partner-card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+</style>

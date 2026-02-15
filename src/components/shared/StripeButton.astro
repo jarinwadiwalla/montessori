@@ -1,0 +1,62 @@
+---
+interface Props {
+  paymentLink: string;
+  buyButtonId?: string;
+  publishableKey?: string;
+  label?: string;
+}
+
+const {
+  paymentLink,
+  buyButtonId,
+  publishableKey,
+  label = 'Purchase Access',
+} = Astro.props;
+---
+
+{buyButtonId && publishableKey ? (
+  <div class="stripe-embed">
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+    <stripe-buy-button
+      buy-button-id={buyButtonId}
+      publishable-key={publishableKey}
+    ></stripe-buy-button>
+  </div>
+) : (
+  <a
+    href={paymentLink}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="stripe-link"
+  >
+    {label}
+  </a>
+)}
+
+<style>
+  .stripe-embed {
+    margin-block: var(--space-md);
+  }
+
+  .stripe-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background-color: var(--color-terracotta);
+    color: var(--color-white);
+    font-weight: 500;
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .stripe-link:hover {
+    background-color: var(--color-terracotta-dark);
+    color: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+</style>

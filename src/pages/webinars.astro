@@ -1,0 +1,83 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import WebinarCard from '../components/webinars/WebinarCard.astro';
+import { getCollection } from 'astro:content';
+
+const webinars = await getCollection('webinars');
+const featured = webinars.filter((w) => w.data.featured);
+const others = webinars.filter((w) => !w.data.featured);
+---
+
+<PageLayout
+  title="Webinars"
+  description="Expert-led webinars on Montessori adolescent education — from classroom design to adolescent psychology."
+  heroTitle="Webinars"
+  heroSubtitle="Expert-led sessions on Montessori philosophy and practice for adolescents"
+>
+  <div class="container">
+    {featured.length > 0 && (
+      <section class="webinars-section">
+        <h2 class="section-heading">Featured Webinars</h2>
+        <div class="webinars-grid">
+          {featured.map((webinar) => (
+            <WebinarCard
+              title={webinar.data.title}
+              description={webinar.data.description}
+              presenter={webinar.data.presenter}
+              duration={webinar.data.duration}
+              price={webinar.data.price}
+              stripePaymentLink={webinar.data.stripePaymentLink}
+              stripeBuyButtonId={webinar.data.stripeBuyButtonId}
+              topics={webinar.data.topics}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {others.length > 0 && (
+      <section class="webinars-section">
+        <h2 class="section-heading">All Webinars</h2>
+        <div class="webinars-grid">
+          {others.map((webinar) => (
+            <WebinarCard
+              title={webinar.data.title}
+              description={webinar.data.description}
+              presenter={webinar.data.presenter}
+              duration={webinar.data.duration}
+              price={webinar.data.price}
+              stripePaymentLink={webinar.data.stripePaymentLink}
+              stripeBuyButtonId={webinar.data.stripeBuyButtonId}
+              topics={webinar.data.topics}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</PageLayout>
+
+<style>
+  .webinars-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .section-heading {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .webinars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 768px) {
+    .webinars-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ResourceCard from '../components/resources/ResourceCard.astro';
+import { getCollection } from 'astro:content';
+
+const resources = (await getCollection('resources')).sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+---
+
+<PageLayout
+  title="Resources"
+  description="Downloadable guides, worksheets, and toolkits for implementing Montessori education with adolescents."
+  heroTitle="Resources"
+  heroSubtitle="Practical guides and tools for Montessori adolescent education"
+>
+  <div class="container">
+    <div class="resources-grid">
+      {resources.map((resource) => (
+        <ResourceCard
+          title={resource.data.title}
+          description={resource.data.description}
+          category={resource.data.category}
+          downloadUrl={resource.data.downloadUrl}
+          publishDate={resource.data.publishDate}
+        />
+      ))}
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-xl);
+  }
+</style>

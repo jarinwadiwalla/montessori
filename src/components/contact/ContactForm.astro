@@ -1,0 +1,110 @@
+---
+interface Props {
+  formspreeId?: string;
+}
+
+const { formspreeId = 'YOUR_FORMSPREE_ID' } = Astro.props;
+---
+
+<form
+  action={`https://formspree.io/f/${formspreeId}`}
+  method="POST"
+  class="contact-form"
+>
+  <div class="form-group">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" id="name" name="name" required class="form-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" id="email" name="email" required class="form-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="organization" class="form-label">Organization (optional)</label>
+    <input type="text" id="organization" name="organization" class="form-input" />
+  </div>
+
+  <div class="form-group">
+    <label for="subject" class="form-label">Subject</label>
+    <select id="subject" name="subject" required class="form-input">
+      <option value="">Select a topic...</option>
+      <option value="collaboration">Collaboration Inquiry</option>
+      <option value="speaking">Speaking Request</option>
+      <option value="resources">Resource Sharing</option>
+      <option value="general">General Question</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="message" class="form-label">Message</label>
+    <textarea id="message" name="message" rows="6" required class="form-input form-textarea"></textarea>
+  </div>
+
+  <button type="submit" class="form-submit">Send Message</button>
+</form>
+
+<style>
+  .contact-form {
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  .form-group {
+    margin-bottom: var(--space-lg);
+  }
+
+  .form-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-earth);
+    margin-bottom: var(--space-sm);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    appearance: none;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--color-terracotta);
+    box-shadow: 0 0 0 3px rgba(184, 117, 93, 0.15);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 150px;
+  }
+
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-md) var(--space-2xl);
+    background-color: var(--color-terracotta);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+  }
+
+  .form-submit:hover {
+    background-color: var(--color-terracotta-dark);
+  }
+</style>

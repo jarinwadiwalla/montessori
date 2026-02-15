@@ -1,0 +1,56 @@
+---
+import quotes from '../../content/quotes/quotes.json';
+
+// Pick a random quote or use the first one
+const quote = quotes[0];
+---
+
+<section class="quote-block">
+  <div class="container container--narrow">
+    <blockquote class="quote-block-content">
+      <p class="quote-text">&ldquo;{quote.text}&rdquo;</p>
+      <footer class="quote-attr">
+        <cite>
+          <span class="quote-author">{quote.author}</span>
+          {quote.source && <span class="quote-source">, {quote.source}</span>}
+        </cite>
+      </footer>
+    </blockquote>
+  </div>
+</section>
+
+<style>
+  .quote-block {
+    background-color: var(--color-earth-dark);
+    padding-block: var(--space-4xl);
+    text-align: center;
+  }
+
+  .quote-text {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-style: italic;
+    color: var(--color-cream);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-xl);
+  }
+
+  .quote-author {
+    color: var(--color-terracotta-light);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .quote-source {
+    color: rgba(250, 247, 242, 0.5);
+    font-size: var(--text-base);
+    font-style: normal;
+  }
+
+  @media (max-width: 768px) {
+    .quote-text {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>

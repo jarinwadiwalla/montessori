@@ -1,0 +1,89 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  external?: boolean;
+}
+
+const { href, variant = 'primary', size = 'md', external = false } = Astro.props;
+const Element = href ? 'a' : 'button';
+const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+<Element
+  class:list={['btn', `btn--${variant}`, `btn--${size}`]}
+  href={href}
+  {...externalAttrs}
+>
+  <slot />
+</Element>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  /* Sizes */
+  .btn--sm {
+    font-size: var(--text-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .btn--md {
+    font-size: var(--text-sm);
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  .btn--lg {
+    font-size: var(--text-base);
+    padding: var(--space-md) var(--space-2xl);
+  }
+
+  /* Variants */
+  .btn--primary {
+    background-color: var(--color-terracotta);
+    color: var(--color-white);
+    border-color: var(--color-terracotta);
+  }
+
+  .btn--primary:hover {
+    background-color: var(--color-terracotta-dark);
+    border-color: var(--color-terracotta-dark);
+    color: var(--color-white);
+  }
+
+  .btn--secondary {
+    background-color: var(--color-sage);
+    color: var(--color-white);
+    border-color: var(--color-sage);
+  }
+
+  .btn--secondary:hover {
+    background-color: var(--color-sage-dark);
+    border-color: var(--color-sage-dark);
+    color: var(--color-white);
+  }
+
+  .btn--outline {
+    background-color: transparent;
+    color: var(--color-terracotta);
+    border-color: var(--color-terracotta);
+  }
+
+  .btn--outline:hover {
+    background-color: var(--color-terracotta);
+    color: var(--color-white);
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = 'Buy Me a Coffee' } = Astro.props;
+---
+
+<a
+  href="https://buymeacoffee.com/montessoriforadolescents"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="bmc-button"
+>
+  <svg class="bmc-icon" width="20" height="20" viewBox="0 0 884 1279" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M791.109 297.518L790.231 297.002L788.201 296.383C789.018 297.072 790.04 297.472 791.109 297.518Z" fill="currentColor"/>
+    <path d="M803.896 388.891L802.916 389.166L803.896 388.891Z" fill="currentColor"/>
+    <path d="M791.109 297.518C789.988 297.377 788.932 296.9 788.073 296.146L788.201 296.383C789.018 297.072 790.04 297.472 791.109 297.518Z" fill="currentColor"/>
+    <path d="M803.896 388.891L804.874 388.611L803.896 388.891Z" fill="currentColor"/>
+    <path d="M350 1107.5C350 1107.5 274 1107.5 250 1107.5C170 1107.5 100 1037.5 100 957.5L100 457.5L784 457.5L784 957.5C784 1037.5 714 1107.5 634 1107.5L500 1107.5" stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+    <path d="M784 507.5L834 507.5C864 507.5 884 527.5 884 557.5L884 707.5C884 737.5 864 757.5 834 757.5L784 757.5" stroke="currentColor" stroke-width="60" stroke-linecap="round"/>
+    <path d="M250 307.5C250 307.5 250 257.5 250 207.5C250 107.5 350 7.5 450 7.5C550 7.5 650 107.5 650 207.5L650 307.5" stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+    <line x1="450" y1="1107.5" x2="450" y2="1227.5" stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+    <line x1="250" y1="1227.5" x2="650" y2="1227.5" stroke="currentColor" stroke-width="80" stroke-linecap="round"/>
+  </svg>
+  <span>{label}</span>
+</a>
+
+<style>
+  .bmc-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background-color: var(--color-gold);
+    color: var(--color-white);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .bmc-button:hover {
+    background-color: #b39843;
+    color: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .bmc-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+</style>
