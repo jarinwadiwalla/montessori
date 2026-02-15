@@ -1,6 +1,6 @@
 ---
 name: Lola Odyssey Waters
-title: Partner
+title: ""
 organization: Montessori for Adolescents
 location: France
 bio: ""

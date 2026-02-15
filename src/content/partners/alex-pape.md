@@ -1,8 +1,8 @@
 ---
 name: Alex Pape
-title: Partner
+title: ""
 organization: Montessori for Adolescents
 location: France
 bio: ""
-order: 1
+order: 0
 ---
