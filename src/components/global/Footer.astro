@@ -6,14 +6,14 @@ const currentYear = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <img src="/images/3.png" alt="Montessori for Adolescents" class="footer-logo" width="280" />
-        <p class="footer-tagline">
-          Nurturing the adolescent spirit through Montessori wisdom.
-        </p>
-      </div>
+    <div class="footer-logo-wrapper">
+      <img src="/images/3.png" alt="Montessori for Adolescents" class="footer-logo" width="280" />
+      <p class="footer-tagline">
+        Nurturing the adolescent spirit through Montessori wisdom.
+      </p>
+    </div>
 
+    <div class="footer-grid">
       <div class="footer-links">
         <h4 class="footer-heading">Explore</h4>
         <ul>
@@ -50,18 +50,19 @@ const currentYear = new Date().getFullYear();
     margin-top: var(--space-4xl);
   }
 
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: var(--space-3xl);
+  .footer-logo-wrapper {
+    text-align: center;
     margin-bottom: var(--space-3xl);
+    padding-bottom: var(--space-2xl);
+    border-bottom: 1px solid rgba(250, 247, 242, 0.1);
   }
 
   .footer-logo {
     height: auto;
     width: 240px;
     filter: brightness(0) invert(1);
-    margin-bottom: var(--space-lg);
+    margin-inline: auto;
+    margin-bottom: var(--space-md);
   }
 
   .footer-tagline {
@@ -69,6 +70,17 @@ const currentYear = new Date().getFullYear();
     line-height: var(--leading-relaxed);
     color: rgba(250, 247, 242, 0.6);
     max-width: 300px;
+    margin-inline: auto;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    max-width: 500px;
+    margin-inline: auto;
+    margin-bottom: var(--space-3xl);
+    text-align: center;
   }
 
   .footer-heading {
@@ -124,6 +136,11 @@ const currentYear = new Date().getFullYear();
     .footer-grid {
       grid-template-columns: 1fr;
       gap: var(--space-xl);
+      text-align: center;
+    }
+
+    .footer-logo {
+      width: 200px;
     }
   }
 </style>
