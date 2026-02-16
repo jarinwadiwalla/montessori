@@ -1,8 +1,8 @@
 ---
 name: Jarin Wadiwalla
-title: ""
+title: "Founder, Contributor"
 organization: Montessori for Adolescents
 location: Bali, Indonesia
 bio: ""
-order: 1
+order: 0
 ---
