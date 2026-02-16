@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://montessoriforadolescents.com/sitemap-index.xml

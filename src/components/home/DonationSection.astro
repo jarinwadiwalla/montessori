@@ -1,0 +1,66 @@
+---
+import BuyMeACoffee from '../shared/BuyMeACoffee.astro';
+---
+
+<section class="donation-section section">
+  <div class="container">
+    <div class="donation-inner">
+      <div class="donation-content">
+        <span class="donation-label">Support Our Mission</span>
+        <h2 class="donation-title">Help Adolescents Thrive</h2>
+        <p class="donation-text">
+          Every dollar donated supports communities in guiding adolescents through authentic,
+          meaningful work rooted in Montessori philosophy—helping them grow into inspired and
+          compassionate leaders of the world. Your contribution goes towards our training efforts,
+          as well as helping under-resourced communities set up Montessori Centers of Work and
+          Study of their own.
+        </p>
+        <div class="donation-action">
+          <BuyMeACoffee label="Support Our Work" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .donation-section {
+    background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-earth-dark) 100%);
+    padding-block: var(--space-4xl);
+  }
+
+  .donation-inner {
+    max-width: 700px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .donation-label {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-terracotta-light);
+    margin-bottom: var(--space-md);
+  }
+
+  .donation-title {
+    font-size: var(--text-4xl);
+    color: var(--color-cream);
+    margin-bottom: var(--space-xl);
+  }
+
+  .donation-text {
+    font-size: var(--text-lg);
+    color: rgba(250, 247, 242, 0.85);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .donation-action {
+    display: flex;
+    justify-content: center;
+  }
+</style>

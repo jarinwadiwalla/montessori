@@ -9,13 +9,32 @@ interface Props {
 const {
   title,
   description,
-  image = '/images/1.png',
+  image = '/images/4.png',
   canonicalUrl,
 } = Astro.props;
 
 const siteName = 'Montessori for Adolescents';
+const siteUrl = 'https://montessoriforadolescents.com';
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const resolvedUrl = canonicalUrl || Astro.url.href;
+const resolvedImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Montessori for Adolescents",
+  "url": siteUrl,
+  "logo": `${siteUrl}/images/4.png`,
+  "description": "Empowering educators and parents to nurture the adolescent spirit through Montessori philosophy, community, and shared wisdom.",
+  "sameAs": [
+    "https://buymeacoffee.com/montessoriforadolescents"
+  ],
+  "founder": {
+    "@type": "Person",
+    "name": "Jarin Wadiwalla"
+  },
+  "keywords": "Montessori for Adolescents, Montessori adolescent education, Erdkinder, third plane of development, AMI 12-18, Montessori secondary education, adolescent Montessori"
+});
 ---
 
 <meta charset="utf-8" />
@@ -24,6 +43,7 @@ const resolvedUrl = canonicalUrl || Astro.url.href;
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+<meta name="keywords" content="Montessori for Adolescents, Montessori adolescent education, Erdkinder, third plane of development, AMI 12-18 diploma, Montessori secondary, adolescent development, Montessori philosophy" />
 <link rel="canonical" href={resolvedUrl} />
 
 <link rel="icon" type="image/png" href="/images/4.png" />
@@ -32,12 +52,16 @@ const resolvedUrl = canonicalUrl || Astro.url.href;
 <meta property="og:type" content="website" />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={image} />
+<meta property="og:image" content={resolvedImage} />
 <meta property="og:url" content={resolvedUrl} />
 <meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="en_US" />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={image} />
+<meta name="twitter:image" content={resolvedImage} />
+
+<!-- Structured Data -->
+<script type="application/ld+json" set:html={jsonLd} />
