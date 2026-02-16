@@ -1,6 +1,4 @@
 ---
-import StripeButton from '../shared/StripeButton.astro';
-
 interface Props {
   title: string;
   description: string;
@@ -37,13 +35,6 @@ const {
     {topics.map((topic) => (
       <span class="webinar-topic">{topic}</span>
     ))}
-  </div>
-  <div class="webinar-action">
-    <StripeButton
-      paymentLink={stripePaymentLink}
-      buyButtonId={stripeBuyButtonId}
-      label={`Purchase — $${price}`}
-    />
   </div>
 </article>
 
@@ -120,8 +111,4 @@ const {
     border-radius: var(--radius-sm);
   }
 
-  .webinar-action {
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--color-border);
-  }
 </style>

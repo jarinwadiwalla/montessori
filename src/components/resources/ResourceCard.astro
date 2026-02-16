@@ -1,6 +1,4 @@
 ---
-import Button from '../shared/Button.astro';
-
 interface Props {
   title: string;
   description: string;
@@ -31,9 +29,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   </div>
   <h3 class="resource-title">{title}</h3>
   <p class="resource-description">{description}</p>
-  <Button href={downloadUrl} variant="outline" size="sm" external>
-    Download PDF
-  </Button>
+  <span class="coming-soon">Coming Soon</span>
 </article>
 
 <style>
@@ -82,5 +78,16 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     color: var(--color-text-light);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-lg);
+  }
+
+  .coming-soon {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-light);
+    background-color: var(--color-cream-dark);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    letter-spacing: var(--tracking-wide);
   }
 </style>
