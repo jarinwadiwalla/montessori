@@ -21,7 +21,7 @@ const initials = name.split(' ').map(n => n[0]).join('');
     <h3 class="partner-name">{name}</h3>
     <p class="partner-title">{title}</p>
     <p class="partner-credential">Association Montessori Internationale (AMI) 12–18 Diploma</p>
-    <p class="partner-org">{organization} &middot; {location}</p>
+    <p class="partner-org">{organization} &middot; <strong>{location}</strong></p>
     <p class="partner-bio">{bio}</p>
     {website && (
       <a href={website} target="_blank" rel="noopener noreferrer" class="partner-link">
