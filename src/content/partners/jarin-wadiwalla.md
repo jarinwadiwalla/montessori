@@ -1,6 +1,6 @@
 ---
 name: Jarin Wadiwalla
-title: "Founder, Contributor"
+title: "Founder Montessori for Adolescents and Montessori Guide"
 organization: "Montessori Farm Bali"
 location: Bali, Indonesia
 bio: "Jarin's work centers on whole-human development across the lifespan. Rooted in Montessori philosophy and Traditional Chinese Medicine, she supports adolescents and adults through the sacred unfolding through education, Acutonics therapy, community-centered grief work."

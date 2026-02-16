@@ -21,13 +21,8 @@ const initials = name.split(' ').map(n => n[0]).join('');
     <h3 class="partner-name">{name}</h3>
     <p class="partner-title">{title}</p>
     <p class="partner-credential">Association Montessori Internationale (AMI) 12–18 Diploma</p>
-    <p class="partner-org">{organization ? <>{organization} &middot; <strong>{location}</strong></> : <strong>{location}</strong>}</p>
+    <p class="partner-org">{organization ? <>{website ? <a href={website} target="_blank" rel="noopener noreferrer" class="partner-org-link">{organization}</a> : organization} &middot; <strong>{location}</strong></> : <strong>{location}</strong>}</p>
     <p class="partner-bio">{bio}</p>
-    {website && (
-      <a href={website} target="_blank" rel="noopener noreferrer" class="partner-link">
-        Visit Website &rarr;
-      </a>
-    )}
   </div>
 </article>
 
@@ -96,10 +91,14 @@ const initials = name.split(' ').map(n => n[0]).join('');
     margin-bottom: var(--space-md);
   }
 
-  .partner-link {
-    font-size: var(--text-sm);
-    font-weight: 500;
+  .partner-org-link {
     color: var(--color-terracotta);
+    font-weight: 500;
+  }
+
+  .partner-org-link:hover {
+    color: var(--color-terracotta-dark);
+    text-decoration: underline;
   }
 
   @media (max-width: 600px) {

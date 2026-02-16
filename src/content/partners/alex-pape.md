@@ -1,6 +1,6 @@
 ---
 name: Alex Pape
-title: "Contributor"
+title: "Montessori Guide"
 organization: ""
 location: France
 bio: ""
