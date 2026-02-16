@@ -1,7 +1,7 @@
 ---
 name: Alex Pape
 title: "Contributor"
-organization: Montessori for Adolescents
+organization: ""
 location: France
 bio: ""
 order: 1
