@@ -20,6 +20,7 @@ const initials = name.split(' ').map(n => n[0]).join('');
   <div class="partner-info">
     <h3 class="partner-name">{name}</h3>
     <p class="partner-title">{title}</p>
+    <p class="partner-credential">Association Montessori Internationale (AMI) 12–18 Diploma</p>
     <p class="partner-org">{organization} &middot; {location}</p>
     <p class="partner-bio">{bio}</p>
     {website && (
@@ -72,6 +73,13 @@ const initials = name.split(' ').map(n => n[0]).join('');
     font-size: var(--text-sm);
     color: var(--color-terracotta);
     font-weight: 500;
+    margin-bottom: var(--space-xs);
+  }
+
+  .partner-credential {
+    font-size: var(--text-sm);
+    color: var(--color-sage-dark);
+    font-style: italic;
     margin-bottom: var(--space-xs);
   }
 
