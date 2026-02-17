@@ -1,16 +1,16 @@
 ---
-title: "Moral Development in Adolescence: A Montessori Perspective"
-description: "Understanding the adolescent's quest for justice, fairness, and moral identity through the lens of Montessori philosophy. Practical approaches for guiding moral development."
-presenter: "Amina Okafor"
-duration: "60 minutes"
+title: "Montessori at Home: Integrating Montessori Principles for Homeschooling Families"
+description: "A practical guide for homeschooling families looking to bring Montessori philosophy into the home environment — from creating meaningful work to fostering independence and self-directed learning in adolescents."
+presenter: ""
+duration: "75 minutes"
 price: 25
 stripePaymentLink: "https://buy.stripe.com/test_example3"
 topics:
-  - Moral development
-  - Social justice
-  - Adolescent identity
-  - Values education
+  - Homeschooling
+  - Prepared environment
+  - Self-directed learning
+  - Adolescent independence
 featured: false
 ---
 
-This webinar examines how Montessori's understanding of the adolescent's moral sensitivity can inform our approach to education.
+This webinar offers homeschooling families practical strategies for integrating Montessori principles into daily life, helping adolescents thrive through meaningful work, community engagement, and self-directed learning.
