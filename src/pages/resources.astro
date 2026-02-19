@@ -6,6 +6,9 @@ import { getCollection } from 'astro:content';
 const resources = (await getCollection('resources')).sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
 );
+
+const featured = resources.filter((r) => r.data.featured);
+const others = resources.filter((r) => !r.data.featured);
 ---
 
 <PageLayout
@@ -15,21 +18,83 @@ const resources = (await getCollection('resources')).sort(
   heroSubtitle="Practical guides and tools for Montessori adolescent education"
 >
   <div class="container">
-    <div class="resources-grid">
-      {resources.map((resource) => (
-        <ResourceCard
-          title={resource.data.title}
-          description={resource.data.description}
-          category={resource.data.category}
-          downloadUrl={resource.data.downloadUrl}
-          publishDate={resource.data.publishDate}
-        />
-      ))}
-    </div>
+    {featured.length > 0 && (
+      <section class="featured-section">
+        <span class="now-available">Now Available</span>
+        <div class="featured-grid">
+          {featured.map((resource) => (
+            <ResourceCard
+              title={resource.data.title}
+              description={resource.data.description}
+              category={resource.data.category}
+              downloadUrl={resource.data.downloadUrl}
+              publishDate={resource.data.publishDate}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {others.length > 0 && (
+      <section class="other-section">
+        <h3 class="other-heading">More Resources</h3>
+        <div class="resources-grid">
+          {others.map((resource) => (
+            <ResourceCard
+              title={resource.data.title}
+              description={resource.data.description}
+              category={resource.data.category}
+              downloadUrl={resource.data.downloadUrl}
+              publishDate={resource.data.publishDate}
+            />
+          ))}
+        </div>
+      </section>
+    )}
   </div>
 </PageLayout>
 
 <style>
+  .featured-section {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .now-available {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-purple);
+    background-color: var(--color-lavender);
+    padding: var(--space-xs) var(--space-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xl);
+  }
+
+  .featured-grid {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  .featured-grid :global(.resource-card) {
+    border: 2px solid var(--color-lavender);
+    box-shadow: var(--shadow-md);
+  }
+
+  .other-section {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-3xl);
+  }
+
+  .other-heading {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-xl);
+    color: var(--color-earth);
+  }
+
   .resources-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
