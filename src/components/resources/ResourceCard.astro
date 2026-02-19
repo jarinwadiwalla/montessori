@@ -28,7 +28,11 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   </div>
   <h3 class="resource-title">{title}</h3>
   <p class="resource-description">{description}</p>
-  <span class="coming-soon">Coming Soon</span>
+  {downloadUrl.startsWith('http') ? (
+    <a href={downloadUrl} target="_blank" rel="noopener noreferrer" class="download-btn">Download</a>
+  ) : (
+    <span class="coming-soon">Coming Soon</span>
+  )}
 </article>
 
 <style>
@@ -77,6 +81,24 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     color: var(--color-text-light);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-lg);
+  }
+
+  .download-btn {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-purple);
+    background-color: var(--color-lavender);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .download-btn:hover {
+    background-color: var(--color-lavender-dark);
+    color: var(--color-purple);
+    transform: translateY(-1px);
   }
 
   .coming-soon {
