@@ -97,7 +97,13 @@ const others = resources.filter((r) => !r.data.featured);
 
   .resources-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-xl);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 768px) {
+    .resources-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
