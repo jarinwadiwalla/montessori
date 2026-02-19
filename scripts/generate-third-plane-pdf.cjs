@@ -172,7 +172,7 @@ const docDefinition = {
   pageMargins: [50, 50, 50, 50],
 
   background(currentPage) {
-    return [
+    const items = [
       {
         canvas: [
           {
@@ -192,6 +192,31 @@ const docDefinition = {
         opacity: 0.12,
       },
     ];
+    if (currentPage === 1) {
+      items.push({
+        canvas: [
+          {
+            type: "rect",
+            x: 0,
+            y: 0,
+            w: 612,
+            h: 50,
+            color: PURPLE,
+          },
+          // Gold accent line at bottom of ribbon
+          {
+            type: "line",
+            x1: 0,
+            y1: 50,
+            x2: 612,
+            y2: 50,
+            lineWidth: 2.5,
+            lineColor: GOLD,
+          },
+        ],
+      });
+    }
+    return items;
   },
 
   footer: pageFooter,
