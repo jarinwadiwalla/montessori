@@ -3,7 +3,7 @@ title: "The Prepared Environment for Adolescents"
 description: "A comprehensive guide to creating physical, social, and intellectual environments that meet the developmental needs of the third plane."
 category: guide
 downloadUrl: /downloads/prepared-environment-guide.pdf
-featured: true
+featured: false
 publishDate: 2025-09-15
 ---
 
