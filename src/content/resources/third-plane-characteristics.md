@@ -1,10 +1,10 @@
 ---
-title: "Characteristics of the Third Plane of Development"
-description: "A practical worksheet summarizing the key developmental characteristics of adolescents aged 12–18, based on Montessori's planes of development."
+title: "Montessori for Adolescents 101"
+description: "A beautifully designed 6-page worksheet summarizing the key developmental characteristics of adolescents aged 12–18; their development sensitivities; and an overview of the prepared environment based on Montessori's planes of development."
 category: worksheet
-downloadUrl: /downloads/third-plane-worksheet.pdf
+downloadUrl: /downloads/montessori-for-adolescents-101.pdf
 featured: false
 publishDate: 2025-08-20
 ---
 
-This worksheet provides an at-a-glance reference for the physical, emotional, social, and cognitive characteristics of the third plane of development.
+A beautifully designed 6-page worksheet summarizing the key developmental characteristics of adolescents aged 12–18; their development sensitivities; and an overview of the prepared environment based on Montessori's planes of development.
