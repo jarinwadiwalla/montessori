@@ -6,10 +6,15 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "generate:pdf": "node scripts/generate-third-plane-pdf.cjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.17.2"
+  },
+  "devDependencies": {
+    "pdfmake": "^0.3.4",
+    "pptxgenjs": "^4.0.1"
   }
 }
