@@ -36,10 +36,15 @@ const currentYear = new Date().getFullYear();
             <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
           </svg>
         </a>
-        <div class="footer-coffee">
-          <BuyMeACoffee label="Support Our Work" />
-        </div>
       </div>
+    </div>
+
+    <div class="footer-support">
+      <h4 class="footer-heading">Support Our Mission</h4>
+      <p class="footer-support-text">
+        Every dollar helps communities guide adolescents through meaningful work rooted in Montessori philosophy.
+      </p>
+      <BuyMeACoffee label="Support Our Work" />
     </div>
 
     <div class="footer-bottom">
@@ -136,8 +141,20 @@ const currentYear = new Date().getFullYear();
     color: var(--color-cream);
   }
 
-  .footer-coffee {
-    margin-top: var(--space-lg);
+  .footer-support {
+    text-align: center;
+    max-width: 400px;
+    margin-inline: auto;
+    margin-bottom: var(--space-3xl);
+    padding-top: var(--space-2xl);
+    border-top: 1px solid rgba(250, 247, 242, 0.1);
+  }
+
+  .footer-support-text {
+    font-size: var(--text-sm);
+    color: rgba(250, 247, 242, 0.6);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-md);
   }
 
   .footer-bottom {
