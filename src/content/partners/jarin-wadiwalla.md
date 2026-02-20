@@ -3,6 +3,6 @@ name: Jarin Wadiwalla
 title: "Founder of Montessori for Adolescents and Montessori Guide"
 organization: ""
 location: Indonesia
-bio: "Jarin spent five years working in the Adolescent Community at Austin Montessori School, a long-standing Montessori program in the United States. She completed Adolescent Diploma studies with AMI trainers Jenny Hoglund, Tina Booth, and Lesley Patrick. Her work is grounded in Montessori philosophy and Traditional Chinese Medicine, with a focus on supporting whole-person development."
+bio: "Jarin worked in the Adolescent Community at Austin Montessori School, one of the long-standing Montessori programs in the United States. She's completed the Adolescent Orientation and 12-18 Diploma with AMI trainers Jenny Hoglund, Tina Booth, and Lesley Patrick. Her work is rooted in Montessori philosophy and Traditional Chinese Medicine, with a deep commitment to supporting whole-person development."
 order: 0
 ---
