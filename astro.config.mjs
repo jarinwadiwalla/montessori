@@ -12,6 +12,8 @@ export default defineConfig({
     '/consulting/': '/support/',
     '/partners': '/our-team/',
     '/partners/': '/our-team/',
+    '/whole-person': '/whole-human/',
+    '/whole-person/': '/whole-human/',
   },
   build: {
     assets: '_assets',
