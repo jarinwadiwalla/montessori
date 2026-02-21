@@ -5,6 +5,10 @@ export default defineConfig({
   site: 'https://montessoriforadolescents.com',
   output: 'static',
   integrations: [sitemap()],
+  redirects: {
+    '/about': '/consulting/',
+    '/about/': '/consulting/',
+  },
   build: {
     assets: '_assets',
   },

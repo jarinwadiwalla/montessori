@@ -1,0 +1,128 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import BuyMeACoffee from '../components/shared/BuyMeACoffee.astro';
+import QuoteBanner from '../components/shared/QuoteBanner.astro';
+---
+
+<PageLayout
+  title="Access"
+  description="Bringing Montessori adolescent programming to communities that have never had access — equity is not a value statement, it's our core mission."
+  heroTitle="Montessori for Everyone"
+  heroSubtitle="Equity isn't a value statement. It's our core mission."
+>
+  <div class="container container--narrow">
+    <section class="page-section">
+      <h2>The Gap</h2>
+      <p>
+        Montessori adolescent training can cost upward of $10,000. For many communities around the world —
+        communities that already live the principles of interdependence, meaningful work, and connection to the land —
+        that price tag puts formal Montessori programming out of reach.
+      </p>
+      <p>
+        We believe that shouldn't be the end of the story. Some of the communities that would benefit most from
+        Montessori adolescent education are the ones least able to afford it. That's the gap we exist to close.
+      </p>
+    </section>
+
+    <section class="page-section">
+      <h2>Our Mission</h2>
+      <p>
+        We raise funds and build partnerships to bring Montessori-inspired adolescent programming to
+        <strong>under-resourced communities</strong> — especially those that already embody these values organically.
+        We don't arrive with a model to impose. We arrive with resources, training, and hands to help build
+        what the community envisions.
+      </p>
+    </section>
+
+    <section class="page-section">
+      <h2>How Your Support Helps</h2>
+      <div class="impact-grid">
+        <div class="impact-card">
+          <h3>Training</h3>
+          <p>Funding Montessori adolescent training for educators in communities that can't afford diploma courses.</p>
+        </div>
+        <div class="impact-card">
+          <h3>Programs</h3>
+          <p>Helping under-resourced communities set up their own Montessori Centers of Study and Work.</p>
+        </div>
+        <div class="impact-card">
+          <h3>On-Site Support</h3>
+          <p>Covering travel and implementation costs so we can be on the ground where we're needed most.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section text-center">
+      <h2>Support Access</h2>
+      <p>
+        Every contribution helps bring Montessori wisdom to communities that have never had the opportunity.
+        This is how we build a more equitable world — one adolescent program at a time.
+      </p>
+      <div class="donate-action">
+        <BuyMeACoffee label="Support Our Work" />
+      </div>
+    </section>
+  </div>
+
+  <QuoteBanner
+    text="Education should no longer be mostly imparting of knowledge, but must take a new path, seeking the release of human potentialities."
+    author="Maria Montessori"
+    source="The Absorbent Mind"
+  />
+</PageLayout>
+
+<style>
+  .page-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .page-section h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-lg);
+    color: var(--color-earth);
+  }
+
+  .page-section p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .impact-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+
+  .impact-card h3 {
+    font-size: var(--text-xl);
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-sm);
+  }
+
+  .impact-card p {
+    font-size: var(--text-sm);
+    margin-bottom: 0;
+  }
+
+  .donate-action {
+    margin-top: var(--space-lg);
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .impact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
