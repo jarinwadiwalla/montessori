@@ -41,6 +41,71 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
       </div>
     </section>
 
+    <section class="page-section">
+      <h2>Roadmap</h2>
+      <div class="phases-grid">
+        <div class="phase-card">
+          <span class="phase-label">Phase 1</span>
+          <h3>Foundation</h3>
+          <span class="phase-goal">$5,000</span>
+          <p>Cover core operations, maintain infrastructure, and stabilize sustainability.</p>
+          <p class="phase-outcome"><strong>Outcome:</strong> The project becomes self-sustaining.</p>
+        </div>
+        <div class="phase-card">
+          <span class="phase-label">Phase 2</span>
+          <h3>Access Expansion</h3>
+          <span class="phase-goal">$10,000</span>
+          <p>Identify an under-served community (Bali or Kathmandu), assess need, provide resources, and research costs and local requirements.</p>
+          <p class="phase-outcome"><strong>Outcome:</strong> A community is selected and groundwork begins.</p>
+        </div>
+        <div class="phase-card">
+          <span class="phase-label">Phase 3</span>
+          <h3>Direct Community Support</h3>
+          <span class="phase-goal">$20,000</span>
+          <p>Partner with local organizations, fund programming and licensing, source a Center for Study and Work location, and train and pay local teachers.</p>
+          <p class="phase-outcome"><strong>Outcome:</strong> Launch a pilot program.</p>
+        </div>
+        <div class="phase-card">
+          <span class="phase-label">Phase 4</span>
+          <h3>Scale Impact</h3>
+          <span class="phase-goal">$50,000</span>
+          <p>Expand to multiple communities, hire a program coordinator, and develop long-term sustainability.</p>
+          <p class="phase-outcome"><strong>Outcome:</strong> Montessori adolescent programming reaches more communities around the world.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Progress</h2>
+      <div class="progress-tracker">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0.03%;"></div>
+        </div>
+        <div class="progress-milestones">
+          <div class="milestone" style="left: 10%;">
+            <span class="milestone-amount">$5k</span>
+            <span class="milestone-label">Foundation</span>
+          </div>
+          <div class="milestone" style="left: 20%;">
+            <span class="milestone-amount">$10k</span>
+            <span class="milestone-label">Access</span>
+          </div>
+          <div class="milestone" style="left: 40%;">
+            <span class="milestone-amount">$20k</span>
+            <span class="milestone-label">Pilot</span>
+          </div>
+          <div class="milestone" style="left: 100%;">
+            <span class="milestone-amount">$50k</span>
+            <span class="milestone-label">Scale</span>
+          </div>
+        </div>
+        <p class="progress-message">
+          <strong>$15 raised</strong> of $50,000 — every dollar helps bring Montessori to a community that's never had access.
+        </p>
+      </div>
+      <p class="accountability">All milestone transitions will be publicly announced, and impact reports will be shared quarterly.</p>
+    </section>
+
     <section class="page-section text-center">
       <h2>Support Access</h2>
       <p>
@@ -54,9 +119,8 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   </div>
 
   <QuoteBanner
-    text="Education should no longer be mostly imparting of knowledge, but must take a new path, seeking the release of human potentialities."
-    author="Maria Montessori"
-    source="The Absorbent Mind"
+    text="Education is the most powerful weapon which you can use to change the world."
+    author="Nelson Mandela"
   />
 </PageLayout>
 
@@ -109,9 +173,128 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     justify-content: center;
   }
 
+  /* Phases */
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .phase-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+
+  .phase-label {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-xs);
+  }
+
+  .phase-card h3 {
+    font-size: var(--text-xl);
+    color: var(--color-earth);
+    margin-bottom: var(--space-xs);
+  }
+
+  .phase-goal {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-md);
+  }
+
+  .phase-card p {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .phase-outcome {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: 0;
+  }
+
+  /* Progress Tracker */
+  .progress-tracker {
+    margin-top: var(--space-xl);
+  }
+
+  .progress-bar {
+    height: 12px;
+    background-color: var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: var(--color-terracotta);
+    border-radius: 6px;
+    min-width: 4px;
+    transition: width var(--transition-slow);
+  }
+
+  .progress-milestones {
+    position: relative;
+    height: 3rem;
+    margin-top: var(--space-sm);
+  }
+
+  .milestone {
+    position: absolute;
+    transform: translateX(-50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .milestone-amount {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-earth);
+  }
+
+  .milestone-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .progress-message {
+    text-align: center;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-top: var(--space-md);
+  }
+
+  .accountability {
+    text-align: center;
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--color-text-light);
+    margin-top: var(--space-lg);
+  }
+
   @media (max-width: 768px) {
     .impact-grid {
       grid-template-columns: 1fr;
+    }
+
+    .phases-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .milestone-label {
+      display: none;
     }
   }
 </style>
