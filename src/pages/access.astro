@@ -99,6 +99,14 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     </section>
 
     <section class="page-section text-center">
+      <h2>With Gratitude</h2>
+      <p>This work is made possible by the generosity of people who believe in it.</p>
+      <div class="donor-chips">
+        <span class="donor-chip">Wadiwalla Family</span>
+      </div>
+    </section>
+
+    <section class="page-section text-center">
       <div class="donate-action">
         <DonateButton label="Support Our Work" />
       </div>
@@ -267,6 +275,27 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     font-size: var(--text-base);
     color: var(--color-text);
     margin-top: var(--space-md);
+  }
+
+  /* Donor Recognition */
+  .donor-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  .donor-chip {
+    display: inline-block;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    padding: var(--space-xs) var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
   }
 
   @media (max-width: 768px) {
