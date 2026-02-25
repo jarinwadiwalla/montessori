@@ -114,13 +114,17 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     <section class="page-section text-center">
       <h2>With Gratitude</h2>
       <p>This work is made possible by the generosity of people who believe in it.</p>
-      <div class="donor-chips">
+      <div class="donor-row">
         <span class="donor-chip">Shaukat Wadiwalla</span>
         <span class="donor-chip">Deborah Wadiwalla</span>
         <span class="donor-chip">Antony Chiang</span>
         <span class="donor-chip">William Lovett</span>
+      </div>
+      <div class="donor-row">
         <span class="donor-chip">Wagas Kurjee</span>
         <span class="donor-chip">Dr. Daniel Vo</span>
+      </div>
+      <div class="donor-row">
         <span class="donor-chip">Pavla Guggenheim</span>
         <span class="donor-chip">Ayan Goswami</span>
       </div>
@@ -292,11 +296,15 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   }
 
   /* Donor Recognition */
-  .donor-chips {
+  .donor-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+
+  .donor-row:first-of-type {
     margin-top: var(--space-lg);
   }
 
