@@ -42,4 +42,15 @@ const webinars = defineCollection({
   }),
 });
 
-export const collections = { partners, resources, webinars };
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    author: z.string().default('Jarin Wadiwalla'),
+    publishDate: z.coerce.date(),
+    featured: z.boolean().default(false),
+  }),
+});
+
+export const collections = { partners, resources, webinars, blog };

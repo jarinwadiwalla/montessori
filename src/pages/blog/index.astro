@@ -1,0 +1,45 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import BlogCard from '../../components/blog/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+---
+
+<PageLayout
+  title="Blog"
+  description="Reflections from work with adolescents — observations, questions, and lessons from Montessori education."
+  heroTitle="Reflections from Work with Adolescents"
+  heroSubtitle="Observations, questions, and lessons from Montessori education"
+>
+  <div class="container">
+    <div class="blog-grid">
+      {posts.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          description={post.data.description}
+          publishDate={post.data.publishDate}
+          slug={post.id}
+        />
+      ))}
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+    max-width: 800px;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
