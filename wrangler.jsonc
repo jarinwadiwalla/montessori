@@ -6,7 +6,7 @@
     {
       "binding": "SITE_DB",
       "database_name": "montessori-db",
-      "database_id": "PLACEHOLDER_DATABASE_ID"
+      "database_id": "0e13fe96-9ad7-476d-9023-c6e340962065"
     }
   ],
   "r2_buckets": [
