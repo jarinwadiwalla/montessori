@@ -8,14 +8,14 @@ export async function onRequestGet(context) {
   }
 
   const row = await env.SITE_DB.prepare(
-    "SELECT * FROM drafts WHERE slug = ?"
+    "SELECT * FROM blog_drafts WHERE slug = ?"
   ).bind(slug).first();
 
   if (!row) {
     return new Response("Draft not found", { status: 404 });
   }
 
-  const draft = typeof row.content === "string" ? JSON.parse(row.content) : row;
+  const draft = row;
   const html = renderPreview(draft);
 
   return new Response(html, {
