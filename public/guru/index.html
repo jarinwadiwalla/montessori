@@ -310,6 +310,17 @@
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
+<!-- Token Login Overlay (shown when Cloudflare Access is not present) -->
+<div id="token-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#1e1e2e;border:1px solid #3a3a5c;border-radius:12px;padding:2rem;width:100%;max-width:400px;text-align:center;">
+    <h2 style="margin:0 0 0.5rem;color:#e2e2f0;">Guru Admin</h2>
+    <p style="color:#9090b0;margin:0 0 1.5rem;font-size:0.9rem;">Enter your admin token to continue</p>
+    <input id="token-input" type="password" placeholder="Admin token" style="width:100%;box-sizing:border-box;padding:0.75rem 1rem;border-radius:8px;border:1px solid #3a3a5c;background:#13131f;color:#e2e2f0;font-size:1rem;margin-bottom:1rem;">
+    <button onclick="submitToken()" style="width:100%;padding:0.75rem;border-radius:8px;border:none;background:#7c6af7;color:#fff;font-size:1rem;cursor:pointer;">Sign In</button>
+    <p id="token-error" style="color:#f87171;margin:0.75rem 0 0;font-size:0.85rem;display:none;">Invalid token. Try again.</p>
+  </div>
+</div>
+
 <script src="/guru/js/guru-core.js"></script>
 <script src="/guru/js/guru-blog.js"></script>
 <script src="/guru/js/guru-newsletter.js"></script>
