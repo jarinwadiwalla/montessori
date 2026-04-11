@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 10pt;
+    line-height: 1.6;
+    color: #4A3F35;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 50px 40px;
+  }
+
+  h1 {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 24pt;
+    color: #3f265b;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  h2 {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 14pt;
+    color: #3f265b;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 11pt;
+    color: #5C4A3A;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 11pt;
+    color: #7A8B6F;
+    font-style: italic;
+    margin-bottom: 30px;
+  }
+
+  p { margin-bottom: 10px; }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .pillar {
+    background-color: #FAF7F2;
+    border-left: 3px solid #7A8B6F;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+  }
+
+  .pillar-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 11pt;
+    font-weight: 600;
+    color: #3f265b;
+    margin-bottom: 4px;
+  }
+
+  .pillar ul {
+    padding-left: 18px;
+    margin-top: 4px;
+  }
+
+  .pillar li {
+    font-size: 9.5pt;
+    margin-bottom: 3px;
+    color: #4A3F35;
+  }
+
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 9pt;
+  }
+
+  .overview-table th {
+    text-align: left;
+    padding: 8px 10px;
+    background-color: #3f265b;
+    color: #FAF7F2;
+    font-weight: 600;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .overview-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #E5DFD7;
+  }
+
+  .overview-table tr:nth-child(even) td {
+    background-color: #FAF7F2;
+  }
+
+  .week-label {
+    font-size: 8pt;
+    font-weight: 600;
+    color: #7A8B6F;
+  }
+
+  .post {
+    border: 1px solid #E5DFD7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #E5DFD7;
+  }
+
+  .post-number {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 11pt;
+    font-weight: 600;
+    color: #3f265b;
+  }
+
+  .post-type {
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #7A8B6F;
+  }
+
+  .post-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 11pt;
+    color: #5C4A3A;
+    margin-bottom: 4px;
+  }
+
+  .meta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 12px;
+  }
+
+  .meta-item {
+    font-size: 8.5pt;
+    color: #7D6B5D;
+  }
+
+  .meta-label {
+    font-weight: 600;
+    color: #7A8B6F;
+  }
+
+  .caption {
+    background-color: #FAF7F2;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 9.5pt;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .slides {
+    background-color: #fff;
+    border: 1px solid #E5DFD7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 9pt;
+    color: #5C4A3A;
+  }
+
+  .slides strong {
+    color: #3f265b;
+  }
+
+  .hashtags {
+    font-size: 8.5pt;
+    color: #7A8B6F;
+    margin-top: 8px;
+    word-spacing: 2px;
+  }
+
+  .tag-group {
+    background-color: #FAF7F2;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+
+  .tag-group-title {
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: #3f265b;
+    margin-bottom: 4px;
+  }
+
+  .tag-group p {
+    font-size: 8.5pt;
+    color: #7A8B6F;
+    margin-bottom: 0;
+  }
+
+  .tip {
+    background-color: #f3eef8;
+    border-left: 3px solid #3f265b;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 9pt;
+  }
+
+  .tip strong {
+    color: #3f265b;
+  }
+
+  ul { padding-left: 18px; }
+  li { margin-bottom: 4px; font-size: 9.5pt; }
+
+  .footer {
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid #E5DFD7;
+    font-size: 9pt;
+    color: #7D6B5D;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Acutonics Instagram Marketing Plan</h1>
+<p class="subtitle">@jarinwadiwalla — Sound Healing, Community, and Whole-Human Development</p>
+
+<div class="section">
+  <h2>Your Differentiator</h2>
+  <p>You're not just a sound healer — you combine Acutonics (rooted in TCM + science) with yoga, grief work, and a whole-human development philosophy. You're based in Bali near the ocean. You bring Tibetan bowls, tingsha bells, wooden flutes, and seed rattles alongside precision-calibrated tuning forks. That's a powerful, unique brand.</p>
+</div>
+
+<div class="section">
+  <h2>Content Pillars</h2>
+  <p>Rotate through these five pillars so your feed stays varied and balanced:</p>
+
+  <div class="pillar">
+    <div class="pillar-title">1. Education — "What is Acutonics?"</div>
+    <ul>
+      <li>What are tuning forks and why they're calibrated to planetary frequencies</li>
+      <li>How it differs from a sound bath</li>
+      <li>The TCM foundation — meridians, acupuncture points, energy flow</li>
+      <li>Myth-busting: "It's not just relaxation — it addresses physical, emotional, and spiritual imbalances"</li>
+    </ul>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-title">2. Experience — "What a Session Looks Like"</div>
+    <ul>
+      <li>Reels of forks being placed on points (with permission)</li>
+      <li>The clearing ritual and intention-setting process</li>
+      <li>Your setup near Nyani Beach — the environment IS the brand</li>
+      <li>Before/after energy shifts (client testimonials in stories)</li>
+    </ul>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-title">3. Personal — "Why I Do This Work"</div>
+    <ul>
+      <li>Your journey from UT Austin to Montessori to Acutonics</li>
+      <li>Being a "forever student" — share what you're currently studying</li>
+      <li>Why you chose Bali</li>
+      <li>Your own experience with grief and healing</li>
+    </ul>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-title">4. Benefits / Conditions</div>
+    <ul>
+      <li>Stress and anxiety relief</li>
+      <li>Emotional release and processing grief</li>
+      <li>Muscular tension and physical discomfort</li>
+      <li>Feeling "stuck" or stagnant</li>
+      <li>Trouble sleeping</li>
+    </ul>
+  </div>
+
+  <div class="pillar">
+    <div class="pillar-title">5. Community — Waves of Grief Collective</div>
+    <ul>
+      <li>Monthly circle announcements</li>
+      <li>Reflections after circles (no client details, just themes)</li>
+      <li>Why grief work matters</li>
+      <li>Nature as a healing element</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Posting Schedule Overview</h2>
+  <p>3x per week — Monday / Wednesday / Friday. Rotate pillars so you never post the same type back-to-back.</p>
+
+  <table class="overview-table">
+    <tr>
+      <th>#</th>
+      <th>Post Title</th>
+      <th>Pillar</th>
+      <th>Format</th>
+      <th>Day</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Acutonics is NOT a Sound Bath</td>
+      <td>Education</td>
+      <td>Carousel</td>
+      <td><span class="week-label">Wk 1</span> Mon</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Tuning Forks + Ocean Reel</td>
+      <td>Experience</td>
+      <td>Reel (15-30s)</td>
+      <td><span class="week-label">Wk 1</span> Wed</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>From Texas to Bali</td>
+      <td>Personal</td>
+      <td>Carousel</td>
+      <td><span class="week-label">Wk 1</span> Fri</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>5 Signs Your Energy Is Stagnant</td>
+      <td>Benefits</td>
+      <td>Carousel</td>
+      <td><span class="week-label">Wk 2</span> Mon</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Planetary Frequencies — The Science</td>
+      <td>Education</td>
+      <td>Carousel</td>
+      <td><span class="week-label">Wk 2</span> Wed</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>My Healing Space</td>
+      <td>Experience</td>
+      <td>Photo + Caption</td>
+      <td><span class="week-label">Wk 2</span> Fri</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Waves of Grief Circle Announcement</td>
+      <td>Community</td>
+      <td>Graphic</td>
+      <td><span class="week-label">Wk 3</span> Mon</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>What Most People Feel After Session 1</td>
+      <td>Benefits</td>
+      <td>Text Graphic</td>
+      <td><span class="week-label">Wk 3</span> Wed</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>I'm Still a Student</td>
+      <td>Personal</td>
+      <td>Photo + Caption</td>
+      <td><span class="week-label">Wk 3</span> Fri</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Acutonics + TCM Explained</td>
+      <td>Education</td>
+      <td>Carousel</td>
+      <td><span class="week-label">Wk 4</span> Mon</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Client Testimonial</td>
+      <td>Experience</td>
+      <td>Quote Graphic</td>
+      <td><span class="week-label">Wk 4</span> Wed</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>What Does Healing Sound Like?</td>
+      <td>Engagement</td>
+      <td>Text Graphic</td>
+      <td><span class="week-label">Wk 4</span> Fri</td>
+    </tr>
+  </table>
+</div>
+
+<!-- POST 1 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 1</span>
+    <span class="post-type">Education</span>
+  </div>
+  <div class="post-title">Acutonics is NOT a Sound Bath</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Carousel (5 slides)</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 1 — Monday</span>
+  </div>
+  <div class="slides">
+    <strong>Slide 1:</strong> "Acutonics is NOT a sound bath. Here's the difference."<br>
+    <strong>Slide 2:</strong> Sound baths wash over you. Acutonics targets specific points on your body.<br>
+    <strong>Slide 3:</strong> Precision-calibrated tuning forks are placed on acupuncture points and chakras.<br>
+    <strong>Slide 4:</strong> It's rooted in Traditional Chinese Medicine, science, and psychology.<br>
+    <strong>Slide 5:</strong> Think of it as acupuncture — without the needles. Through sound.
+  </div>
+  <div class="caption">Most people hear "sound healing" and picture lying in a room while someone plays singing bowls. That's a sound bath — and it's beautiful.
+
+Acutonics is something different.
+
+It uses precision-calibrated tuning forks placed directly on acupuncture points and chakras. Each fork is tuned to a specific planetary frequency. The vibrations travel through your body's meridian system to move stagnation, support emotional release, and restore the flow of energy.
+
+It's grounded in Traditional Chinese Medicine, science, and psychology. It's not passive — it's targeted, intentional, and deeply personal.
+
+I combine tuning forks with Tibetan bowls, tingsha bells, wooden flutes, and seed rattles to create a session that meets you exactly where you are.
+
+If you've been curious, my DMs are open.</div>
+  <div class="hashtags">#Acutonics #SoundHealing #TuningForkTherapy #NotASoundBath #TCM #VibrationalMedicine #BaliHealer #HolisticHealing</div>
+</div>
+
+<!-- POST 2 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 2</span>
+    <span class="post-type">Experience</span>
+  </div>
+  <div class="post-title">Tuning Forks + Ocean Reel</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Reel (15-30 seconds)</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 1 — Wednesday</span>
+  </div>
+  <div class="caption">[Film: Close-up of tuning forks being activated and placed on skin. Natural ocean sounds in the background. No talking — just the resonance of the forks and the waves.]
+
+This is what healing sounds like.
+
+Precision-calibrated tuning forks on acupuncture points. Ocean air. Intention.
+
+Every session begins with a clearing ritual and intention-setting — then we let the frequencies do their work.
+
+Sessions available near Nyani Beach, Bali. Link in bio to book.
+
+(Keep the reel simple and sensory — let the sound and visuals do the work. Add a trending ambient audio track underneath if the original audio is too quiet.)</div>
+  <div class="hashtags">#Acutonics #SoundHealing #BaliWellness #TuningForks #HealingSounds #ASMR #SoundTherapy #NyaniBeach</div>
+</div>
+
+<!-- POST 3 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 3</span>
+    <span class="post-type">Personal</span>
+  </div>
+  <div class="post-title">From Texas to Bali</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Carousel or photo + caption</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 1 — Friday</span>
+  </div>
+  <div class="caption">I have a degree in Public Relations from UT Austin. I was not supposed to end up here.
+
+But life doesn't move in straight lines. It moves in spirals.
+
+I found Montessori education in 2019 and it changed everything I understood about human development. Then I found yoga. Then sound. Then Acutonics — a modality rooted in Traditional Chinese Medicine that uses tuning forks on acupuncture points to restore the body's energy systems.
+
+Now I live in Bali, I facilitate grief circles by the ocean, I help communities build Montessori adolescent programs, and I offer Acutonics sessions near Nyani Beach.
+
+None of this was the plan. All of it was the path.
+
+I'm a forever student. I'm currently studying reiki, lymphatic massage, gua sha, and EFT tapping — because the body holds more wisdom than we give it credit for.
+
+If your path has taken unexpected turns too, I see you.</div>
+  <div class="hashtags">#MyStory #HealingJourney #Acutonics #BaliLife #ForeverStudent #SoundHealing #WholeHumanDevelopment #LifePath</div>
+</div>
+
+<!-- POST 4 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 4</span>
+    <span class="post-type">Benefits</span>
+  </div>
+  <div class="post-title">5 Signs Your Energy Is Stagnant</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Carousel (6 slides)</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 2 — Monday</span>
+  </div>
+  <div class="slides">
+    <strong>Slide 1:</strong> 5 signs your energy is stagnant<br>
+    <strong>Slide 2:</strong> You feel tired even after sleeping<br>
+    <strong>Slide 3:</strong> Emotions feel "stuck" — the same loops playing on repeat<br>
+    <strong>Slide 4:</strong> Physical tension that won't release no matter what you try<br>
+    <strong>Slide 5:</strong> You feel disconnected from your body or your intuition<br>
+    <strong>Slide 6:</strong> Something just feels "off" but you can't name it
+  </div>
+  <div class="caption">In Traditional Chinese Medicine, health is about flow. When energy moves freely through your meridians, you feel alive, clear, and grounded. When it stagnates, things start to feel heavy.
+
+Acutonics uses vibration to move that stagnation — gently, precisely, and without needles. The tuning forks meet your body where it's holding on and help it let go.
+
+You don't need to understand the science to feel the shift. You just need to show up.
+
+If any of these signs resonate, it might be time.
+
+Link in bio to learn more or book a session.</div>
+  <div class="hashtags">#EnergyHealing #Acutonics #StagnantEnergy #TCM #MeridianTherapy #SoundHealing #BaliWellness #HolisticHealth</div>
+</div>
+
+<!-- POST 5 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 5</span>
+    <span class="post-type">Education</span>
+  </div>
+  <div class="post-title">Planetary Frequencies — The Science</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Carousel (5 slides)</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 2 — Wednesday</span>
+  </div>
+  <div class="slides">
+    <strong>Slide 1:</strong> Why are Acutonics forks tuned to planetary frequencies?<br>
+    <strong>Slide 2:</strong> Every planet in our solar system has a measurable orbital frequency<br>
+    <strong>Slide 3:</strong> These frequencies are transposed into the audible range and calibrated into tuning forks<br>
+    <strong>Slide 4:</strong> Different planetary frequencies address different aspects — grounding, emotional release, transformation<br>
+    <strong>Slide 5:</strong> It's where ancient wisdom meets modern science
+  </div>
+  <div class="caption">This is the question I get most often: "Why planets?"
+
+Every planet has an orbital frequency — a measurable vibration based on its movement through space. Acutonics takes those frequencies and transposes them into the audible range, then calibrates them into precision tuning forks.
+
+When those forks are placed on acupuncture points, the vibrations travel through your body's energy system. Different planetary frequencies serve different purposes — some ground you, some help release grief, some support transformation.
+
+It sounds esoteric. But the physics is real. And the experience speaks for itself.
+
+This is what drew me to Acutonics — it honors both the scientific and the sacred.</div>
+  <div class="hashtags">#Acutonics #PlanetaryFrequencies #SoundScience #VibrationalMedicine #TuningForkTherapy #TCM #SoundHealing #AncientWisdom</div>
+</div>
+
+<!-- POST 6 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 6</span>
+    <span class="post-type">Experience</span>
+  </div>
+  <div class="post-title">My Healing Space</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Photo + caption</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 2 — Friday</span>
+  </div>
+  <div class="caption">[Photo: Your setup — tuning forks laid out, Tibetan bowls, tingsha bells, wooden flutes, seed rattles. Nyani Beach in the background or nearby.]
+
+This is where it happens.
+
+Before every session, there's a clearing ritual. We set an intention together. Then the forks come out — each one chosen for you, placed on specific acupuncture points and chakras based on what your body needs that day.
+
+Tibetan bowls, tingsha bells, wooden flutes, and seed rattles weave in alongside the forks. The ocean provides the rest.
+
+No two sessions are the same. Because no two people — and no two days — are the same.
+
+If you're in Bali and you've been curious about Acutonics, come experience it. Link in bio.</div>
+  <div class="hashtags">#Acutonics #HealingSpace #SoundHealing #BaliWellness #TuningForks #TibetanBowls #NyaniBeach #SacredSpace</div>
+</div>
+
+<!-- POST 7 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 7</span>
+    <span class="post-type">Community</span>
+  </div>
+  <div class="post-title">Waves of Grief Circle Announcement</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Announcement graphic</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 3 — Monday</span>
+  </div>
+  <div class="caption">This Sunday: Waves of Grief Collective community circle.
+
+9:30 – 11:30 AM. By the ocean. Donation-based.
+
+This space is for anyone carrying loss — death, divorce, illness, identity, a move, a pet, a relationship, ancestral grief. All of it is welcome here.
+
+We ground through movement, visualization, and sound. We share. We hold space. We let the waves remind us that everything moves — including the heaviest things we carry.
+
+You don't have to grieve alone.
+
+DM me or just show up. Wear something comfortable.</div>
+  <div class="hashtags">#WavesOfGrief #GriefCircle #GriefSupport #CommunityHealing #BaliCommunity #HealingCircle #GriefAndLoss #YouAreNotAlone</div>
+</div>
+
+<!-- POST 8 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 8</span>
+    <span class="post-type">Benefits</span>
+  </div>
+  <div class="post-title">What Most People Feel After Session 1</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Text graphic + caption</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 3 — Wednesday</span>
+  </div>
+  <div class="caption">One session won't fix everything. I'll never promise that.
+
+But here's what most people tell me after their first Acutonics experience:
+
+"I feel lighter."
+"Something shifted but I can't explain it."
+"I slept better than I have in months."
+"I didn't realize how much I was holding."
+"I cried and I don't know why — but it felt right."
+
+Acutonics works with your body's own energy system. The forks don't add anything — they help release what's already there, waiting to move.
+
+Sometimes the most profound healing doesn't have words. It just has a feeling.
+
+If you've been carrying something heavy, maybe it's time to let the sound in.</div>
+  <div class="hashtags">#Acutonics #SoundHealing #EnergyRelease #HealingJourney #FirstSession #VibrationalMedicine #BaliHealer #LetItGo</div>
+</div>
+
+<!-- POST 9 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 9</span>
+    <span class="post-type">Personal</span>
+  </div>
+  <div class="post-title">I'm Still a Student</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Photo + caption</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 3 — Friday</span>
+  </div>
+  <div class="caption">I'm pursuing my Associate Acutonics Practitioner certification. I'm a 200-hour registered yoga teacher. I facilitate grief circles.
+
+And I'm still a student.
+
+Right now I'm studying reiki, lymphatic massage, gua sha, and EFT tapping. Not because I need more credentials. Because the body is endlessly complex and endlessly wise, and I want to understand it more deeply so I can serve people more fully.
+
+Every modality I learn informs the others. Yoga informs how I understand the body. TCM informs how I read energy. Grief work informs how I hold space. Sound brings it all together.
+
+I don't think you ever stop learning if you're doing this work honestly.
+
+What are you learning right now? I'd love to hear.</div>
+  <div class="hashtags">#ForeverStudent #Acutonics #YogaTeacher #HolisticPractitioner #Reiki #GuaSha #EFT #ContinuousLearning #BaliWellness</div>
+</div>
+
+<!-- POST 10 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 10</span>
+    <span class="post-type">Education</span>
+  </div>
+  <div class="post-title">Acutonics + Traditional Chinese Medicine</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Carousel (5 slides)</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 4 — Monday</span>
+  </div>
+  <div class="slides">
+    <strong>Slide 1:</strong> Acutonics is rooted in Traditional Chinese Medicine. Here's what that means.<br>
+    <strong>Slide 2:</strong> TCM views the body as a network of energy pathways called meridians<br>
+    <strong>Slide 3:</strong> When energy (qi) flows freely, you feel balanced. When it's blocked, symptoms appear.<br>
+    <strong>Slide 4:</strong> Acutonics uses tuning forks on acupuncture points to restore that flow — without needles<br>
+    <strong>Slide 5:</strong> Ancient medicine. Modern application. Deep healing.
+  </div>
+  <div class="caption">Acutonics didn't come out of nowhere. It's built on thousands of years of Traditional Chinese Medicine.
+
+TCM understands the body as a network of energy pathways — meridians — through which qi (life force) flows. When that flow is disrupted by stress, trauma, grief, or physical strain, we feel it. Sometimes as pain. Sometimes as emotional heaviness. Sometimes as that unnamed feeling that something is just off.
+
+Acupuncture uses needles to restore flow. Acutonics uses sound.
+
+Precision-calibrated tuning forks are placed on the same acupuncture points, and the vibrations travel through your meridian system to move stagnation and support your body's natural healing.
+
+It's ancient medicine with a modern application. And it works.</div>
+  <div class="hashtags">#Acutonics #TCM #TraditionalChineseMedicine #MeridianTherapy #QiFlow #SoundHealing #TuningForkTherapy #AncientMedicine</div>
+</div>
+
+<!-- POST 11 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 11</span>
+    <span class="post-type">Experience</span>
+  </div>
+  <div class="post-title">Client Testimonial</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Quote graphic over photo of space</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 4 — Wednesday</span>
+  </div>
+  <div class="caption">[Use a real client quote with their permission. Place it over a photo of your healing space or the ocean. Keep it simple.]
+
+Example format:
+"I came in carrying something I couldn't name. I left feeling like I could breathe again." — [Client first name]
+
+Nothing I can say about Acutonics is more powerful than what the people who experience it have to say.
+
+If you've had a session with me and want to share your experience, I'd be honored. DM me anytime.
+
+And if you haven't tried it yet — maybe their words will say what mine can't.
+
+Link in bio to book.</div>
+  <div class="hashtags">#Acutonics #ClientLove #Testimonial #SoundHealing #BaliWellness #HealingExperience #TuningForkTherapy</div>
+</div>
+
+<!-- POST 12 -->
+<div class="post">
+  <div class="post-header">
+    <span class="post-number">Post 12</span>
+    <span class="post-type">Engagement</span>
+  </div>
+  <div class="post-title">What Does Healing Sound Like to You?</div>
+  <div class="meta">
+    <span class="meta-item"><span class="meta-label">Format:</span> Text graphic with warm background</span>
+    <span class="meta-item"><span class="meta-label">Day:</span> Week 4 — Friday</span>
+  </div>
+  <div class="caption">What does healing sound like to you?
+
+Ocean waves. A deep breath. Rain on a roof. Your mother's voice. Silence. A tuning fork vibrating against your skin.
+
+There's no right answer. Healing sounds different for everyone.
+
+Drop one word below. I'll go first: resonance.</div>
+  <div class="hashtags">#SoundHealing #HealingSounds #Acutonics #WellnessCommunity #MindfulLiving #BaliWellness #SoundTherapy #WhatsYourSound</div>
+</div>
+
+<div class="section">
+  <h2>Hashtag Strategy</h2>
+
+  <div class="tag-group">
+    <div class="tag-group-title">Core — Use Every Post</div>
+    <p>#Acutonics #SoundHealing #TuningForkTherapy #HolisticHealing #BaliHealer</p>
+  </div>
+
+  <div class="tag-group">
+    <div class="tag-group-title">Rotate In</div>
+    <p>#TCM #TraditionalChineseMedicine #EnergyHealing #VibrationalMedicine #SoundTherapy #ChakraHealing #MeridianTherapy #GriefSupport #WavesOfGrief #BaliWellness #HolisticPractitioner #WholeHumanDevelopment #SoundMedicine #HealingFrequencies</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Growth Tactics</h2>
+
+  <div class="tip"><strong>Collaborate</strong> — Partner with other Bali wellness practitioners for joint lives, shared posts, and cross-promotion.</div>
+  <div class="tip"><strong>Reels first</strong> — Even a 15-second clip of forks resonating on skin with ocean in the background will stop the scroll. Reels get 2-3x the reach of static posts.</div>
+  <div class="tip"><strong>Location tag everything</strong> — Bali, Nyani Beach. Tourists and expats search by location.</div>
+  <div class="tip"><strong>CTA in bio</strong> — Link directly to your booking page. Make it one tap to book.</div>
+  <div class="tip"><strong>Stories daily</strong> — Behind-the-scenes, booking reminders, reposts. Stories keep you top of mind between posts.</div>
+  <div class="tip"><strong>Engagement polls</strong> — "Have you ever tried sound healing?" "Needles or no needles?" Polls boost your algorithm ranking.</div>
+</div>
+
+<div class="footer">
+  <p>Acutonics Instagram Marketing Plan — @jarinwadiwalla<br>jarinwadiwalla.com</p>
+</div>
+
+</body>
+</html>
