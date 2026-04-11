@@ -11,37 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadDashboardStats();
 });
 
-function showTokenOverlay() {
-  const overlay = document.getElementById("token-overlay");
-  overlay.style.display = "flex";
-  // Check sessionStorage for a saved token
-  const saved = sessionStorage.getItem("guru_token");
-  if (saved) {
-    document.getElementById("token-input").value = saved;
-  }
-  document.getElementById("token-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") submitToken();
-  });
-}
-
-async function submitToken() {
-  const input = document.getElementById("token-input").value.trim();
-  if (!input) return;
-
-  // Verify the token works by hitting a protected endpoint
-  const res = await fetch("/api/subscriber-count", {
-    headers: { "X-Admin-Token": input },
-  });
-
-  if (res.ok) {
-    _adminToken = input;
-    sessionStorage.setItem("guru_token", input);
-    document.getElementById("token-overlay").style.display = "none";
-    loadDashboardStats();
-  } else {
-    document.getElementById("token-error").style.display = "block";
-  }
-}
 
 function updateDate() {
   const el = document.getElementById("header-date");
@@ -49,26 +18,13 @@ function updateDate() {
 }
 
 async function fetchAdminSession() {
-  // Check sessionStorage first (token entered manually)
-  const saved = sessionStorage.getItem("guru_token");
-  if (saved) {
-    _adminToken = saved;
-    return;
-  }
-
   try {
     const res = await fetch("/api/admin-session");
     if (res.ok) {
       const data = await res.json();
-      if (data.token) {
-        _adminToken = data.token;
-        return;
-      }
+      if (data.token) _adminToken = data.token;
     }
   } catch {}
-
-  // No Cloudflare Access session and no saved token — show login overlay
-  showTokenOverlay();
 }
 
 // ── API Fetch ──
