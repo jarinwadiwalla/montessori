@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /guru/
 
 Sitemap: https://montessoriforadolescents.com/sitemap-index.xml

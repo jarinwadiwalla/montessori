@@ -1,0 +1,125 @@
+---
+---
+
+<form id="subscribe-form" class="subscribe-form">
+  <div class="subscribe-fields">
+    <input type="text" name="firstName" placeholder="First name" required class="subscribe-input" />
+    <input type="email" name="email" placeholder="Email address" required class="subscribe-input" />
+    <button type="submit" class="subscribe-btn">Subscribe</button>
+  </div>
+  <p class="subscribe-status" id="subscribe-status"></p>
+</form>
+
+<script>
+  const subForm = document.getElementById('subscribe-form') as HTMLFormElement;
+  const subStatus = document.getElementById('subscribe-status')!;
+  const subBtn = subForm.querySelector('.subscribe-btn') as HTMLButtonElement;
+
+  subForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    subBtn.disabled = true;
+    subBtn.textContent = 'Subscribing...';
+    subStatus.textContent = '';
+    subStatus.className = 'subscribe-status';
+
+    const formData = new FormData(subForm);
+    const data = {
+      firstName: formData.get('firstName'),
+      email: formData.get('email'),
+    };
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        subForm.reset();
+        subStatus.textContent = result.message || 'Thank you for subscribing!';
+        subStatus.classList.add('subscribe-status--success');
+      } else {
+        subStatus.textContent = result.error || 'Something went wrong. Please try again.';
+        subStatus.classList.add('subscribe-status--error');
+      }
+    } catch {
+      subStatus.textContent = 'Something went wrong. Please try again.';
+      subStatus.classList.add('subscribe-status--error');
+    }
+
+    subBtn.disabled = false;
+    subBtn.textContent = 'Subscribe';
+  });
+</script>
+
+<style>
+  .subscribe-form {
+    max-width: 400px;
+    margin-inline: auto;
+  }
+
+  .subscribe-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .subscribe-input {
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background-color: rgba(250, 247, 242, 0.1);
+    border: 1px solid rgba(250, 247, 242, 0.2);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-fast);
+  }
+
+  .subscribe-input::placeholder {
+    color: rgba(250, 247, 242, 0.4);
+  }
+
+  .subscribe-input:focus {
+    outline: none;
+    border-color: rgba(250, 247, 242, 0.5);
+  }
+
+  .subscribe-btn {
+    padding: var(--space-sm) var(--space-lg);
+    background-color: var(--color-terracotta);
+    color: var(--color-cream);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .subscribe-btn:hover {
+    opacity: 0.9;
+  }
+
+  .subscribe-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .subscribe-status {
+    margin-top: var(--space-sm);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .subscribe-status--success {
+    color: var(--color-sage);
+  }
+
+  .subscribe-status--error {
+    color: var(--color-terracotta);
+  }
+</style>

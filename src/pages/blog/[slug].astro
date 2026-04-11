@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
+import BlogComments from '../../components/blog/BlogComments.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -34,6 +35,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       <div class="post-content">
         <Content />
       </div>
+      <BlogComments slug={post.id} />
       <div class="back-link-wrapper">
         <a href="/blog/" class="back-link">&larr; All Posts</a>
       </div>

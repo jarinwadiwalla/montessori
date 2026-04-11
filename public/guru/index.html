@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Guru - Montessori for Adolescents</title>
+  <link rel="stylesheet" href="/guru/css/guru.css">
+</head>
+<body>
+
+<header class="guru-header">
+  <div style="display:flex;align-items:center;">
+    <h1>Guru</h1>
+    <span class="header-sub">Montessori for Adolescents</span>
+  </div>
+  <span class="header-date" id="header-date"></span>
+</header>
+
+<nav class="guru-nav">
+  <ul class="nav-tabs">
+    <li class="nav-tab active" data-section="dashboard">Dashboard</li>
+    <li class="nav-tab" data-section="blog">Blog</li>
+    <li class="nav-tab" data-section="newsletter">Newsletter</li>
+    <li class="nav-tab" data-section="subscribers">Subscribers</li>
+    <li class="nav-tab" data-section="comments">Comments <span class="badge" id="pending-badge" style="display:none;">0</span></li>
+    <li class="nav-tab" data-section="notes">Notes</li>
+  </ul>
+</nav>
+
+<main class="guru-main">
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="section-dashboard">
+    <div class="stats-grid" id="dashboard-stats">
+      <div class="stat-card">
+        <div class="label">Subscribers</div>
+        <div class="value" id="stat-subscribers">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Blog Drafts</div>
+        <div class="value" id="stat-drafts">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Published Posts</div>
+        <div class="value" id="stat-published">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Pending Comments</div>
+        <div class="value" id="stat-pending-comments">--</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Recent Campaigns</h3>
+      <div id="dashboard-campaigns"><p class="empty-state">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- BLOG -->
+  <div class="section" id="section-blog">
+    <div class="sub-nav">
+      <div class="sub-tab active" data-sub="blog-editor">Editor</div>
+      <div class="sub-tab" data-sub="blog-drafts">Drafts</div>
+      <div class="sub-tab" data-sub="blog-published">Published</div>
+    </div>
+
+    <!-- Blog Editor -->
+    <div class="sub-section active" id="sub-blog-editor">
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="blog-title" class="form-input" placeholder="Post title" oninput="blogAutoSlug()">
+          </div>
+          <div class="form-group" style="max-width:240px;">
+            <label class="form-label">Slug</label>
+            <input type="text" id="blog-slug" class="form-input" placeholder="post-slug">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="blog-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Author</label>
+            <input type="text" id="blog-author" class="form-input" value="Jarin Wadiwalla">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" id="blog-description" class="form-input" placeholder="Brief description for previews">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Cover Image URL</label>
+            <div class="image-insert-inline">
+              <input type="text" id="blog-image" class="form-input" placeholder="https://...">
+              <button class="btn btn-secondary btn-sm" onclick="blogUploadCoverImage()">Upload</button>
+              <input type="file" id="blog-image-file" accept="image/*" style="display:none" onchange="blogHandleCoverUpload(this)">
+            </div>
+          </div>
+          <div class="form-group" style="max-width:120px;">
+            <label class="form-label">&nbsp;</label>
+            <div class="form-check">
+              <input type="checkbox" id="blog-featured">
+              <label for="blog-featured">Featured</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <label class="form-label" style="margin:0;">Body (Markdown)</label>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('bold')"><b>B</b></button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('italic')"><i>I</i></button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('h2')">H2</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('h3')">H3</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('link')">Link</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('image')">Img</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('ul')">List</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogMdFormat('quote')">Quote</button>
+            <button class="btn btn-sm btn-secondary" onclick="blogInsertImage()">Upload Img</button>
+          </div>
+        </div>
+        <div class="editor-layout">
+          <textarea id="blog-body" class="form-textarea editor" placeholder="Write your post in Markdown..." oninput="blogUpdatePreview()"></textarea>
+          <div class="preview-pane" id="blog-preview"><p style="color:var(--gray-400);">Preview will appear here...</p></div>
+        </div>
+        <input type="file" id="blog-inline-image-file" accept="image/*" style="display:none" onchange="blogHandleInlineUpload(this)">
+      </div>
+
+      <div class="card">
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="blogSaveDraft()">Save Draft</button>
+          <button class="btn btn-success" onclick="blogPublish()">Publish</button>
+          <button class="btn btn-secondary" onclick="blogClearEditor()">New Post</button>
+        </div>
+        <div id="blog-auto-save-status" style="font-size:12px;color:var(--gray-400);margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Blog Drafts List -->
+    <div class="sub-section" id="sub-blog-drafts">
+      <div class="card">
+        <h3>Drafts</h3>
+        <div id="drafts-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+
+    <!-- Blog Published List -->
+    <div class="sub-section" id="sub-blog-published">
+      <div class="card">
+        <h3>Published Posts</h3>
+        <div id="published-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="section" id="section-newsletter">
+    <div class="sub-nav">
+      <div class="sub-tab active" data-sub="nl-compose">Compose</div>
+      <div class="sub-tab" data-sub="nl-templates">Templates</div>
+      <div class="sub-tab" data-sub="nl-campaigns">Campaigns</div>
+    </div>
+
+    <!-- Compose -->
+    <div class="sub-section active" id="sub-nl-compose">
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" id="nl-subject" class="form-input" placeholder="Newsletter subject line">
+        </div>
+
+        <div class="mode-toggle">
+          <button class="mode-btn active" onclick="nlSetMode('visual')">Visual</button>
+          <button class="mode-btn" onclick="nlSetMode('html')">HTML</button>
+        </div>
+
+        <div id="nl-visual-wrap">
+          <div class="nl-toolbar">
+            <button onclick="nlFormat('bold')" title="Bold"><b>B</b></button>
+            <button onclick="nlFormat('italic')" title="Italic"><i>I</i></button>
+            <button onclick="nlFormat('insertUnorderedList')" title="List">List</button>
+            <button onclick="nlFormat('createLink')" title="Link">Link</button>
+            <button onclick="nlFormat('formatBlock', 'h2')" title="Heading">H2</button>
+            <button onclick="nlInsertImage()" title="Image">Img</button>
+          </div>
+          <div class="nl-editor" id="nl-visual-editor" contenteditable="true"></div>
+        </div>
+        <div id="nl-html-wrap" style="display:none;">
+          <textarea id="nl-html-editor" class="form-textarea editor" placeholder="<html>..."></textarea>
+        </div>
+        <input type="file" id="nl-image-file" accept="image/*" style="display:none" onchange="nlHandleImageUpload(this)">
+      </div>
+
+      <div class="card">
+        <h3>Send</h3>
+        <div class="form-group">
+          <label class="form-label">Test Email (optional)</label>
+          <div style="display:flex;gap:8px;">
+            <input type="email" id="nl-test-email" class="form-input" placeholder="test@example.com" style="flex:1;">
+            <button class="btn btn-secondary" onclick="nlSendTest()">Send Test</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+          <button class="btn btn-success" onclick="nlSendToAll()">Send to All Subscribers</button>
+          <span id="nl-subscriber-count" style="font-size:13px;color:var(--gray-500);"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Template</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="nl-template-select" class="form-select" style="flex:1;" onchange="nlLoadTemplate()">
+            <option value="">-- Select template --</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="nlSaveTemplate()">Save As</button>
+          <button class="btn btn-danger btn-sm" onclick="nlDeleteTemplate()">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates -->
+    <div class="sub-section" id="sub-nl-templates">
+      <div class="card">
+        <h3>Saved Templates</h3>
+        <div id="templates-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+
+    <!-- Campaigns -->
+    <div class="sub-section" id="sub-nl-campaigns">
+      <div class="card">
+        <h3>Campaign History</h3>
+        <div id="campaigns-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBSCRIBERS -->
+  <div class="section" id="section-subscribers">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;">Subscribers</h3>
+        <button class="btn btn-secondary btn-sm" onclick="loadSubscribers()">Refresh</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="subscribers-table">
+          <thead>
+            <tr><th>Email</th><th>Name</th><th>Date</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="subscribers-body">
+            <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMENTS -->
+  <div class="section" id="section-comments">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;">Comment Moderation</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="comments-filter" class="form-select" style="width:auto;" onchange="loadComments()">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="all">All</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="loadComments()">Refresh</button>
+        </div>
+      </div>
+      <div id="comments-list"><p class="empty-state">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="section" id="section-notes">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="margin:0;">Notes</h3>
+        <button class="btn btn-secondary btn-sm" onclick="notesAddTab()">+ New Tab</button>
+      </div>
+      <div class="notes-tabs" id="notes-tabs"></div>
+      <textarea id="notes-editor" class="notes-textarea" placeholder="Start typing..." oninput="notesAutoSave()"></textarea>
+      <div class="notes-status" id="notes-status"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-message">Are you sure?</p>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm-btn" onclick="modalConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/guru/js/guru-core.js"></script>
+<script src="/guru/js/guru-blog.js"></script>
+<script src="/guru/js/guru-newsletter.js"></script>
+<script src="/guru/js/guru-comments.js"></script>
+<script src="/guru/js/guru-notes.js"></script>
+
+</body>
+</html>
