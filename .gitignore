@@ -26,3 +26,16 @@ Thumbs.db
 
 # Cloudflare
 .wrangler/
+
+# Loose files in repo root that shouldn't be committed
+/*.pdf
+/*.html
+/*.csv
+/*.jpg
+/*.jpeg
+/*.png
+/*.pptx
+/*.md
+!README.md
+!SETUP.md
+!CHANGELOG.md
