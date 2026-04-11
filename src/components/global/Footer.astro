@@ -1,5 +1,6 @@
 ---
 import DonateButton from '../shared/DonateButton.astro';
+import SubscribeForm from '../shared/SubscribeForm.astro';
 
 const currentYear = new Date().getFullYear();
 ---
@@ -39,6 +40,14 @@ const currentYear = new Date().getFullYear();
           </svg>
         </a>
       </div>
+    </div>
+
+    <div class="footer-subscribe">
+      <h4 class="footer-heading">Stay Updated</h4>
+      <p class="footer-subscribe-text">
+        Get reflections, resources, and updates delivered to your inbox.
+      </p>
+      <SubscribeForm />
     </div>
 
     <div class="footer-support">
@@ -141,6 +150,22 @@ const currentYear = new Date().getFullYear();
 
   .footer-instagram:hover {
     color: var(--color-cream);
+  }
+
+  .footer-subscribe {
+    text-align: center;
+    max-width: 400px;
+    margin-inline: auto;
+    margin-bottom: var(--space-3xl);
+    padding-top: var(--space-2xl);
+    border-top: 1px solid rgba(250, 247, 242, 0.1);
+  }
+
+  .footer-subscribe-text {
+    font-size: var(--text-sm);
+    color: rgba(250, 247, 242, 0.6);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-md);
   }
 
   .footer-support {

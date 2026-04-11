@@ -1,0 +1,29 @@
+---
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<section class="blog-comments-section" id="blog-comments" data-slug={slug}>
+  <h3 class="comments-heading">Comments</h3>
+  <div id="comment-list"></div>
+  <div id="comment-form-root"></div>
+</section>
+
+<script src="/js/blog-comments.js" defer></script>
+
+<style>
+  .blog-comments-section {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .comments-heading {
+    font-size: var(--text-xl);
+    color: var(--color-earth);
+    margin-bottom: var(--space-lg);
+  }
+</style>
