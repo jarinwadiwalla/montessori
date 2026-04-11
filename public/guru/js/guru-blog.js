@@ -96,6 +96,21 @@ function blogClearEditor() {
   localStorage.removeItem(BLOG_DRAFT_KEY);
 }
 
+// ── Preview ──
+async function blogPreview() {
+  const draft = blogCollectDraft();
+  if (!draft.slug) {
+    showToast("Save the draft first to preview it", "error");
+    return;
+  }
+  // Save silently first so preview reflects latest content
+  await apiFetch("/api/blog-drafts", {
+    method: "POST",
+    body: JSON.stringify({ draft }),
+  });
+  window.open(`/guru/preview?slug=${encodeURIComponent(draft.slug)}`, "_blank");
+}
+
 // ── Save draft ──
 async function blogSaveDraft() {
   const draft = blogCollectDraft();
