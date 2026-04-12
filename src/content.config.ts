@@ -49,6 +49,7 @@ const blog = defineCollection({
     description: z.string(),
     author: z.string().default('Jarin Wadiwalla'),
     publishDate: z.coerce.date(),
+    image: z.string().optional(),
     featured: z.boolean().default(false),
   }),
 });
