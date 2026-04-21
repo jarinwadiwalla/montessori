@@ -1,6 +1,6 @@
 ---
 title: "Understanding Erdkinder: Montessori's Farm School"
-description: "An overview of Montessori's Erdkinder concept,the 'land school' designed to meet the unique developmental needs of adolescents through practical work and community life."
+description: "An overview of Montessori's Erdkinder concept, the 'land school' designed to meet the unique developmental needs of adolescents through practical work and community life."
 category: guide
 downloadUrl: /downloads/erdkinder-overview.pdf
 featured: false

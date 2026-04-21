@@ -1,6 +1,6 @@
 ---
 title: "Practical First Steps: Starting Your Third Plane Community"
-description: "A hands-on webinar for communities ready to take the leap into adolescent programming. We walk through the essential first steps,from vision to structure,so you can move from orientation to action."
+description: "A hands-on webinar for communities ready to take the leap into adolescent programming. We walk through the essential first steps, from vision to structure, so you can move from orientation to action."
 presenter: "Jarin Wadiwalla"
 duration: "90 minutes"
 price: 35
