@@ -39,6 +39,7 @@ Thumbs.db
 !README.md
 !SETUP.md
 !CHANGELOG.md
+!CLOUDFLARE-SECRETS-SETUP.md
 
 # Loose folders in repo root (e.g. exported image sets)
 /Montessori*/

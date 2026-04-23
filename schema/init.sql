@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS subscribers (
   unsubscribed INTEGER DEFAULT 0,
   unsubscribedAt TEXT DEFAULT '',
   resubscribedAt TEXT DEFAULT '',
-  preferences TEXT DEFAULT 'blog'
+  preferences TEXT DEFAULT 'all',
+  tier TEXT DEFAULT 'subscriber'
 );
 
 -- Campaigns
@@ -32,8 +33,41 @@ CREATE TABLE IF NOT EXISTS campaigns (
   totalSent INTEGER DEFAULT 0,
   totalRecipients INTEGER DEFAULT 0,
   status TEXT DEFAULT 'sent',
-  errors TEXT DEFAULT '[]'
+  errors TEXT DEFAULT '[]',
+  emailIds TEXT DEFAULT '[]',
+  recipients TEXT DEFAULT '[]',
+  tier TEXT DEFAULT 'all',
+  cachedStats TEXT DEFAULT '{}',
+  statsCachedAt TEXT DEFAULT '',
+  retryKey TEXT DEFAULT '',
+  failedCount INTEGER DEFAULT 0
 );
+
+-- Resend webhook event tracking
+CREATE TABLE IF NOT EXISTS resend_events (
+  emailId TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  last_event TEXT DEFAULT 'queued',
+  events TEXT DEFAULT '[]',
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_resend_events_email ON resend_events(email);
+
+-- Retry queue for failed newsletter sends
+CREATE TABLE IF NOT EXISTS retry_queue (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL,
+  htmlBody TEXT NOT NULL,
+  textBody TEXT DEFAULT '',
+  failedRecipients TEXT DEFAULT '[]',
+  status TEXT DEFAULT 'pending',
+  campaignId TEXT DEFAULT '',
+  retryCount INTEGER DEFAULT 0,
+  originalSentAt TEXT NOT NULL,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_retry_queue_status ON retry_queue(status);
 
 -- Blog comments
 CREATE TABLE IF NOT EXISTS blog_comments (
