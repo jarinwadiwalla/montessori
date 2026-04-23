@@ -207,6 +207,20 @@ tr:hover td { background: var(--gray-50); }
 .status-rejected { background: #fee2e2; color: #991b1b; }
 .status-sent { background: #dbeafe; color: #1e40af; }
 .status-partial { background: #fef3c7; color: #92400e; }
+.status-failed { background: #fee2e2; color: #991b1b; }
+.status-error { background: #fee2e2; color: #991b1b; }
+
+/* Tier badges */
+.tier-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.tier-subscriber { background: var(--gray-100); color: var(--gray-600); }
+.tier-founding { background: #fef3c7; color: #92400e; }
+.tier-all { background: #dbeafe; color: #1e40af; }
+.tier-test { background: var(--gray-100); color: var(--gray-500); }
+.tier-custom { background: #e0e7ff; color: #3730a3; }
+
+/* Subscriber edit modal */
+#subscriber-edit-overlay .form-row { display: flex; gap: 12px; }
+#subscriber-edit-overlay .form-row .form-group { flex: 1; }
 
 /* Comment cards */
 .comment-card {

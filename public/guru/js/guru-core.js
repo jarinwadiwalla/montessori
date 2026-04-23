@@ -76,7 +76,7 @@ function switchTab(sectionName) {
 
   // Lazy load data
   if (sectionName === "blog") blogLoadDrafts();
-  if (sectionName === "newsletter") { nlLoadTemplates(); nlLoadCampaigns(); nlLoadSubscriberCount(); }
+  if (sectionName === "newsletter") { nlLoadTemplates(); nlLoadCampaigns(); nlLoadSubscriberCount(); nlLoadRetries(); }
   if (sectionName === "subscribers") loadSubscribers();
   if (sectionName === "comments") loadComments();
   if (sectionName === "notes") notesLoad();
@@ -99,6 +99,7 @@ function setupSubTabs() {
       if (subName === "blog-published") blogLoadPublished();
       if (subName === "nl-campaigns") nlLoadCampaigns();
       if (subName === "nl-templates") nlLoadTemplatesList();
+      if (subName === "nl-retries") nlLoadRetries();
     });
   });
 }
@@ -123,6 +124,7 @@ function openModal(title, message, callback) {
 
 function closeModal() {
   document.getElementById("modal-overlay").classList.remove("active");
+  document.getElementById("modal-confirm-btn").style.display = "";
   _modalCallback = null;
 }
 

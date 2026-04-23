@@ -247,6 +247,7 @@ Visit `http://localhost:8788/guru/` in your browser. In local dev, auth is fail-
 | `R2_SECRET_ACCESS_KEY` | No | R2 S3-compatible secret key |
 | `R2_ENDPOINT` | No | R2 S3-compatible endpoint URL |
 | `R2_BUCKET_NAME` | No | R2 bucket name (defaults to `montessori-media`) |
+| `RESEND_WEBHOOK_SECRET` | No | Svix signing secret for webhook verification (starts with `whsec_`) |
 
 ## Architecture
 
@@ -264,10 +265,15 @@ functions/              Cloudflare Pages Functions (serverless API)
     subscribers.js       Admin subscriber management
     subscriber-count.js  Subscriber count
     unsubscribe.js       Unsubscribe flow
-    newsletter-send.js   Send newsletters via Resend
+    newsletter-send.js   Send newsletters via Resend (batch, retry queue)
     newsletter-campaigns.js  Campaign history
     newsletter-templates.js  Email templates
-    resend-webhook.js    Bounce/complaint handling
+    newsletter-retry.js  Retry queue for failed sends
+    campaign-stats.js    Campaign delivery/click analytics
+    campaign-resend.js   Resend to undelivered recipients
+    preferences.js       Subscriber email preferences
+    subscriber-edit.js   Admin subscriber editing
+    resend-webhook.js    Event tracking + bounce/complaint handling
     settings.js          Notes and settings storage
     file-presign.js      R2 presigned upload URLs
     file-confirm.js      Confirm uploaded files

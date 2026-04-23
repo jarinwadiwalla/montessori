@@ -166,6 +166,7 @@
       <div class="sub-tab active" data-sub="nl-compose">Compose</div>
       <div class="sub-tab" data-sub="nl-templates">Templates</div>
       <div class="sub-tab" data-sub="nl-campaigns">Campaigns</div>
+      <div class="sub-tab" data-sub="nl-retries">Retries <span class="badge" id="retry-badge" style="display:none;">0</span></div>
     </div>
 
     <!-- Compose -->
@@ -201,14 +202,33 @@
       <div class="card">
         <h3>Send</h3>
         <div class="form-group">
-          <label class="form-label">Test Email (optional)</label>
-          <div style="display:flex;gap:8px;">
-            <input type="email" id="nl-test-email" class="form-input" placeholder="test@example.com" style="flex:1;">
-            <button class="btn btn-secondary" onclick="nlSendTest()">Send Test</button>
+          <label class="form-label">Test Email</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="email" id="nl-test-email" class="form-input" placeholder="test@example.com" style="flex:1;min-width:200px;">
+            <button class="btn btn-secondary btn-sm" onclick="nlSendTest()">Send Test</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <button class="btn btn-outline btn-sm" onclick="nlSetTestEmail('jarin.wadiwalla@gmail.com')">Jarin</button>
+            <button class="btn btn-outline btn-sm" onclick="nlSetTestEmail('bijanrahnamai@gmail.com')">Bijan</button>
+            <button class="btn btn-outline btn-sm" onclick="nlSendTestBoth()">Send to Both</button>
           </div>
         </div>
+
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Audience</label>
+          <select id="nl-audience" class="form-select" onchange="nlUpdateAudienceInfo()">
+            <option value="all">All Subscribers</option>
+            <option value="founding">Founding Members Only</option>
+          </select>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+            <label style="font-size:12px;color:var(--gray-500);cursor:pointer;">
+              <input type="checkbox" id="nl-is-announcement"> Mark as announcement (includes unsubscribed founding members)
+            </label>
+          </div>
+        </div>
+
         <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
-          <button class="btn btn-success" onclick="nlSendToAll()">Send to All Subscribers</button>
+          <button class="btn btn-success" onclick="nlSendToAudience()">Send Newsletter</button>
           <span id="nl-subscriber-count" style="font-size:13px;color:var(--gray-500);"></span>
         </div>
       </div>
@@ -240,6 +260,17 @@
         <div id="campaigns-list"><p class="empty-state">Loading...</p></div>
       </div>
     </div>
+
+    <!-- Retries -->
+    <div class="sub-section" id="sub-nl-retries">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;">Retry Queue</h3>
+          <button class="btn btn-primary btn-sm" onclick="nlRetryAll()">Retry All Pending</button>
+        </div>
+        <div id="retries-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
   </div>
 
   <!-- SUBSCRIBERS -->
@@ -247,17 +278,66 @@
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h3 style="margin:0;">Subscribers</h3>
-        <button class="btn btn-secondary btn-sm" onclick="loadSubscribers()">Refresh</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="subscriber-filter" class="form-select" style="width:auto;" onchange="loadSubscribers()">
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="unsubscribed">Unsubscribed</option>
+            <option value="founding">Founding Members</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="loadSubscribers()">Refresh</button>
+        </div>
       </div>
+      <div id="subscriber-counts" style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:var(--gray-500);"></div>
       <div class="table-wrapper">
         <table id="subscribers-table">
           <thead>
-            <tr><th>Email</th><th>Name</th><th>Date</th><th>Status</th><th></th></tr>
+            <tr><th>Email</th><th>Name</th><th>Tier</th><th>Preference</th><th>Date</th><th>Status</th><th></th></tr>
           </thead>
           <tbody id="subscribers-body">
-            <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+            <tr><td colspan="7" class="empty-state">Loading...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscriber Edit Modal -->
+  <div class="modal-overlay" id="subscriber-edit-overlay">
+    <div class="modal" style="max-width:400px;">
+      <h3>Edit Subscriber</h3>
+      <input type="hidden" id="sub-edit-old-email">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="sub-edit-email" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input type="text" id="sub-edit-first" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input type="text" id="sub-edit-last" class="form-input">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tier</label>
+          <select id="sub-edit-tier" class="form-select">
+            <option value="subscriber">Subscriber</option>
+            <option value="founding">Founding</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preference</label>
+          <select id="sub-edit-pref" class="form-select">
+            <option value="all">All emails</option>
+            <option value="updates-only">Updates only</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-group" style="margin-top:16px;">
+        <button class="btn btn-secondary" onclick="closeSubscriberEdit()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSubscriberEdit()">Save</button>
       </div>
     </div>
   </div>
