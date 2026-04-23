@@ -24,7 +24,9 @@ const { text, author, source } = Astro.props;
 
 <style>
   .quote-banner {
-    background: linear-gradient(135deg, var(--color-earth-dark) 0%, var(--color-purple) 100%);
+    background-image: url('/images/banner-lavender.png');
+    background-size: cover;
+    background-position: center;
     padding-block: var(--space-3xl);
     text-align: center;
   }
@@ -33,19 +35,19 @@ const { text, author, source } = Astro.props;
     font-family: var(--font-heading);
     font-size: var(--text-2xl);
     font-style: italic;
-    color: var(--color-cream);
+    color: var(--color-purple);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-lg);
   }
 
   .quote-author {
-    color: var(--color-terracotta-light);
+    color: var(--color-terracotta-dark);
     font-weight: 600;
     font-style: normal;
   }
 
   .quote-source {
-    color: rgba(250, 247, 242, 0.5);
+    color: var(--color-earth-light);
     font-style: normal;
   }
 </style>
