@@ -98,10 +98,10 @@ export async function onRequestPost(context) {
         recipients = results;
       }
     } else {
-      // Regular sends respect preferences
+      // Regular sends respect preferences ('updates-only' opts out of regular sends)
       recipients = results.filter((r) => {
         const pref = r.preferences || "all";
-        return pref === "all";
+        return pref !== "updates-only";
       });
     }
   }

@@ -38,3 +38,6 @@ CREATE TABLE IF NOT EXISTS retry_queue (
   updatedAt TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_retry_queue_status ON retry_queue(status);
+
+-- Normalize legacy 'blog' preferences to 'all'
+UPDATE subscribers SET preferences = 'all' WHERE preferences = 'blog';
