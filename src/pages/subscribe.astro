@@ -18,7 +18,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <!-- Form card -->
     <section class="form-section">
       <div class="form-card">
-        <h2 class="form-heading">Subscribe to our newsletter</h2>
+        <h2 class="form-heading">
+          <svg class="form-heart" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Subscribe to Montessori Mail
+        </h2>
 
         <form id="sub-page-form" class="sub-form">
           <div class="sub-form-fields">
@@ -36,12 +39,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="wave-strip"></div>
     </section>
 
-    <!-- Quote -->
+    <!-- Fact section -->
     <section class="quote-section">
-      <blockquote class="pull-quote">
-        <p>&ldquo;The land is the source of all life, and the children who work on it, producing food, gain a sense of the cosmic order of things.&rdquo;</p>
-        <cite>Maria Montessori</cite>
-      </blockquote>
+      <div class="fact-block">
+        <p class="fact-text">Maria Montessori was nominated for the Nobel Peace Prize three consecutive years: 1949, 1950, and 1951. She was honored for her vision of peace through education.</p>
+        <p class="fact-tagline">We strive to continue this vision.</p>
+      </div>
     </section>
 
   </div>
@@ -181,6 +184,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-weight: 600;
     margin-bottom: var(--space-md);
     line-height: var(--leading-tight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+
+  .form-heart {
+    color: var(--color-terracotta);
+    flex-shrink: 0;
   }
 
   .form-text {
@@ -295,28 +307,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     text-align: center;
   }
 
-  .pull-quote {
-    max-width: 640px;
+  .fact-block {
+    max-width: 580px;
     margin-inline: auto;
   }
 
-  .pull-quote p {
+  .fact-text {
     font-family: var(--font-heading);
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
     font-style: italic;
     color: var(--color-purple);
     line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
   }
 
-  .pull-quote cite {
+  .fact-tagline {
     font-family: var(--font-body);
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     font-weight: 600;
-    color: var(--color-earth);
-    font-style: normal;
+    color: var(--color-terracotta);
     letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
   }
 
   @media (max-width: 640px) {
