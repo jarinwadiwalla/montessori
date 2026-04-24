@@ -159,11 +159,10 @@ async function nlLoadTemplate() {
   const tpl = (data.templates || []).find((t) => t.id === id);
   if (tpl) {
     document.getElementById("nl-subject").value = tpl.subject || "";
-    if (_nlMode === "visual") {
-      document.getElementById("nl-visual-editor").innerHTML = tpl.body || "";
-    } else {
-      document.getElementById("nl-html-editor").value = tpl.body || "";
-    }
+    // Always load into HTML mode to preserve inline styles and document structure
+    document.getElementById("nl-html-editor").value = tpl.body || "";
+    document.getElementById("nl-visual-editor").innerHTML = "";
+    nlSetMode("html");
     showToast(`Loaded template: ${tpl.name}`, "info");
   }
 }
