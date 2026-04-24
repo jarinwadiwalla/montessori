@@ -19,8 +19,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section class="form-section">
       <div class="form-card">
         <h2 class="form-heading">
-          Subscribe to Montessori Mail
-          <svg class="form-heart" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span class="form-heading-inner">
+            <svg class="form-heart" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Subscribe to Montessori Mail
+          </span>
         </h2>
 
         <form id="sub-page-form" class="sub-form">
@@ -184,15 +186,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-weight: 600;
     margin-bottom: var(--space-md);
     line-height: var(--leading-tight);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
+    text-align: center;
+  }
+
+  .form-heading-inner {
+    position: relative;
+    display: inline-block;
   }
 
   .form-heart {
     color: var(--color-terracotta);
-    flex-shrink: 0;
+    position: absolute;
+    top: -8px;
+    left: -4px;
   }
 
   .form-text {
