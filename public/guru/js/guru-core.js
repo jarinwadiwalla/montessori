@@ -76,7 +76,7 @@ function switchTab(sectionName) {
 
   // Lazy load data
   if (sectionName === "blog") blogLoadDrafts();
-  if (sectionName === "newsletter") { nlLoadTemplates(); nlLoadCampaigns(); nlLoadSubscriberCount(); nlLoadRetries(); }
+  if (sectionName === "newsletter") { nlLoadTemplates(); nlLoadCampaigns(); nlLoadSubscriberCount(); nlLoadRetries(); nlLoadNewsletterDrafts(); nlRestoreAutosave(); }
   if (sectionName === "subscribers") loadSubscribers();
   if (sectionName === "comments") loadComments();
   if (sectionName === "notes") notesLoad();

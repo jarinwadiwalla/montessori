@@ -1,6 +1,93 @@
 /* ── Guru Newsletter ── */
 
 var _nlMode = "visual";
+var _nlAutoSaveTimer = null;
+const NL_AUTOSAVE_KEY = "montessori-nl-autosave";
+
+// ── Auto-save ──
+function nlAutoSave() {
+  clearTimeout(_nlAutoSaveTimer);
+  _nlAutoSaveTimer = setTimeout(() => {
+    const subject = document.getElementById("nl-subject").value;
+    const body = nlGetHtml();
+    if (!subject && !body) return;
+    try {
+      localStorage.setItem(NL_AUTOSAVE_KEY, JSON.stringify({ subject, body, savedAt: new Date().toISOString() }));
+    } catch {}
+    const el = document.getElementById("nl-autosave-status");
+    if (el) el.textContent = `Auto-saved at ${new Date().toLocaleTimeString()}`;
+  }, 2000);
+}
+
+function nlRestoreAutosave() {
+  try {
+    const raw = localStorage.getItem(NL_AUTOSAVE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (!saved.subject && !saved.body) return;
+    document.getElementById("nl-subject").value = saved.subject || "";
+    document.getElementById("nl-html-editor").value = saved.body || "";
+    document.getElementById("nl-visual-editor").innerHTML = saved.body || "";
+    const el = document.getElementById("nl-autosave-status");
+    if (el) el.textContent = `Restored auto-save from ${new Date(saved.savedAt).toLocaleString()}`;
+  } catch {}
+}
+
+function nlClearCompose() {
+  if (!confirm("Clear the compose area?")) return;
+  document.getElementById("nl-subject").value = "";
+  document.getElementById("nl-visual-editor").innerHTML = "";
+  document.getElementById("nl-html-editor").value = "";
+  try { localStorage.removeItem(NL_AUTOSAVE_KEY); } catch {}
+  const el = document.getElementById("nl-autosave-status");
+  if (el) el.textContent = "";
+}
+
+// ── Named drafts (D1) ──
+async function nlSaveDraft() {
+  const subject = document.getElementById("nl-subject").value.trim();
+  const body = nlGetHtml();
+  if (!subject && !body) { showToast("Nothing to save", "error"); return; }
+
+  const name = prompt("Name this draft:", subject || "Untitled draft");
+  if (!name) return;
+
+  const id = "nldraft-" + Date.now();
+  const now = new Date().toISOString();
+  const data = await apiFetch("/api/newsletter-templates", {
+    method: "POST",
+    body: JSON.stringify({ id, name: `[Draft] ${name}`, subject, body }),
+  });
+  if (data) {
+    showToast("Draft saved!", "success");
+    nlLoadTemplates();
+  }
+}
+
+async function nlLoadNewsletterDrafts() {
+  const data = await apiFetch("/api/newsletter-templates");
+  if (!data) return;
+  const drafts = (data.templates || []).filter((t) => t.name.startsWith("[Draft]"));
+  const card = document.getElementById("nl-drafts-card");
+  const container = document.getElementById("nl-drafts-list");
+  if (drafts.length === 0) {
+    card.style.display = "none";
+    return;
+  }
+  card.style.display = "";
+  container.innerHTML = drafts.map((d) => `
+    <div class="draft-item">
+      <div>
+        <span class="draft-title" onclick="nlUseTemplate('${escapeHtml(d.id)}')">${escapeHtml(d.name.replace("[Draft] ", ""))}</span>
+        <span class="draft-date">${d.subject || ""}</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-secondary" onclick="nlUseTemplate('${escapeHtml(d.id)}')">Load</button>
+        <button class="btn btn-sm btn-danger" onclick="nlRemoveTemplate('${escapeHtml(d.id)}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
 
 // ── Mode toggle ──
 function nlSetMode(mode) {
