@@ -7,11 +7,11 @@ featured: false
 ---
 
 This subject continues to weigh heavy on me. As I move through the world and see young people glued to their phones: riding a bicycle, cell phone in hand; sitting with a group of friends, all looking down onto screens; I feel a twinge of despair. 
-### How did we get here? How can we restablish some balance? Safety? Presence? 
+### How did we get here? How can we reestablish some balance? Safety? Presence? 
 
-(Of course this problem is not only for young people - we are all suffering at the hands of social media... but today, we are just addressing the developing brains of the future.)
+(Of course this problem is not only for young people - we are all suffering at the hands of social media... but today, we are just addressing the developing brains of the future lol.)
 
-**According to the several dozen studies I read, specifically related to adolescents, the numbers are stark.** One in five U.S. teens now experiences a major depressive episode each year. Adolescent girls' suicide rates have reached levels higher than at any previously recorded point. Nearly half of all American teenagers aged 13–17 report using social media "almost constantly" throughout each day — and globally, the average person spends roughly 145 minutes on social platforms daily.
+**According to the several dozen studies I've read, specifically related to adolescents, the numbers are stark.** One in five U.S. teens now experiences a major depressive episode each year. Adolescent girls' suicide rates have reached levels higher than at any previously recorded point. Nearly half of all American teenagers aged 13–17 report using social media "almost constantly" throughout each day — and globally, the average person spends roughly 145 minutes on social platforms daily.
 
 A 2019 longitudinal study of 7,594 adolescents found that spending more than three hours per day on social media is associated with a significantly increased risk for internalizing problems — anxiety,
 depression, and withdrawal. Academic performance, sleep quality, exercise, and in-person friendships have all declined since the early 2010s — the same period smartphones became ubiquitous among young people.
