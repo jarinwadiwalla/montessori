@@ -324,6 +324,7 @@ tr:hover td { background: var(--gray-50); }
   color: var(--gray-700);
 }
 .nl-toolbar button:hover { background: var(--gray-200); }
+.nl-toolbar-divider { width: 1px; background: var(--gray-300); margin: 2px 4px; align-self: stretch; }
 .mode-toggle { display: flex; gap: 0; margin-bottom: 8px; }
 .mode-btn {
   padding: 6px 14px;
