@@ -14,6 +14,7 @@ const posts = (await getCollection('blog')).sort(
   heroTitle="Reflections from Work with Adolescents"
   heroSubtitle="Observations, questions, and lessons from Montessori education"
 >
+  <div class="blog-wave-strip"></div>
   <div class="container">
     <div class="blog-grid">
       {posts.map((post) => (
@@ -30,6 +31,15 @@ const posts = (await getCollection('blog')).sort(
 </PageLayout>
 
 <style>
+  .blog-wave-strip {
+    background-image: url('/images/banner-lavender.png');
+    background-size: cover;
+    background-position: center;
+    height: 80px;
+    opacity: 0.7;
+    margin-bottom: var(--space-3xl);
+  }
+
   .blog-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

@@ -42,9 +42,14 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   .blog-card {
     background-color: var(--color-white);
     border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-lavender);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: box-shadow var(--transition-base);
+    transition: box-shadow var(--transition-base), border-top-color var(--transition-fast);
+  }
+
+  .blog-card-link:hover .blog-card {
+    border-top-color: var(--color-purple);
   }
 
   .blog-thumbnail {
@@ -86,7 +91,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     font-size: var(--text-xl);
     margin-top: var(--space-sm);
     margin-bottom: var(--space-sm);
-    color: var(--color-earth);
+    color: var(--color-purple);
   }
 
   .blog-description {
