@@ -50,11 +50,12 @@ async function nlHandleImageUpload(input) {
   if (!file) return;
   const url = await uploadImage(file);
   if (url) {
+    const imgHtml = `<img src="${url}" alt="${file.name}" width="484" style="display:block;margin:0 auto;max-width:100%;height:auto;">`;
     if (_nlMode === "visual") {
-      document.execCommand("insertImage", false, url);
+      document.execCommand("insertHTML", false, imgHtml);
     } else {
       const ta = document.getElementById("nl-html-editor");
-      ta.setRangeText(`<img src="${url}" alt="${file.name}" style="max-width:100%;">`, ta.selectionStart, ta.selectionEnd, "end");
+      ta.setRangeText(imgHtml, ta.selectionStart, ta.selectionEnd, "end");
     }
   }
   input.value = "";
