@@ -11,7 +11,7 @@ For me, wellness is the foundation of education. At the beginning of each year, 
 
 > Montessori explains that adolescence involves a significant amount of doubt, hesitation, violent emotions, discouragement, and an unexpected decrease in intellectual capacity (Montessori, 1973). 
 
-During this vulnerable phase, the World Health Organization (WHO, 2023) states that **one in seven adolescents suffers from mental health problems and that suicide is the fourth leading cause of death in this age group. **
+During this vulnerable phase, the World Health Organization (WHO, 2023) states that one in seven adolescents suffers from mental health problems and that suicide is the fourth leading cause of death in this age group.
 
 
 > This stark reality compels us to look more deeply into the "Work of the Heart."
@@ -76,7 +76,7 @@ While we can nourish wellbeing directly, we must also do so indirectly. Research
 
 **Purpose:** This can be abstract for an adolescent. In the Montessori view, we want students to find an inner drive, not just comply with instructions. We must give them the time to search and explore what truly "makes them tick." As adults, we often view life through a productive lens, but every time we "rescue" a student from boredom or the discomfort of not knowing, we remove a chance for them to find their own inspiration.
 
-**Agency: **We empower students by allowing them to directly influence their environment—whether through construction or organizing events. These opportunities confront them with reality, responsibility, and consequences. The more an adolescent experiences these moments of genuine influence, the more empowered they feel, nourishing a lifelong desire to contribute to the world.
+**Agency:** We empower students by allowing them to directly influence their environment—whether through construction or organizing events. These opportunities confront them with reality, responsibility, and consequences. The more an adolescent experiences these moments of genuine influence, the more empowered they feel, nourishing a lifelong desire to contribute to the world.
 
 
 
@@ -114,8 +114,3 @@ Thorn & Rose Counseling. (2025, January 17). How journal prompts can enhance sel
 Wouter Sanderse. (2023). Adolescents’ moral self-cultivation through emulation: Implications for modeling in moral education. Journal of Moral Education, 1–18. https://doi.org/10.1080/03057240.2023.2236314
 ‌‌
 World Health Organization. (2023, November 17). Mental health of adolescents. https://www.who.int/news-room/factsheets/detail/adolescent-mental-health‌
-
-
-
-
-
