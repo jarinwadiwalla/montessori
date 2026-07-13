@@ -42,6 +42,7 @@ const webinars = defineCollection({
     eventStartISO: z.string().optional(),
     eventEndISO: z.string().optional(),
     image: z.string().optional(),
+    heroImage: z.string().optional(),
     price: z.number(),
     stripePaymentLink: z.string(),
     stripeBuyButtonId: z.string().optional(),

@@ -34,9 +34,11 @@ const qaSuffix = ' and Q&A Session';
 const hasQaSuffix = webinar.data.title.endsWith(qaSuffix);
 const titleMain = hasQaSuffix ? webinar.data.title.slice(0, -qaSuffix.length) : webinar.data.title;
 
+const heroImageSrc = webinar.data.heroImage ?? webinar.data.image;
+
 const galleryPhotos = [
   { src: '/images/landing-photo-10.jpg', alt: 'Adolescents working together in a Montessori community' },
-  { src: '/images/landing-photo-3.jpg', alt: 'Montessori adolescent community life' },
+  { src: '/images/webinars/market-day-candid.jpg', alt: 'Adolescents selling their produce at a farmers market' },
   { src: '/images/guidance-photo-4.jpg', alt: 'Meaningful work in the Montessori adolescent environment' },
 ];
 
@@ -115,10 +117,10 @@ const eventJsonLd = JSON.stringify({
         </div>
       </div>
 
-      {webinar.data.image && (
+      {heroImageSrc && (
         <div class="hero-media">
           <img
-            src={webinar.data.image}
+            src={heroImageSrc}
             alt={webinar.data.title}
             class="hero-image"
             fetchpriority="high"

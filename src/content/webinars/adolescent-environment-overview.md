@@ -8,6 +8,7 @@ eventStartISO: "2026-07-30T09:00:00+08:00"
 eventEndISO: "2026-07-30T10:00:00+08:00"
 duration: "60 minutes, including a thorough 15-minute Q&A"
 image: "/images/webinars/adolescent-environment-overview.jpg"
+heroImage: "/images/webinars/market-day-group.jpg"
 price: 65
 stripePaymentLink: "https://buy.stripe.com/9B6eVdfDEb06dwc8oj4sE07"
 topics:
