@@ -1,0 +1,193 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Let's Work Together"
+  description="Resources and consulting overview for Montessori for Adolescents."
+  heroTitle="Let's Work Together"
+>
+  <section class="offering-section">
+    <div class="container offering-inner">
+
+      <div class="offering-text">
+        <p class="offering-eyebrow">Guidance Partnership</p>
+        <h2 class="offering-title">Overview of Offerings</h2>
+        <p class="offering-desc">
+          An overview of our guidance partnership levels and practical resources for educators and communities ready to build Montessori adolescent programs.
+        </p>
+        <a href="/downloads/guidance-offerings-overview.pdf" target="_blank" rel="noopener noreferrer" class="offering-btn">
+          Download Overview
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="offering-visual">
+        <div class="doc-preview">
+          <div class="doc-lines">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="doc-label">MFA Offerings Guide</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .offering-section {
+    padding-block: var(--space-4xl);
+  }
+
+  .offering-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .offering-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-terracotta);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .offering-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: #d0905b;
+    flex-shrink: 0;
+  }
+
+  .offering-title {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 300;
+    color: var(--color-earth-dark);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-lg);
+  }
+
+  .offering-desc {
+    font-size: var(--text-base);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-xl);
+    max-width: 400px;
+  }
+
+  .offering-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.65rem 1.8rem;
+    background: var(--color-earth-dark);
+    color: var(--color-cream);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: opacity 0.2s;
+  }
+
+  .offering-btn:hover {
+    opacity: 0.85;
+  }
+
+  /* Document visual */
+  .offering-visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  .doc-preview {
+    width: 220px;
+    height: 280px;
+    background: var(--color-cream);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    box-shadow: 8px 12px 40px rgba(0,0,0,0.1), 2px 4px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    position: relative;
+  }
+
+  .doc-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #d0905b;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .doc-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .doc-lines span {
+    display: block;
+    height: 1px;
+    background: var(--color-border);
+    border-radius: 1px;
+  }
+
+  .doc-lines span:first-child {
+    height: 2px;
+    width: 60%;
+    background: rgba(208, 144, 91, 0.4);
+  }
+
+  .doc-lines span:nth-child(2) { width: 100%; }
+  .doc-lines span:nth-child(3) { width: 85%; }
+  .doc-lines span:nth-child(4) { width: 90%; }
+  .doc-lines span:nth-child(5) { width: 70%; }
+
+  .doc-label {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .offering-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .offering-visual {
+      display: none;
+    }
+  }
+</style>

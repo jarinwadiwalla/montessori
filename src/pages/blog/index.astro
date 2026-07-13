@@ -6,6 +6,8 @@ import { getCollection } from 'astro:content';
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
 );
+
+const [featured, ...rest] = posts;
 ---
 
 <PageLayout
@@ -13,39 +15,93 @@ const posts = (await getCollection('blog')).sort(
   description="Reflections from work with adolescents, observations, questions, and lessons from Montessori education."
   heroTitle="Reflections from Work with Adolescents"
   heroSubtitle="Observations, questions, and lessons from Montessori education"
+  heroImage="/images/Blog.jpg"
 >
-  <div class="blog-wave-strip"></div>
-  <div class="container">
-    <div class="blog-grid">
-      {posts.map((post) => (
+  <div class="container blog-wrap">
+
+    {featured && (
+      <section class="featured-post">
+        <p class="section-eyebrow">Latest</p>
         <BlogCard
-          title={post.data.title}
-          description={post.data.description}
-          publishDate={post.data.publishDate}
-          slug={post.id}
-          image={post.data.image}
+          title={featured.data.title}
+          description={featured.data.description}
+          publishDate={featured.data.publishDate}
+          slug={featured.id}
+          image={featured.data.image}
+          featured={true}
         />
-      ))}
-    </div>
+      </section>
+    )}
+
+    {rest.length > 0 && (
+      <section class="posts-section">
+        <p class="section-eyebrow">More Posts</p>
+        <div class="blog-grid">
+          {rest.map((post) => (
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              publishDate={post.data.publishDate}
+              slug={post.id}
+              image={post.data.image}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
   </div>
 </PageLayout>
 
 <style>
-  .blog-wave-strip {
-    background-color: var(--color-purple);
-    height: 12px;
-    margin-bottom: var(--space-3xl);
+  .blog-wrap {
+    padding-block: var(--space-3xl);
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(208, 144, 91, 0.85);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 0.5px;
+    background: #d0905b;
+    flex-shrink: 0;
+  }
+
+  .featured-post {
+    margin-bottom: var(--space-4xl);
+  }
+
+  .posts-section {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-2xl);
   }
 
   .blog-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-lg);
-    max-width: 800px;
-    margin-inline: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
     .blog-grid {
       grid-template-columns: 1fr;
     }

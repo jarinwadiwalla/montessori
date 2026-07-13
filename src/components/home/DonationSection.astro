@@ -2,63 +2,103 @@
 import DonateButton from '../shared/DonateButton.astro';
 ---
 
-<section class="donation-section section">
-  <div class="container">
-    <div class="donation-inner">
-      <div class="donation-content">
-        <span class="donation-label">Support Access</span>
-        <h2 class="donation-title">This Work Belongs to Everyone</h2>
-        <p class="donation-text">
-          Your contribution helps bring Montessori adolescent programming to communities that have
-          never had access, funding training, on-site support, and the creation of new Centers of
-          Study and Work where the world needs them most.
-        </p>
-        <div class="donation-action">
-          <DonateButton label="Support Our Work" />
-        </div>
-      </div>
+<section class="donation-section">
+  <div class="container donation-inner">
+    <p class="donation-eyebrow">Support Access</p>
+    <h2 class="donation-title">Adolescents Need These Environments</h2>
+    <p class="donation-sub">
+      Your contribution helps in the creation of new Centers of Study and Work worldwide.
+    </p>
+    <div class="donation-action">
+      <DonateButton label="Support Our Work" />
     </div>
   </div>
 </section>
 
 <style>
   .donation-section {
-    background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-earth-dark) 100%);
+    background: linear-gradient(
+      135deg,
+      #190c28 0%,
+      #2e1445 45%,
+      #3d1f5a 100%
+    );
     padding-block: var(--space-4xl);
   }
 
   .donation-inner {
-    max-width: 700px;
-    margin-inline: auto;
-    text-align: center;
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .donation-label {
-    display: inline-block;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .donation-eyebrow {
     font-family: var(--font-body);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: var(--tracking-wider);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-terracotta-light);
+    color: rgba(250, 247, 242, 0.55);
     margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .donation-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 0.5px;
+    background: #d0905b;
+    flex-shrink: 0;
   }
 
   .donation-title {
-    font-size: var(--text-4xl);
-    color: var(--color-cream);
-    margin-bottom: var(--space-xl);
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-md);
   }
 
-  .donation-text {
-    font-size: var(--text-lg);
-    color: rgba(250, 247, 242, 0.85);
+  .donation-sub {
+    font-size: var(--text-base);
+    color: rgba(250, 247, 242, 0.6);
+    font-weight: 300;
+    font-style: italic;
+    max-width: 560px;
     line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-xl);
+    letter-spacing: 0.02em;
   }
 
-  .donation-action {
-    display: flex;
-    justify-content: center;
+  .donation-action :global(.donate-button) {
+    background: transparent;
+    border: 0.5px solid rgba(208, 144, 91, 0.7);
+    color: #d0905b;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    padding: 0.65rem 2rem;
+    transition: background 0.25s, border-color 0.25s, color 0.25s;
+    text-transform: uppercase;
+  }
+
+  .donation-action :global(.donate-button:hover) {
+    background: rgba(208, 144, 91, 0.12);
+    border-color: #d0905b;
+    color: #e8a878;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .donation-action :global(.donate-icon) {
+    color: rgba(208, 144, 91, 0.8);
   }
 </style>

@@ -11,6 +11,7 @@ topics:
   - Adolescent support
   - Guide development
 featured: true
+hidden: true
 ---
 
 What does preparation of the guide really mean? Practical considerations to help you interact, communicate, and support the adolescent.

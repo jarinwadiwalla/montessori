@@ -2,112 +2,173 @@
 interface Props {
   title: string;
   description: string;
-  presenter: string;
-  duration: string;
   price: number;
-  stripePaymentLink: string;
-  stripeBuyButtonId?: string;
-  topics: string[];
+  href: string;
+  dateDisplay?: string;
+  timeDisplay?: string;
+  presenter?: string;
+  image?: string;
 }
 
-const {
-  title,
-  description,
-  presenter,
-  duration,
-  price,
-  stripePaymentLink,
-  stripeBuyButtonId,
-  topics,
-} = Astro.props;
+const { title, description, price, href, dateDisplay, timeDisplay, presenter, image } = Astro.props;
 ---
 
 <article class="webinar-card">
-  <div class="webinar-header">
-    <h3 class="webinar-title">{title}</h3>
+  {image && (
+    <a href={href} class="webinar-image-link">
+      <img src={image} alt={title} class="webinar-image" loading="lazy" />
+    </a>
+  )}
+  <div class="webinar-top">
+    <span class="webinar-badge">Live Webinar</span>
+    <span class="webinar-price">${price} USD</span>
   </div>
-  <div class="webinar-meta">
-    <span class="webinar-duration">{duration}</span>
-  </div>
+  {dateDisplay && (
+    <p class="webinar-date">
+      {dateDisplay}
+      {timeDisplay && <span class="webinar-time"> · {timeDisplay}</span>}
+    </p>
+  )}
+  <h3 class="webinar-title">
+    <a href={href}>{title}</a>
+  </h3>
+  {presenter && <p class="webinar-presenter">with {presenter}</p>}
   <p class="webinar-description">{description}</p>
-  <div class="webinar-topics">
-    {topics.map((topic) => (
-      <span class="webinar-topic">{topic}</span>
-    ))}
+  <div class="webinar-footer">
+    <a href={href} class="webinar-cta">
+      Details &amp; Registration
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
   </div>
 </article>
 
 <style>
   .webinar-card {
-    background-color: var(--color-white);
+    background: var(--color-white);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-top: 3px solid var(--color-purple);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     padding: var(--space-xl);
-    transition: box-shadow var(--transition-base);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.25s, transform 0.25s;
   }
 
   .webinar-card:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
   }
 
-  .webinar-header {
+  .webinar-image-link {
+    display: block;
+    margin-bottom: var(--space-lg);
+  }
+
+  .webinar-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  .webinar-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-md);
-    margin-bottom: var(--space-sm);
-  }
-
-  .webinar-title {
-    font-size: var(--text-xl);
-    flex: 1;
-  }
-
-  .webinar-price {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    font-weight: 600;
-    color: var(--color-terracotta);
-    white-space: nowrap;
-  }
-
-  .webinar-meta {
-    display: flex;
+    align-items: baseline;
     gap: var(--space-md);
     margin-bottom: var(--space-md);
   }
 
-  .webinar-presenter {
-    font-size: var(--text-sm);
-    color: var(--color-sage-dark);
+  .webinar-badge {
+    font-family: var(--font-body);
+    font-size: 10px;
     font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-purple);
+    background-color: var(--color-lavender);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
   }
 
-  .webinar-duration {
+  .webinar-price {
+    font-family: var(--font-body);
     font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-earth-dark);
+    white-space: nowrap;
+  }
+
+  .webinar-date {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-terracotta-dark);
+    margin-bottom: var(--space-sm);
+  }
+
+  .webinar-time {
+    font-weight: 400;
     color: var(--color-text-light);
+  }
+
+  .webinar-title {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: var(--text-xl);
+    font-weight: 300;
+    line-height: 1.3;
+    margin-bottom: var(--space-xs);
+  }
+
+  .webinar-title a {
+    color: var(--color-earth-dark);
+    text-decoration: none;
+  }
+
+  .webinar-title a:hover {
+    color: var(--color-purple);
+  }
+
+  .webinar-presenter {
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--color-text-light);
+    margin-bottom: var(--space-sm);
   }
 
   .webinar-description {
     font-size: var(--text-sm);
     color: var(--color-text-light);
     line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-lg);
-  }
-
-  .webinar-topics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
+    flex: 1;
     margin-bottom: var(--space-xl);
   }
 
-  .webinar-topic {
-    font-size: var(--text-xs);
-    color: var(--color-purple);
-    background-color: var(--color-lavender);
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: var(--radius-sm);
+  .webinar-footer {
+    margin-top: auto;
   }
 
+  .webinar-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-earth-dark);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(75, 55, 55, 0.3);
+    padding-bottom: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .webinar-cta:hover {
+    color: var(--color-purple);
+    border-color: var(--color-purple);
+  }
 </style>

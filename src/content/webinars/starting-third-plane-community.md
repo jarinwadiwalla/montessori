@@ -11,6 +11,7 @@ topics:
   - Community building
   - Getting started
 featured: true
+hidden: true
 ---
 
 A hands-on webinar for communities ready to take the leap into adolescent programming.

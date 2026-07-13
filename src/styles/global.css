@@ -4,11 +4,11 @@
 
 :root {
   /* Colors — warm earth tones */
-  --color-cream: #FAF7F2;
-  --color-cream-dark: #F0EBE3;
-  --color-terracotta: #B8755D;
-  --color-terracotta-light: #D4A08E;
-  --color-terracotta-dark: #9A5F4A;
+  --color-cream: #eee4db;
+  --color-cream-dark: #e0d4c8;
+  --color-terracotta: #d0905b;
+  --color-terracotta-light: #dfa87c;
+  --color-terracotta-dark: #b87440;
   --color-sage: #7A8B6F;
   --color-sage-light: #A3B396;
   --color-sage-dark: #5E6D54;
@@ -26,8 +26,8 @@
   --color-border: #E5DFD7;
 
   /* Typography */
-  --font-heading: 'Lora', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

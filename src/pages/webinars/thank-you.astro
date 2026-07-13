@@ -1,0 +1,71 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Registration Confirmed"
+  description="Thank you for registering for a Montessori for Adolescents live webinar."
+  heroTitle="You're Registered!"
+  heroSubtitle="Thank you for joining us — we're so glad you'll be there."
+>
+  <div class="container thank-you-wrap">
+    <div class="thank-you-card">
+      <h2 class="thank-you-heading">What happens next</h2>
+      <ol class="next-steps">
+        <li>You'll receive a payment receipt from Stripe at the email you used at checkout.</li>
+        <li>Before the session, we'll email your Google Meet invitation to that same address — keep an eye on your inbox (and spam folder, just in case).</li>
+        <li>Come with your questions! The session includes a live Q&amp;A.</li>
+      </ol>
+      <p class="thank-you-note">
+        Didn't receive an email, or have a question in the meantime?
+        <a href="/contact/">Get in touch</a> and we'll sort it out.
+      </p>
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  .thank-you-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  .thank-you-card {
+    max-width: 560px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-purple);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: var(--space-2xl);
+  }
+
+  .thank-you-heading {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin-bottom: var(--space-lg);
+  }
+
+  .next-steps {
+    padding-left: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .next-steps li {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+  }
+
+  .thank-you-note {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-md);
+  }
+
+  .thank-you-note a {
+    color: var(--color-terracotta-dark);
+    text-decoration: underline;
+  }
+</style>

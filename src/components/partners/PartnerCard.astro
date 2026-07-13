@@ -6,106 +6,191 @@ interface Props {
   location: string;
   bio: string;
   website?: string;
+  photo?: string;
+  linkedin?: string;
+  education?: string;
 }
 
-const { name, title, organization, location, bio, website } = Astro.props;
+const { name, title, organization, location, bio, website, photo, linkedin, education } = Astro.props;
+
+const educationLines = education ? education.split('\n') : [];
+const educationHeading = educationLines[0];
+const educationBodyRaw = educationLines.slice(1).join('\n').trim();
+const educationBody = educationBodyRaw
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/(University of [^:\n]+)/g, '<strong>$1</strong>')
+  .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  .replace(/\n/g, '<br />');
 
 const initials = name.split(' ').map(n => n[0]).join('');
 ---
 
 <article class="partner-card">
-  <div class="partner-avatar">
-    <span class="partner-initials">{initials}</span>
+  <div class="partner-photo-wrap">
+    {photo
+      ? <img src={photo} alt={name} class="partner-photo" />
+      : <div class="partner-initials">{initials}</div>
+    }
   </div>
+
   <div class="partner-info">
+    <p class="partner-credential">AMI 12–18 Diploma</p>
     <h3 class="partner-name">{name}</h3>
-    <p class="partner-title">{title}</p>
-    <p class="partner-credential">Association Montessori Internationale (AMI) 12–18 Diploma</p>
-    <p class="partner-org">{organization ? <>{website ? <a href={website} target="_blank" rel="noopener noreferrer" class="partner-org-link">{organization}</a> : organization} &middot; <strong>{location}</strong></> : <strong>{location}</strong>}</p>
-    <p class="partner-bio">{bio}</p>
+    {location && <p class="partner-location">{location}</p>}
+    {bio && <p class="partner-bio">{bio}</p>}
+
+    {education && (
+      <div class="partner-education">
+        <p class="education-heading">{educationHeading}</p>
+        <p class="education-body" set:html={educationBody} />
+      </div>
+    )}
+
+    {linkedin && (
+      <a href={linkedin} target="_blank" rel="noopener noreferrer" class="partner-link">
+        LinkedIn
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    )}
   </div>
 </article>
 
 <style>
   .partner-card {
     display: flex;
-    gap: var(--space-xl);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    transition: box-shadow var(--transition-base);
+    flex-direction: column;
+    background: var(--color-white);
+    border-top: 2px solid #d0905b;
   }
 
-  .partner-card:hover {
-    box-shadow: var(--shadow-md);
+  .partner-photo-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--color-cream);
   }
 
-  .partner-avatar {
-    flex-shrink: 0;
-    width: 72px;
-    height: 72px;
-    background-color: var(--color-lavender);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .partner-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .partner-card:hover .partner-photo {
+    transform: scale(1.03);
   }
 
   .partner-initials {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    color: var(--color-purple);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Georgia Pro', Georgia, serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: rgba(208, 144, 91, 0.4);
   }
 
-  .partner-name {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-xs);
-  }
-
-  .partner-title {
-    font-size: var(--text-sm);
-    color: var(--color-terracotta);
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
+  .partner-info {
+    padding: var(--space-lg) var(--space-lg) var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 
   .partner-credential {
-    font-size: var(--text-sm);
-    color: var(--color-sage-dark);
-    font-style: italic;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(208, 144, 91, 0.8);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .partner-credential::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 0.5px;
+    background: #d0905b;
+    flex-shrink: 0;
+  }
+
+  .partner-name {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: var(--text-2xl);
+    font-weight: 300;
+    color: var(--color-earth-dark);
+    line-height: 1.2;
     margin-bottom: var(--space-xs);
   }
 
-  .partner-org {
-    font-size: var(--text-sm);
+  .partner-location {
+    font-size: var(--text-xs);
     color: var(--color-text-light);
-    margin-bottom: var(--space-md);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-lg);
   }
 
   .partner-bio {
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
-    color: var(--color-text);
-    margin-bottom: var(--space-md);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-lg);
+    flex: 1;
   }
 
-  .partner-org-link {
-    color: var(--color-terracotta);
+  .partner-education {
+    margin-bottom: var(--space-lg);
+  }
+
+  .education-heading {
+    font-size: 10px;
     font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    margin-bottom: var(--space-xs);
   }
 
-  .partner-org-link:hover {
-    color: var(--color-terracotta-dark);
-    text-decoration: underline;
+  .education-body {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
   }
 
-  @media (max-width: 600px) {
-    .partner-card {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+  .partner-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(208, 144, 91, 0.3);
+    padding-bottom: 2px;
+    width: fit-content;
+    margin-top: auto;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .partner-link:hover {
+    color: #d0905b;
+    border-color: #d0905b;
   }
 </style>

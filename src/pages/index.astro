@@ -4,8 +4,8 @@ import HeroSection from '../components/home/HeroSection.astro';
 import FeaturedContent from '../components/home/FeaturedContent.astro';
 import AnxiousGenFAQ from '../components/home/AnxiousGenFAQ.astro';
 import DonationSection from '../components/home/DonationSection.astro';
-import QuoteBlock from '../components/home/QuoteBlock.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
+import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 ---
 
 <BaseLayout
@@ -14,12 +14,105 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
 >
   <HeroSection />
   <FeaturedContent />
+
+  <div class="carousel-section">
+    <PhotoCarousel autoplay={true} photos={[
+      { src: '/images/landing-photo-10.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/guidance-photo-4.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-11.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-1.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-3.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-4.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-5.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-6.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-7.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-8.jpg', alt: 'Montessori adolescent community' },
+      { src: '/images/landing-photo-9.jpg', alt: 'Montessori adolescent community' },
+    ]} />
+  </div>
+
   <AnxiousGenFAQ />
   <DonationSection />
-  <QuoteBlock />
   <QuoteBanner
     text="The land is the source of all life, and the children who work on it, producing food, gain a sense of the cosmic order of things."
     author="Maria Montessori"
     source="From Childhood to Adolescence"
   />
 </BaseLayout>
+
+<style>
+  .carousel-section {
+    margin-block: var(--space-3xl);
+  }
+
+  .dictionary-entry {
+    max-width: 960px;
+    margin-inline: auto;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+    padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
+    border-left: 3px solid var(--color-terracotta);
+    background-color: var(--color-cream);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  }
+
+  .dict-headword {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-purple);
+    margin-bottom: var(--space-xs);
+  }
+
+  .dict-meta {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-lg);
+  }
+
+  .dict-pos {
+    font-style: italic;
+    color: var(--color-terracotta);
+    font-weight: 600;
+  }
+
+  .dict-phonetic {
+    color: var(--color-text-light);
+    letter-spacing: 0.01em;
+  }
+
+  .dict-definition {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+  }
+
+  .dict-definition em {
+    font-style: italic;
+    color: var(--color-earth);
+  }
+
+  .dict-note {
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-light);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-md);
+  }
+
+  .dict-note em {
+    font-style: italic;
+    color: var(--color-earth);
+  }
+
+  @media (max-width: 640px) {
+    .dictionary-entry {
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    .dict-headword {
+      font-size: var(--text-xl);
+    }
+  }
+</style>

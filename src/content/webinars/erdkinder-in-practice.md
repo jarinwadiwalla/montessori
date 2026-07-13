@@ -11,6 +11,7 @@ topics:
   - Practical life
   - Economic independence
 featured: true
+hidden: true
 ---
 
 This webinar explores real-world implementations of Montessori's Erdkinder concept across diverse settings.

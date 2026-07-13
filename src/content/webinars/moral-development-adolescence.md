@@ -11,6 +11,7 @@ topics:
   - Self-directed learning
   - Adolescent independence
 featured: false
+hidden: true
 ---
 
 This webinar offers homeschooling families practical strategies for integrating Montessori principles into daily life, helping adolescents thrive through meaningful work, community engagement, and self-directed learning.

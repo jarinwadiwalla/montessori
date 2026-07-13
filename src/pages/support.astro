@@ -2,6 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import Button from '../components/shared/Button.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
+import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 ---
 
 <PageLayout
@@ -9,10 +10,11 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   description="Side-by-side support for building Montessori adolescent programs, practical guidance to bring your adolescent community to life."
   heroTitle="Building Programs From the Ground Up"
   heroSubtitle="Practical guidance and resources to bring your community to life."
+  heroImage="/images/ground-up.jpg"
+  heroImagePosition="center 15%"
 >
   <div class="container container--narrow">
     <section class="page-section">
-      <h2>What We Do</h2>
       <p>
         We provide practical, virtual or on-site guidance to help you build a living adolescent community,
         based on Montessori principles. We help you see your vision with the daily flow, the rhythms and
@@ -21,7 +23,22 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
         every step of the way.
       </p>
     </section>
+  </div>
 
+  <div class="carousel-section">
+    <PhotoCarousel autoplay={true} photos={[
+      { src: '/images/guidance-photo-1.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-2.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-3.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-5.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-6.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-7.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-8.jpg', alt: 'Montessori guidance' },
+      { src: '/images/guidance-photo-9.jpg', alt: 'Montessori guidance' },
+    ]} />
+  </div>
+
+  <div class="container container--narrow">
     <section class="page-section">
       <h2>Who This Is For</h2>
       <ul class="page-list">
@@ -59,16 +76,16 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
       </div>
     </section>
 
-    <section class="page-section text-center">
-      <h2>Ready to Start?</h2>
-      <p>
-        Every great program begins with a conversation. We'd love to hear about your vision.
-      </p>
-      <div class="cta-actions">
-        <Button href="/contact/" variant="primary" size="lg">Get in Touch</Button>
-      </div>
-    </section>
   </div>
+
+  <section class="ready-banner">
+    <div class="container ready-inner">
+      <p class="ready-eyebrow">Take the next step</p>
+      <h2 class="ready-title">Ready to Start?</h2>
+      <p class="ready-sub">Every great program begins with a conversation. We'd love to hear about your vision.</p>
+      <a href="/contact/" class="ready-cta">Get in Touch</a>
+    </div>
+  </section>
 
   <QuoteBanner
     text="The land is where the child's spirit finds its true nourishment."
@@ -113,49 +130,136 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
 
   .steps {
     display: grid;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
     margin-top: var(--space-xl);
   }
 
   .step {
     display: flex;
-    gap: var(--space-lg);
+    gap: var(--space-xl);
     align-items: flex-start;
-    background-color: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
+    background: var(--color-white);
+    border-top: 2px solid #d0905b;
+    padding: var(--space-xl) var(--space-lg) var(--space-lg);
   }
 
   .step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    border-radius: 50%;
-    background-color: var(--color-lavender);
-    color: var(--color-purple);
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    font-weight: 700;
+    font-family: 'Georgia Pro', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: rgba(208, 144, 91, 0.4);
+    line-height: 1;
+    min-width: 2rem;
+    flex-shrink: 0;
   }
 
   .step h3 {
+    font-family: 'Georgia Pro', Georgia, serif;
     font-size: var(--text-xl);
-    color: var(--color-terracotta);
+    font-weight: 300;
+    color: var(--color-earth-dark);
     margin-bottom: var(--space-xs);
   }
 
   .step p {
     font-size: var(--text-base);
+    color: var(--color-text-light);
     margin-bottom: 0;
+    line-height: var(--leading-relaxed);
   }
 
   .cta-actions {
     margin-top: var(--space-lg);
     display: flex;
     justify-content: center;
+  }
+
+  .carousel-section {
+    margin-block: var(--space-3xl);
+  }
+
+  /* Ready to Start gradient banner */
+  .ready-banner {
+    background: linear-gradient(
+      135deg,
+      #190c28 0%,
+      #2e1445 45%,
+      #3d1f5a 100%
+    );
+    padding-block: var(--space-4xl);
+    margin-top: var(--space-3xl);
+  }
+
+  .ready-inner {
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .ready-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.55);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ready-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 0.5px;
+    background: #d0905b;
+    flex-shrink: 0;
+  }
+
+  .ready-title {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 300;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-md);
+  }
+
+  .ready-sub {
+    font-size: var(--text-base);
+    color: rgba(250, 247, 242, 0.6);
+    font-weight: 300;
+    font-style: italic;
+    max-width: 480px;
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-xl);
+    letter-spacing: 0.02em;
+  }
+
+  .ready-cta {
+    display: inline-block;
+    padding: 0.65rem 2rem;
+    border: 0.5px solid rgba(208, 144, 91, 0.7);
+    color: #d0905b;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.25s, border-color 0.25s, color 0.25s;
+  }
+
+  .ready-cta:hover {
+    background: rgba(208, 144, 91, 0.12);
+    border-color: #d0905b;
+    color: #e8a878;
   }
 </style>

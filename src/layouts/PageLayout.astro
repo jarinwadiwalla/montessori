@@ -7,15 +7,28 @@ interface Props {
   description: string;
   heroTitle: string;
   heroSubtitle?: string;
+  heroEyebrow?: string;
+  heroCta?: string;
+  heroCtaHref?: string;
+  heroImage?: string;
+  heroImagePosition?: string;
   image?: string;
 }
 
-const { title, description, heroTitle, heroSubtitle, image } = Astro.props;
+const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
-  <PageHero title={heroTitle} subtitle={heroSubtitle} />
-  <div class="page-content">
+  <PageHero
+    title={heroTitle}
+    subtitle={heroSubtitle}
+    eyebrow={heroEyebrow}
+    ctaLabel={heroCta}
+    ctaHref={heroCtaHref}
+    image={heroImage}
+    imagePosition={heroImagePosition}
+  />
+  <div class="page-content" id="content">
     <slot />
   </div>
 </BaseLayout>

@@ -11,24 +11,26 @@ const { formspreeId = 'xpqjyzba' } = Astro.props;
   data-formspree={`https://formspree.io/f/${formspreeId}`}
   class="contact-form"
 >
-  <div class="form-group">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" id="name" name="name" required class="form-input" />
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" id="name" name="name" required class="form-input" />
+    </div>
+    <div class="form-group">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" id="email" name="email" required class="form-input" />
+    </div>
   </div>
 
-  <div class="form-group">
-    <label for="email" class="form-label">Email</label>
-    <input type="email" id="email" name="email" required class="form-input" />
-  </div>
-
-  <div class="form-group">
-    <label for="phone" class="form-label">Phone (optional)</label>
-    <input type="tel" id="phone" name="phone" class="form-input" />
-  </div>
-
-  <div class="form-group">
-    <label for="organization" class="form-label">Organization (optional)</label>
-    <input type="text" id="organization" name="organization" class="form-input" />
+  <div class="form-row">
+    <div class="form-group">
+      <label for="phone" class="form-label">Phone <span class="form-optional">(optional)</span></label>
+      <input type="tel" id="phone" name="phone" class="form-input" />
+    </div>
+    <div class="form-group">
+      <label for="organization" class="form-label">Organization <span class="form-optional">(optional)</span></label>
+      <input type="text" id="organization" name="organization" class="form-input" />
+    </div>
   </div>
 
   <div class="form-group">
@@ -36,7 +38,15 @@ const { formspreeId = 'xpqjyzba' } = Astro.props;
     <textarea id="message" name="message" rows="6" required class="form-input form-textarea"></textarea>
   </div>
 
-  <button type="submit" class="form-submit">Send Message</button>
+  <div class="form-submit-wrapper">
+    <button type="submit" class="form-submit">
+      Send Message
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
   <p class="form-status" id="form-status"></p>
 </form>
 
@@ -79,83 +89,118 @@ const { formspreeId = 'xpqjyzba' } = Astro.props;
 
 <style>
   .contact-form {
-    max-width: 600px;
-    margin-inline: auto;
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
   }
 
   .form-group {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-2xl);
   }
 
   .form-label {
     display: block;
-    font-size: var(--text-sm);
+    font-family: var(--font-body);
+    font-size: 10px;
     font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--color-earth);
     margin-bottom: var(--space-sm);
   }
 
+  .form-optional {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--color-text-light);
+    font-size: 10px;
+  }
+
   .form-input {
     width: 100%;
-    padding: var(--space-md);
+    padding: var(--space-sm) 0;
     font-family: var(--font-body);
     font-size: var(--text-base);
     color: var(--color-text);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    transition: border-color 0.2s;
     appearance: none;
   }
 
   .form-input:focus {
     outline: none;
-    border-color: var(--color-terracotta);
-    box-shadow: 0 0 0 3px rgba(184, 117, 93, 0.15);
+    border-bottom-color: #d0905b;
   }
 
   .form-textarea {
-    resize: vertical;
-    min-height: 150px;
+    resize: none;
+    min-height: 120px;
+    padding: var(--space-md) var(--space-sm);
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .form-textarea:focus {
+    border-color: rgba(208, 144, 91, 0.5);
+    outline: none;
+    border-bottom-color: rgba(208, 144, 91, 0.5);
+  }
+
+  .form-submit-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-xl);
   }
 
   .form-submit {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: var(--space-md) var(--space-2xl);
-    background-color: var(--color-lavender);
-    color: var(--color-purple);
+    gap: var(--space-sm);
+    padding: 0.75rem 2.5rem;
+    background: var(--color-earth-dark);
+    color: var(--color-cream);
     font-family: var(--font-body);
-    font-size: var(--text-base);
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: 2px;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: opacity 0.2s;
   }
 
   .form-submit:hover {
-    background-color: var(--color-lavender-dark);
+    opacity: 0.85;
   }
 
   .form-submit:disabled {
-    opacity: 0.7;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .form-status {
-    margin-top: var(--space-md);
+    margin-top: var(--space-lg);
     font-size: var(--text-sm);
     text-align: center;
   }
 
-  .form-status--success {
-    color: var(--color-sage);
-  }
+  .form-status--success { color: var(--color-sage); }
+  .form-status--error   { color: var(--color-terracotta); }
 
-  .form-status--error {
-    color: var(--color-terracotta);
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
   }
 </style>

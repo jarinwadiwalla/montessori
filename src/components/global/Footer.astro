@@ -6,204 +6,342 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
+  <!-- Watermark logo -->
+  <img src="/images/logo-dark-purple.png" alt="" class="footer-watermark" aria-hidden="true" />
+
   <div class="container">
-    <div class="footer-logo-wrapper">
-      <img src="/images/3.png" alt="Montessori for Adolescents" class="footer-logo" width="280" />
-      <p class="footer-tagline">
-        Practical support to bring your adolescent community to life.
-      </p>
-    </div>
+    <a href="/" class="brand-link">
+      <img src="/images/logo-dark-purple.png" alt="Montessori for Adolescents" class="brand-logo" />
+      <p class="brand-name">Montessori for Adolescents</p>
+    </a>
+    <div class="top-rule"></div>
 
     <div class="footer-grid">
-      <div class="footer-links">
-        <h4 class="footer-heading">Explore</h4>
-        <ul>
-          <li><a href="/support/">Guidance</a></li>
-          <li><a href="/access/">Access</a></li>
-          <li><a href="/whole-human/">Whole Human</a></li>
-          <li><a href="/resources/">Resources</a></li>
-          <li><a href="/blog/">Blog</a></li>
-          <li><a href="/our-team/">Our Team</a></li>
-        </ul>
+
+      <!-- Col 1: Subscribe + Donate -->
+      <div class="footer-col-brand">
+        <div class="footer-subscribe-wrap">
+          <SubscribeForm />
+        </div>
+        <div class="footer-donate-wrap">
+          <DonateButton label="Support Our Work" />
+        </div>
       </div>
 
-      <div class="footer-connect">
-        <h4 class="footer-heading">Connect</h4>
-        <ul>
-          <li><a href="/contact/">Get in Touch</a></li>
-        </ul>
-        <a href="https://www.instagram.com/montessoriforadolescents" target="_blank" rel="noopener noreferrer" class="footer-instagram" aria-label="Follow us on Instagram">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
-          </svg>
-        </a>
+      <!-- Col 2+3: Explore + Connect -->
+      <div class="footer-nav-cols">
+        <div>
+          <p class="col-heading">Explore</p>
+          <ul class="col-links">
+            <li><a href="/support/">Guidance</a></li>
+            <li><a href="/access/">Access</a></li>
+            <li><a href="/whole-human/">Whole Human</a></li>
+            <li><a href="/resources/">Resources</a></li>
+            <li><a href="/blog/">Blog</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="col-heading">Connect</p>
+          <ul class="col-links">
+            <li><a href="/our-team/">Our Team</a></li>
+            <li><a href="/contact/">Contact</a></li>
+            <li>
+              <a
+                href="https://www.instagram.com/montessoriforadolescents"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <div class="footer-subscribe">
-      <h4 class="footer-heading">Stay Updated</h4>
-      <p class="footer-subscribe-text">
-        Get reflections, resources, and updates delivered to your inbox.
-      </p>
-      <SubscribeForm />
-    </div>
-
-    <div class="footer-support">
-      <h4 class="footer-heading">Support Our Mission</h4>
-      <p class="footer-support-text">
-        Every dollar helps communities guide adolescents through meaningful work rooted in Montessori philosophy.
-      </p>
-      <DonateButton label="Support Our Work" />
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; {currentYear} Montessori for Adolescents. All rights reserved.</p>
+      <p class="copy">&copy; {currentYear} Montessori for Adolescents. All rights reserved.</p>
+      <a
+        href="https://www.instagram.com/montessoriforadolescents"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="footer-ig-icon"
+        aria-label="Instagram"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+        </svg>
+      </a>
     </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    background-color: var(--color-earth-dark);
-    color: rgba(250, 247, 242, 0.8);
-    padding-block: var(--space-3xl) var(--space-xl);
+    background: var(--color-earth-dark);
+    color: #fff;
+    padding: var(--space-3xl) 0 0;
     margin-top: var(--space-4xl);
+    font-family: var(--font-body);
+    position: relative;
+    overflow: hidden;
   }
 
-  .footer-logo-wrapper {
-    text-align: center;
-    margin-bottom: var(--space-3xl);
-    padding-bottom: var(--space-2xl);
-    border-bottom: 1px solid rgba(250, 247, 242, 0.1);
-  }
-
-  .footer-logo {
-    height: auto;
-    width: 240px;
+  /* Watermark */
+  .footer-watermark {
+    position: absolute;
+    width: 600px;
+    bottom: -60px;
+    left: -60px;
     filter: brightness(0) invert(1);
-    margin-inline: auto;
-    margin-bottom: var(--space-md);
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .footer-tagline {
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-    color: rgba(250, 247, 242, 0.6);
-    max-width: 300px;
-    margin-inline: auto;
+  .site-footer .container {
+    position: relative;
+    z-index: 1;
   }
 
+  /* Brand logo + name link */
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-md);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+  }
+
+  .brand-logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+  }
+
+  /* Short brand-brown top rule */
+  .top-rule {
+    width: 48px;
+    height: 1px;
+    background: #d0905b;
+    margin-bottom: var(--space-3xl);
+  }
+
+  /* 2-column grid: brand | nav pair */
   .footer-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.7fr 1fr;
     gap: var(--space-3xl);
-    max-width: 500px;
-    margin-inline: auto;
-    margin-bottom: var(--space-3xl);
-    text-align: center;
+    padding-bottom: var(--space-2xl);
+    border-bottom: 0.5px solid rgba(250, 247, 242, 0.1);
+    align-items: start;
+    justify-items: center;
   }
 
-  .footer-heading {
-    font-family: var(--font-heading);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-cream);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wider);
-    margin-bottom: var(--space-md);
+  .footer-col-brand {
+    width: 100%;
   }
 
-  .footer-links ul,
-  .footer-connect ul {
-    list-style: none;
-    padding: 0;
+  .footer-nav-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    width: 100%;
+  }
+
+  /* Brand name above rule */
+  .brand-name {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #faf7f2;
+    letter-spacing: 0.03em;
+    line-height: 1.3;
     margin: 0;
   }
 
-  .footer-links li,
-  .footer-connect li {
-    margin-bottom: var(--space-sm);
+  .brand-desc {
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: rgba(200, 175, 230, 0.45);
+    font-weight: 300;
+    margin-bottom: var(--space-xl);
+    max-width: 280px;
   }
 
-  .footer-links a,
-  .footer-connect a {
+  /* Subscribe form overrides */
+  .footer-subscribe-wrap {
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-form) {
+    max-width: 100%;
+    margin-inline: 0;
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-fields) {
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid rgba(250, 247, 242, 0.75);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-input) {
+    border: none;
+    border-bottom: 1px solid rgba(250, 247, 242, 0.6);
+    border-radius: 0;
+    padding: 9px 12px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+    background: transparent;
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-input::placeholder) {
     color: rgba(250, 247, 242, 0.7);
-    font-size: var(--text-sm);
-    transition: color var(--transition-fast);
   }
 
-  .footer-links a:hover,
-  .footer-connect a:hover {
-    color: var(--color-cream);
+  .footer-subscribe-wrap :global(.subscribe-input:focus) {
+    border-color: #ffffff;
+    outline: none;
   }
 
-  .footer-instagram {
-    display: inline-flex;
-    align-items: center;
+  .footer-subscribe-wrap :global(.subscribe-btn) {
+    background: rgba(250, 247, 242, 0.08);
+    border: none;
+    border-top: 1px solid rgba(250, 247, 242, 0.6);
+    border-radius: 0;
+    color: #ffffff;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-btn:hover) {
+    background: rgba(250, 247, 242, 0.18);
+    color: #ffffff;
+    opacity: 1;
+  }
+
+  .footer-subscribe-wrap :global(.subscribe-status) {
+    font-size: 10px;
+    margin-top: var(--space-xs);
+    text-align: center;
+    letter-spacing: 0.04em;
+    color: rgba(250, 247, 242, 0.8);
+  }
+
+  /* Donate button override: full-width ghost gold */
+  .footer-donate-wrap :global(.donate-button) {
+    width: 100%;
     justify-content: center;
-    color: rgba(250, 247, 242, 0.7);
-    margin-top: var(--space-md);
-    transition: color var(--transition-fast);
+    background: transparent;
+    border: 0.5px solid rgba(208, 144, 91, 0.75);
+    color: #d0905b;
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    padding: 10px 20px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    text-transform: uppercase;
   }
 
-  .footer-instagram:hover {
-    color: var(--color-cream);
+  .footer-donate-wrap :global(.donate-button:hover) {
+    background: rgba(208, 144, 91, 0.1);
+    color: #e8a878;
+    border-color: #d0905b;
+    transform: none;
+    box-shadow: none;
   }
 
-  .footer-subscribe {
+  .footer-donate-wrap :global(.donate-icon) {
+    color: rgba(208, 144, 91, 0.8);
+  }
+
+  /* Nav column headings */
+  .col-heading {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(208, 144, 91, 0.75);
+    margin-bottom: var(--space-sm);
+    font-weight: 400;
     text-align: center;
-    max-width: 400px;
-    margin-inline: auto;
-    margin-bottom: var(--space-3xl);
-    padding-top: var(--space-2xl);
-    border-top: 1px solid rgba(250, 247, 242, 0.1);
   }
 
-  .footer-subscribe-text {
-    font-size: var(--text-sm);
-    color: rgba(250, 247, 242, 0.6);
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-md);
+  /* Nav links */
+  .col-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    align-items: center;
   }
 
-  .footer-support {
-    text-align: center;
-    max-width: 400px;
-    margin-inline: auto;
-    margin-bottom: var(--space-3xl);
-    padding-top: var(--space-2xl);
-    border-top: 1px solid rgba(250, 247, 242, 0.1);
+  .col-links a {
+    font-size: 0.8125rem;
+    color: rgba(250, 247, 242, 0.55);
+    text-decoration: none;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
   }
 
-  .footer-support-text {
-    font-size: var(--text-sm);
-    color: rgba(250, 247, 242, 0.6);
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-md);
+  .col-links a:hover {
+    color: rgba(250, 247, 242, 0.9);
   }
 
+  /* Bottom bar */
   .footer-bottom {
-    border-top: 1px solid rgba(250, 247, 242, 0.1);
-    padding-top: var(--space-xl);
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: var(--space-lg);
   }
 
-  .footer-bottom p {
-    font-size: var(--text-xs);
-    color: rgba(250, 247, 242, 0.4);
+  .copy {
+    font-size: 11px;
+    color: rgba(250, 247, 242, 0.5);
+    letter-spacing: 0.06em;
+    margin: 0;
   }
 
-  @media (max-width: 768px) {
+  .footer-ig-icon {
+    color: rgba(250, 247, 242, 0.5);
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+
+  .footer-ig-icon:hover {
+    color: rgba(250, 247, 242, 0.9);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
     .footer-grid {
       grid-template-columns: 1fr;
-      gap: var(--space-xl);
-      text-align: center;
     }
 
-    .footer-logo {
-      width: 200px;
+    .footer-subscribe-wrap,
+    .footer-donate-wrap {
+      max-width: 360px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-nav-cols {
+      grid-template-columns: 1fr 1fr;
     }
   }
 </style>

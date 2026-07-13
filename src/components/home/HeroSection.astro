@@ -1,75 +1,97 @@
 ---
-import Button from '../shared/Button.astro';
 ---
 
 <section class="hero">
+  <div class="hero-overlay"></div>
   <div class="container hero-content">
-    <h1 class="hero-title">Montessori for Adolescents</h1>
-    <p class="hero-subtitle">
-      We help communities build Montessori Adolescent Centers for Study and Work, through practical guidance, equitable access, and a whole-human approach, so that young people can grow into their most self-assured, authentic selves.
-    </p>
-    <div class="hero-actions">
-      <Button href="/support/" variant="primary" size="lg">Our Work</Button>
-      <Button href="/access/" variant="outline" size="lg">Support Access</Button>
+
+    <div class="hero-left">
+      <h1 class="hero-title">Montessori for Adolescents</h1>
+      <p class="hero-subtitle">Practical Guidance and Resources to Bring Your Adolescent Community to Life</p>
     </div>
+
+
   </div>
 </section>
 
 <style>
   .hero {
     position: relative;
-    padding-block: var(--space-5xl);
-    text-align: center;
     overflow: hidden;
-    min-height: 60vh;
     display: flex;
-    align-items: center;
-    background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-earth-dark) 100%);
+    align-items: flex-end;
+    min-height: 580px;
+    padding-bottom: var(--space-4xl);
+    background-image: url('/images/landing-banner.jpg');
+    background-size: cover;
+    background-position: center center;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(25, 12, 40, 0.88) 0%,
+      rgba(25, 12, 40, 0.6) 55%,
+      rgba(25, 12, 40, 0.2) 100%
+    );
   }
 
   .hero-content {
     position: relative;
     z-index: 1;
+    width: 100%;
+  }
+
+  /* Left: title + subtitle */
+  .hero-left {
+    max-width: 680px;
   }
 
   .hero-title {
-    font-size: var(--text-5xl);
-    color: var(--color-cream);
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    color: #ffffff;
+    line-height: 1.1;
+    font-weight: 300;
+    letter-spacing: -0.01em;
     margin-bottom: var(--space-lg);
-    letter-spacing: var(--tracking-tight);
+    animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .hero-subtitle {
-    font-size: var(--text-lg);
-    color: rgba(250, 247, 242, 0.85);
-    max-width: 620px;
-    margin-inline: auto;
-    margin-bottom: var(--space-2xl);
-    line-height: var(--leading-relaxed);
+    font-family: var(--font-body);
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    color: rgba(250, 247, 242, 0.7);
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    max-width: 520px;
+    animation: fadeUp 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .hero-actions {
-    display: flex;
-    gap: var(--space-md);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
 
-  .hero-actions :global(.btn--outline) {
-    color: var(--color-lavender);
-    border-color: var(--color-lavender);
-  }
-
-  .hero-actions :global(.btn--outline:hover) {
-    background-color: var(--color-lavender);
-    border-color: var(--color-lavender);
-    color: var(--color-purple);
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   @media (max-width: 768px) {
     .hero {
-      min-height: 40vh;
-      padding-block: var(--space-3xl);
+      min-height: 440px;
+      padding-bottom: var(--space-3xl);
+      background-position: 70% center;
     }
+
+    .hero-overlay {
+      background: rgba(25, 12, 40, 0.72);
+    }
+
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
   }
 </style>

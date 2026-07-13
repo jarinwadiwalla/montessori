@@ -12,7 +12,7 @@ const partners = (await getCollection('partners')).sort(
   title="Global Partners"
   description="Meet the AMI-trained Montessori guides and global partners advancing Montessori for Adolescents education around the world."
   heroTitle="Our Team"
-  heroSubtitle="Our experienced team all carry the AMI 12-18 Adolescent Diploma, have worked in established Adolescent Communities, and have started programs from the ground."
+  heroSubtitle="Our experienced team all carry the AMI 12-18 Adolescent Diploma, and have worked in Adolescent communities all around the globe."
 >
   <div class="container">
     <div class="partners-grid">
@@ -24,6 +24,9 @@ const partners = (await getCollection('partners')).sort(
           location={partner.data.location}
           bio={partner.data.bio}
           website={partner.data.website}
+          photo={partner.data.photo}
+          linkedin={partner.data.linkedin}
+          education={partner.data.education}
         />
       ))}
     </div>
@@ -34,8 +37,20 @@ const partners = (await getCollection('partners')).sort(
 <style>
   .partners-grid {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-xl);
-    margin-bottom: var(--space-4xl);
+    margin-block: var(--space-3xl) var(--space-4xl);
   }
 
+  @media (max-width: 900px) {
+    .partners-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 540px) {
+    .partners-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>

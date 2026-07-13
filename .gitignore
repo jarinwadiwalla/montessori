@@ -44,3 +44,12 @@ Thumbs.db
 # Loose folders in repo root (e.g. exported image sets)
 /Montessori*/
 /Acutonics*/
+/Guidance Page/
+/Landing Page Banner/
+/Landing Pages Photos/
+/More Photos/
+/Whole Human/
+/*.HEIC
+
+# Claude Code local config
+.claude/

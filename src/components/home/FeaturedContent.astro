@@ -25,11 +25,13 @@ const features = [
 
 <section class="featured section">
   <div class="container">
-    <h2 class="featured-heading text-center">What We Do</h2>
-    <p class="featured-intro text-center">
-      Practical support for building Montessori adolescent programs,
-      virtually or in person, side by side.
-    </p>
+    <div class="featured-badges">
+      <span class="featured-badge">AMI 12–18 Trained</span>
+      <span class="featured-badge">Global Support</span>
+    </div>
+    <div class="featured-header">
+      <p class="featured-eyebrow">What We Do</p>
+    </div>
     <div class="featured-grid">
       {features.map((feature) => (
         <Card
@@ -44,16 +46,51 @@ const features = [
 </section>
 
 <style>
-  .featured-heading {
-    margin-bottom: var(--space-md);
+  .featured-badges {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
   }
 
-  .featured-intro {
-    color: var(--color-text-light);
-    max-width: 600px;
-    margin-inline: auto;
-    margin-bottom: var(--space-3xl);
-    font-size: var(--text-lg);
+  .featured-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border: 0.5px solid rgba(208, 144, 91, 0.5);
+    border-radius: 2px;
+    background: rgba(208, 144, 91, 0.06);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+  }
+
+  .featured-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .featured-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(208, 144, 91, 0.85);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .featured-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 0.5px;
+    background: #d0905b;
+    flex-shrink: 0;
   }
 
   .featured-grid {

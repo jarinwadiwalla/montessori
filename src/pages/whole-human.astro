@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
+import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 ---
 
 <PageLayout
@@ -8,23 +9,36 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   description="A unique integration of Montessori philosophy with mindfulness, social/emotional learning, and holistic traditions, whole-human adolescent development beyond pedagogy."
   heroTitle="Beyond Pedagogy"
   heroSubtitle="Weaving Montessori with Whole-Human Development"
+  heroImage="/images/whole-human-hero.jpg"
 >
   <div class="container container--narrow">
     <section class="page-section">
-      <h2>A Unique Approach</h2>
       <p>
-        Montessori pedagogy offers a profound understanding of adolescent development and we have found that it weaves beautifully with other wellness practices that nurture the whole-person. Our work draws on Montessori philosophy alongside practices like mindfulness, social/emotional learning, and yoga to support the whole human, not just the academic student.
+        Imagine a community where each young person is given room to breathe, unfold, and grow into their most authentic self.
       </p>
       <p>
-        Infusing these complementary disciplines into everything that is done creates a bridge between Montessori's vision for adolescents and the broader landscape of human development wisdom.
+        Montessori pedagogy offers a profound understanding of adolescent development and we have found that it weaves beautifully with wellness practices that nurture the whole-person. Our work draws on authentic Montessori philosophy alongside practices like mindfulness, social/emotional learning, and yoga.
+      </p>
+      <p>
+        By weaving these practices together, we create a richer, more complete framework for supporting adolescents through one of the most transformative periods of their lives.
       </p>
     </section>
 
+  </div>
+
+  <div class="carousel-section">
+    <PhotoCarousel photos={[
+      { src: '/images/whole-human-photo-1.jpg', alt: 'Whole human development' },
+      { src: '/images/whole-human-photo-2.jpg', alt: 'Whole human development' },
+      { src: '/images/whole-human-photo-3.jpg', alt: 'Whole human development' },
+      { src: '/images/whole-human-photo-4.jpg', alt: 'Whole human development' },
+      { src: '/images/whole-human-photo-5.jpg', alt: 'Whole human development' },
+      { src: '/images/whole-human-photo-6.jpg', alt: 'Whole human development' },
+    ]} />
+  </div>
+
+  <div class="container container--narrow">
     <section class="page-section">
-      <h2>What This Looks Like</h2>
-      <p>
-        We believe adolescent development spans every dimension of being. These tenets show up in the routines, rituals, and structure that we help you scaffold. Our approach nurtures growth across:
-      </p>
       <div class="dimensions">
         <div class="dimension">
           <h3>Intellectual</h3>
@@ -49,19 +63,6 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
       </div>
     </section>
 
-    <section class="page-section">
-      <h2>The Bridge</h2>
-      <p>
-        Maria Montessori understood that adolescents need more than academic instruction. They need environments
-        that honor the whole of who they are becoming. Practices like mindfulness and social/emotional learning
-        have long recognized what Montessori intuited, that the intellectual, emotional, and physical are not
-        separate but deeply interconnected.
-      </p>
-      <p>
-        By weaving these traditions together, we create a richer, more complete framework for supporting
-        adolescents through one of the most transformative periods of their lives.
-      </p>
-    </section>
   </div>
 
   <QuoteBanner
@@ -89,8 +90,9 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   }
 
   .dimensions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-lg);
     margin-top: var(--space-xl);
   }
@@ -100,6 +102,15 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
+    flex: 0 1 calc(33.333% - var(--space-lg));
+    min-width: 220px;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 600px) {
+    .dimension {
+      flex: 0 1 100%;
+    }
   }
 
   .dimension h3 {
@@ -111,5 +122,9 @@ import QuoteBanner from '../components/shared/QuoteBanner.astro';
   .dimension p {
     font-size: var(--text-sm);
     margin-bottom: 0;
+  }
+
+  .carousel-section {
+    margin-block: var(--space-3xl);
   }
 </style>

@@ -11,6 +11,7 @@ topics:
   - Classroom design
   - Home environment
 featured: true
+hidden: true
 ---
 
 This webinar dives deep into the concept of the prepared environment as it applies to adolescents aged 12–18.
