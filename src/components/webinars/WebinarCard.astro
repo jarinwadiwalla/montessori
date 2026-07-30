@@ -8,9 +8,10 @@ interface Props {
   timeDisplay?: string;
   presenter?: string;
   image?: string;
+  isRecording?: boolean;
 }
 
-const { title, description, price, href, dateDisplay, timeDisplay, presenter, image } = Astro.props;
+const { title, description, price, href, dateDisplay, timeDisplay, presenter, image, isRecording = false } = Astro.props;
 ---
 
 <article class="webinar-card">
@@ -20,7 +21,7 @@ const { title, description, price, href, dateDisplay, timeDisplay, presenter, im
     </a>
   )}
   <div class="webinar-top">
-    <span class="webinar-badge">Live Webinar</span>
+    <span class="webinar-badge">{isRecording ? 'Recording' : 'Live Webinar'}</span>
     <span class="webinar-price">${price} USD</span>
   </div>
   {dateDisplay && (
@@ -36,7 +37,7 @@ const { title, description, price, href, dateDisplay, timeDisplay, presenter, im
   <p class="webinar-description">{description}</p>
   <div class="webinar-footer">
     <a href={href} class="webinar-cta">
-      Details &amp; Registration
+      {isRecording ? 'Watch the Recording' : 'Details & Registration'}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="5" y1="12" x2="19" y2="12"/>
         <polyline points="12 5 19 12 12 19"/>

@@ -27,7 +27,16 @@ const dateDisplay = webinar.data.eventDate
     })
   : 'Date to be announced';
 
-const registrationOpen = webinar.data.stripePaymentLink.startsWith('http');
+const isRecording = webinar.data.recordingAvailable;
+const price = isRecording
+  ? webinar.data.recordingPrice ?? webinar.data.price
+  : webinar.data.price;
+const buyLink = isRecording
+  ? webinar.data.stripeRecordingLink ?? ''
+  : webinar.data.stripePaymentLink;
+const purchaseOpen = buyLink.startsWith('http');
+const buyLabel = isRecording ? 'Get the Recording' : 'Register Now';
+const soonLabel = isRecording ? 'Recording Available Soon' : 'Registration Opening Soon';
 
 // Mirror the promo card: set "and Q&A Session" on its own accented line
 const qaSuffix = ' and Q&A Session';
@@ -69,7 +78,7 @@ const eventJsonLd = JSON.stringify({
   performer: { '@type': 'Organization', name: 'Montessori for Adolescents' },
   offers: {
     '@type': 'Offer',
-    price: webinar.data.price,
+    price: price,
     priceCurrency: 'USD',
     url: Astro.url.href,
     availability: 'https://schema.org/InStock',
@@ -91,7 +100,7 @@ const eventJsonLd = JSON.stringify({
 
     <div class="container hero-grid">
       <div class="hero-copy">
-        <p class="event-eyebrow">Live Webinar · Online</p>
+        <p class="event-eyebrow">{isRecording ? 'Webinar Recording · Watch Anytime' : 'Live Webinar · Online'}</p>
         <h1 class="event-title">
           {titleMain}
           {hasQaSuffix && <span class="title-accent">and Q&amp;A Session</span>}
@@ -108,11 +117,11 @@ const eventJsonLd = JSON.stringify({
               {webinar.data.eventTimeDisplay}
             </span>
           )}
-          <span class="meta-pill meta-pill--price">${webinar.data.price} USD</span>
+          <span class="meta-pill meta-pill--price">${price} USD</span>
         </div>
 
         <div class="hero-actions">
-          <a href="#register" class="btn-primary">Reserve Your Spot</a>
+          <a href="#register" class="btn-primary">{isRecording ? 'Get the Recording' : 'Reserve Your Spot'}</a>
           <a href="#about" class="btn-ghost">What we'll cover</a>
         </div>
       </div>
@@ -196,14 +205,14 @@ const eventJsonLd = JSON.stringify({
 
       <aside class="webinar-aside" id="register">
         <div class="register-card">
-          <p class="register-heading">Registration</p>
+          <p class="register-heading">{isRecording ? 'Watch the Recording' : 'Registration'}</p>
 
           <dl class="event-details">
             <div class="detail-row">
-              <dt>Date</dt>
+              <dt>{isRecording ? 'Recorded' : 'Date'}</dt>
               <dd>{dateDisplay}</dd>
             </div>
-            {webinar.data.eventTimeDisplay && (
+            {!isRecording && webinar.data.eventTimeDisplay && (
               <div class="detail-row">
                 <dt>Time</dt>
                 <dd>{webinar.data.eventTimeDisplay}</dd>
@@ -216,21 +225,23 @@ const eventJsonLd = JSON.stringify({
               </div>
             )}
             <div class="detail-row">
-              <dt>Where</dt>
-              <dd>Online — the meeting link is emailed to you after registration</dd>
+              <dt>{isRecording ? 'Format' : 'Where'}</dt>
+              <dd>{isRecording
+                ? 'On-demand video — you’ll get the link to watch immediately after checkout'
+                : 'Online — the meeting link is emailed to you after registration'}</dd>
             </div>
             <div class="detail-row">
               <dt>Price</dt>
-              <dd class="detail-price">${webinar.data.price} USD</dd>
+              <dd class="detail-price">${price} USD</dd>
             </div>
           </dl>
 
-          {registrationOpen ? (
-            <a href={webinar.data.stripePaymentLink} class="register-btn">
-              Register Now
+          {purchaseOpen ? (
+            <a href={buyLink} class="register-btn">
+              {buyLabel}
             </a>
           ) : (
-            <span class="register-btn register-btn--soon">Registration Opening Soon</span>
+            <span class="register-btn register-btn--soon">{soonLabel}</span>
           )}
 
           <p class="register-note">
@@ -246,11 +257,13 @@ const eventJsonLd = JSON.stringify({
     <section class="cta-band">
       <div class="cta-band-inner">
         <div class="cta-copy">
-          <h2 class="cta-title">Join us live on {dateDisplay}</h2>
-          <p class="cta-sub">Bring your questions — we're saving time at the end for a thorough Q&amp;A.</p>
+          <h2 class="cta-title">{isRecording ? 'Watch the full session, anytime' : `Join us live on ${dateDisplay}`}</h2>
+          <p class="cta-sub">{isRecording
+            ? 'The complete recording — presentation plus the live Q&A.'
+            : 'Bring your questions — we\'re saving time at the end for a thorough Q&A.'}</p>
         </div>
-        <a href={registrationOpen ? webinar.data.stripePaymentLink : '#register'} class="cta-btn">
-          {registrationOpen ? 'Register Now' : 'Registration Opening Soon'}
+        <a href={purchaseOpen ? buyLink : '#register'} class="cta-btn">
+          {purchaseOpen ? buyLabel : soonLabel}
         </a>
       </div>
     </section>

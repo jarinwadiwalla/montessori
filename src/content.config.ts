@@ -49,6 +49,11 @@ const webinars = defineCollection({
     topics: z.array(z.string()),
     featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
+    // --- Recording (for past webinars sold on demand) ---
+    recordingAvailable: z.boolean().default(false),
+    recordingPrice: z.number().optional(),
+    stripeRecordingLink: z.string().optional(),
+    recordingEmbedUrl: z.string().optional(),
   }),
 });
 

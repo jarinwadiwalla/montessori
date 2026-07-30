@@ -21,6 +21,15 @@ const webinars = (await getCollection('webinars'))
       (b.data.eventDate?.getTime() ?? Number.MAX_SAFE_INTEGER)
   );
 
+// Upcoming = live events still to come; Past = recordings now for sale on demand.
+const upcomingWebinars = webinars.filter((w) => !w.data.recordingAvailable);
+const pastWebinars = webinars
+  .filter((w) => w.data.recordingAvailable)
+  .sort(
+    (a, b) =>
+      (b.data.eventDate?.getTime() ?? 0) - (a.data.eventDate?.getTime() ?? 0)
+  );
+
 const formatEventDate = (date: Date) =>
   date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -40,11 +49,11 @@ const formatEventDate = (date: Date) =>
 >
   <div class="container resources-wrap">
 
-    {webinars.length > 0 && (
+    {upcomingWebinars.length > 0 && (
       <section class="webinars-section">
         <p class="section-eyebrow section-eyebrow--webinars">Upcoming Live Webinars</p>
         <div class="webinars-grid">
-          {webinars.map((webinar) => (
+          {upcomingWebinars.map((webinar) => (
             <WebinarCard
               title={webinar.data.title}
               description={webinar.data.description}
@@ -54,6 +63,26 @@ const formatEventDate = (date: Date) =>
               timeDisplay={webinar.data.eventTimeDisplay}
               presenter={webinar.data.presenter}
               image={webinar.data.image}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {pastWebinars.length > 0 && (
+      <section class="webinars-section">
+        <p class="section-eyebrow section-eyebrow--webinars">Past Webinars — Watch the Recording</p>
+        <div class="webinars-grid">
+          {pastWebinars.map((webinar) => (
+            <WebinarCard
+              title={webinar.data.title}
+              description={webinar.data.description}
+              price={webinar.data.recordingPrice ?? webinar.data.price}
+              href={`/webinars/${webinar.id}/`}
+              dateDisplay={webinar.data.eventDate ? `Recorded ${formatEventDate(webinar.data.eventDate)}` : undefined}
+              presenter={webinar.data.presenter}
+              image={webinar.data.image}
+              isRecording={true}
             />
           ))}
         </div>

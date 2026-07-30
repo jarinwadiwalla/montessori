@@ -11,6 +11,13 @@ image: "/images/webinars/adolescent-environment-overview.jpg"
 heroImage: "/images/webinars/market-day-group.jpg"
 price: 65
 stripePaymentLink: "https://buy.stripe.com/9B6eVdfDEb06dwc8oj4sE07"
+# --- Recording now for sale (live event has passed) ---
+recordingAvailable: true
+recordingPrice: 45
+# PASTE your new Stripe payment link for the RECORDING between the quotes below:
+stripeRecordingLink: ""
+# PASTE the unlisted YouTube/Vimeo EMBED url for the recording between the quotes below:
+recordingEmbedUrl: ""
 topics:
   - What Maria Montessori envisioned for the adolescent environment
   - What a weekly flow could look like

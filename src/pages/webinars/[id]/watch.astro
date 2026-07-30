@@ -1,0 +1,112 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const webinars = await getCollection(
+    'webinars',
+    ({ data }) => !data.hidden && data.recordingAvailable
+  );
+  return webinars.map((webinar) => ({
+    params: { id: webinar.id },
+    props: { webinar },
+  }));
+}
+
+const { webinar } = Astro.props;
+const embedUrl = webinar.data.recordingEmbedUrl ?? '';
+const hasVideo = embedUrl.startsWith('http');
+---
+
+<PageLayout
+  title="Your Recording"
+  description="Watch your Montessori for Adolescents webinar recording."
+  heroTitle="Thank You — Enjoy the Recording"
+  heroSubtitle="Your purchase is complete. The full session is ready to watch below."
+>
+  <div class="container watch-wrap">
+    <h2 class="watch-title">{webinar.data.title}</h2>
+
+    {hasVideo ? (
+      <div class="video-frame">
+        <iframe
+          src={embedUrl}
+          title={webinar.data.title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+    ) : (
+      <div class="watch-pending">
+        <p>The recording is being prepared and will appear here shortly. If you’ve
+        just purchased and it isn’t ready yet, <a href="/contact/">get in touch</a>
+        and we’ll send it to you right away.</p>
+      </div>
+    )}
+
+    <p class="watch-note">
+      This is your personal viewing page — please keep the link to yourself.
+      Trouble playing the video? <a href="/contact/">Contact us</a> and we’ll help.
+    </p>
+  </div>
+</PageLayout>
+
+<style>
+  .watch-wrap {
+    max-width: 900px;
+    margin-inline: auto;
+    padding-block: var(--space-3xl);
+  }
+
+  .watch-title {
+    font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-xl);
+  }
+
+  .video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 24px 60px -24px rgba(63, 38, 91, 0.4);
+    background: #000;
+  }
+
+  .video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .watch-pending {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-purple);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: var(--space-2xl);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .watch-note {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--leading-normal);
+  }
+
+  .watch-pending a,
+  .watch-note a {
+    color: var(--color-terracotta-dark);
+    text-decoration: underline;
+  }
+</style>
