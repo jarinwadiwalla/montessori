@@ -14,10 +14,8 @@ stripePaymentLink: "https://buy.stripe.com/9B6eVdfDEb06dwc8oj4sE07"
 # --- Recording now for sale (live event has passed) ---
 recordingAvailable: true
 recordingPrice: 45
-# PASTE your new Stripe payment link for the RECORDING between the quotes below:
-stripeRecordingLink: ""
-# PASTE the unlisted YouTube/Vimeo EMBED url for the recording between the quotes below:
-recordingEmbedUrl: ""
+stripeRecordingLink: "https://buy.stripe.com/fZu8wPfDE4BI3VCdID4sE08"
+recordingEmbedUrl: "https://www.youtube.com/embed/u1yOYSjLbDE"
 topics:
   - What Maria Montessori envisioned for the adolescent environment
   - What a weekly flow could look like
