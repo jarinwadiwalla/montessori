@@ -209,7 +209,11 @@ async function nlSendToAudience() {
 
   const countData = await apiFetch("/api/subscriber-count");
   const count = countData ? countData.count : "all";
-  const tierLabel = tier === "founding" ? "founding members" : `${count} subscribers`;
+  // Only the "all" count is known here, so name the audience instead of
+  // quoting a total that does not apply to a single-tier send.
+  const tierLabel = tier === "founding" ? "founding members"
+    : tier === "donor" ? "donors"
+    : `${count} subscribers`;
 
   openModal("Send Newsletter", `Send "${subject}" to ${tierLabel}?${isAnnouncement ? " (announcement mode)" : ""} This cannot be undone.`, async () => {
     const data = await apiFetch("/api/newsletter-send", {
@@ -536,6 +540,7 @@ async function loadSubscribers() {
       <span>Active: <strong>${data.counts.active}</strong></span>
       <span>Unsubscribed: <strong>${data.counts.unsubscribed}</strong></span>
       <span>Founding: <strong>${data.counts.founding}</strong></span>
+      <span>Donors: <strong>${data.counts.donor || 0}</strong></span>
     `;
   }
 

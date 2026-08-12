@@ -15,6 +15,8 @@ export async function onRequestGet(context) {
     conditions.push("unsubscribed = 1");
   } else if (filter === "founding") {
     conditions.push("tier = 'founding'");
+  } else if (filter === "donor") {
+    conditions.push("tier = 'donor'");
   } else if (filter === "active") {
     conditions.push("unsubscribed = 0");
   }
@@ -29,12 +31,12 @@ export async function onRequestGet(context) {
 
   // Counts for the dashboard
   const { results: countResults } = await env.SITE_DB.prepare(
-    "SELECT COUNT(*) as total, SUM(CASE WHEN unsubscribed = 0 THEN 1 ELSE 0 END) as active, SUM(CASE WHEN unsubscribed = 1 THEN 1 ELSE 0 END) as unsubscribed, SUM(CASE WHEN tier = 'founding' THEN 1 ELSE 0 END) as founding FROM subscribers"
+    "SELECT COUNT(*) as total, SUM(CASE WHEN unsubscribed = 0 THEN 1 ELSE 0 END) as active, SUM(CASE WHEN unsubscribed = 1 THEN 1 ELSE 0 END) as unsubscribed, SUM(CASE WHEN tier = 'founding' THEN 1 ELSE 0 END) as founding, SUM(CASE WHEN tier = 'donor' THEN 1 ELSE 0 END) as donor FROM subscribers"
   ).all();
 
   return Response.json({
     subscribers: results,
-    counts: countResults[0] || { total: 0, active: 0, unsubscribed: 0, founding: 0 },
+    counts: countResults[0] || { total: 0, active: 0, unsubscribed: 0, founding: 0, donor: 0 },
   });
 }
 

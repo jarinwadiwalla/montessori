@@ -214,6 +214,7 @@ tr:hover td { background: var(--gray-50); }
 .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .tier-subscriber { background: var(--gray-100); color: var(--gray-600); }
 .tier-founding { background: #fef3c7; color: #92400e; }
+.tier-donor { background: #ede4f8; color: #5a3d7a; }
 .tier-all { background: #dbeafe; color: #1e40af; }
 .tier-test { background: var(--gray-100); color: var(--gray-500); }
 .tier-custom { background: #e0e7ff; color: #3730a3; }

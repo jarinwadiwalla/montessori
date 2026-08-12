@@ -77,6 +77,9 @@ export async function onRequestPost(context) {
     if (tier === "founding") {
       query += " AND tier = 'founding'";
       sendTier = "founding";
+    } else if (tier === "donor") {
+      query += " AND tier = 'donor'";
+      sendTier = "donor";
     } else if (tier === "subscriber") {
       query += " AND (tier = 'subscriber' OR tier IS NULL)";
       sendTier = "subscriber";
