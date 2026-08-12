@@ -19,6 +19,12 @@ function nlAutoSave() {
   }, 2000);
 }
 
+// The contenteditable visual editor drops <!DOCTYPE>, <html>, <head> and <body>,
+// so anything that looks like a full email document is edited as HTML instead.
+function nlIsFullDocument(html) {
+  return /<(!doctype|html|body)\b/i.test(html || "");
+}
+
 function nlRestoreAutosave() {
   try {
     const raw = localStorage.getItem(NL_AUTOSAVE_KEY);
@@ -26,8 +32,16 @@ function nlRestoreAutosave() {
     const saved = JSON.parse(raw);
     if (!saved.subject && !saved.body) return;
     document.getElementById("nl-subject").value = saved.subject || "";
-    document.getElementById("nl-html-editor").value = saved.body || "";
-    document.getElementById("nl-visual-editor").innerHTML = saved.body || "";
+    if (nlIsFullDocument(saved.body)) {
+      // A full email document loses its wrapper if it goes through the visual
+      // editor, so restore it as HTML and leave the visual editor empty.
+      document.getElementById("nl-visual-editor").innerHTML = "";
+      nlSetMode("html");
+      document.getElementById("nl-html-editor").value = saved.body || "";
+    } else {
+      document.getElementById("nl-html-editor").value = saved.body || "";
+      document.getElementById("nl-visual-editor").innerHTML = saved.body || "";
+    }
     const el = document.getElementById("nl-autosave-status");
     if (el) el.textContent = `Restored auto-save from ${new Date(saved.savedAt).toLocaleString()}`;
   } catch {}
@@ -247,10 +261,12 @@ async function nlLoadTemplate() {
   const tpl = (data.templates || []).find((t) => t.id === id);
   if (tpl) {
     document.getElementById("nl-subject").value = tpl.subject || "";
-    // Always load into HTML mode to preserve inline styles and document structure
-    document.getElementById("nl-html-editor").value = tpl.body || "";
+    // Always load into HTML mode to preserve inline styles and document structure.
+    // Switch modes first — nlSetMode("html") copies the visual editor over the
+    // textarea, so filling the textarea before the switch would wipe it.
     document.getElementById("nl-visual-editor").innerHTML = "";
     nlSetMode("html");
+    document.getElementById("nl-html-editor").value = tpl.body || "";
     showToast(`Loaded template: ${tpl.name}`, "info");
   }
 }
