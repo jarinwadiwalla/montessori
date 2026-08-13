@@ -84,6 +84,9 @@ export async function onRequestPost(context) {
       query += " AND (tier = 'subscriber' OR tier IS NULL)";
       sendTier = "subscriber";
     } else {
+      // Donors are a separate list: they are reached only by choosing
+      // "Donors Only", never by a general send.
+      query += " AND (tier IS NULL OR tier != 'donor')";
       sendTier = "all";
     }
 

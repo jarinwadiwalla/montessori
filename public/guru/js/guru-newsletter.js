@@ -208,12 +208,13 @@ async function nlSendToAudience() {
   const isAnnouncement = document.getElementById("nl-is-announcement").checked;
 
   const countData = await apiFetch("/api/subscriber-count");
-  const count = countData ? countData.count : "all";
-  // Only the "all" count is known here, so name the audience instead of
+  // "All Subscribers" excludes donors, so quote the general count, not the total.
+  const count = countData ? countData.generalCount : "all";
+  // Only the general count is known here, so name the audience instead of
   // quoting a total that does not apply to a single-tier send.
   const tierLabel = tier === "founding" ? "founding members"
     : tier === "donor" ? "donors"
-    : `${count} subscribers`;
+    : `${count} subscribers (donors not included)`;
 
   openModal("Send Newsletter", `Send "${subject}" to ${tierLabel}?${isAnnouncement ? " (announcement mode)" : ""} This cannot be undone.`, async () => {
     const data = await apiFetch("/api/newsletter-send", {
@@ -236,8 +237,17 @@ function nlUpdateAudienceInfo() {
 // ── Subscriber count ──
 async function nlLoadSubscriberCount() {
   const data = await apiFetch("/api/subscriber-count");
-  if (data) {
-    document.getElementById("nl-subscriber-count").textContent = `${data.count} active subscriber${data.count !== 1 ? "s" : ""}`;
+  if (!data) return;
+  // Only the "All Subscribers" audience has a count here, and it excludes
+  // donors. For a single-tier audience, show nothing rather than a number
+  // that does not describe who would be sent to.
+  const audience = document.getElementById("nl-audience").value;
+  const el = document.getElementById("nl-subscriber-count");
+  if (audience === "all") {
+    const n = data.generalCount;
+    el.textContent = `${n} active subscriber${n !== 1 ? "s" : ""} (donors not included)`;
+  } else {
+    el.textContent = "";
   }
 }
 
