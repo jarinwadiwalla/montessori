@@ -466,6 +466,9 @@ const eventJsonLd = JSON.stringify({
     position: relative;
     z-index: 1;
     width: 100%;
+    /* Reserve the space before the photo loads so the page doesn't jump */
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
     border-radius: 28px;
     box-shadow: 0 30px 60px -20px rgba(63, 38, 91, 0.35);
   }
