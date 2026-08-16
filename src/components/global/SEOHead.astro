@@ -4,6 +4,7 @@ interface Props {
   description: string;
   image?: string;
   canonicalUrl?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -11,6 +12,7 @@ const {
   description,
   image = '/images/4.png',
   canonicalUrl,
+  noindex = false,
 } = Astro.props;
 
 const siteName = 'Montessori for Adolescents';
@@ -43,6 +45,7 @@ const jsonLd = JSON.stringify({
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
 <meta name="keywords" content="Montessori for Adolescents, Montessori adolescent education, Erdkinder, third plane of development, AMI 12-18 diploma, Montessori secondary, adolescent development, Montessori philosophy" />
 <link rel="canonical" href={resolvedUrl} />
 

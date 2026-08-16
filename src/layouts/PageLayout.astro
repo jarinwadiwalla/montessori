@@ -13,12 +13,13 @@ interface Props {
   heroImage?: string;
   heroImagePosition?: string;
   image?: string;
+  noindex?: boolean;
 }
 
-const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image } = Astro.props;
+const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image, noindex } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} image={image}>
+<BaseLayout title={title} description={description} image={image} noindex={noindex}>
   <PageHero
     title={heroTitle}
     subtitle={heroSubtitle}

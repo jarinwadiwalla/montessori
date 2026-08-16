@@ -19,13 +19,42 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   month: 'long',
   day: 'numeric',
 }).format(post.data.publishDate);
+
+const postJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.publishDate.toISOString().slice(0, 10),
+  author: {
+    '@type': 'Person',
+    name: post.data.author,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Montessori for Adolescents',
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/images/4.png', Astro.site ?? Astro.url).href,
+    },
+  },
+  ...(post.data.image && {
+    image: new URL(post.data.image, Astro.site ?? Astro.url).href,
+  }),
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': Astro.url.href,
+  },
+});
 ---
 
 <PageLayout
   title={post.data.title}
   description={post.data.description}
   heroTitle={post.data.title}
+  image={post.data.image}
 >
+  <script type="application/ld+json" set:html={postJsonLd} />
   <div class="post-wave-strip"></div>
   <div class="container">
     <article class="blog-post">
