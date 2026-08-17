@@ -1,10 +1,17 @@
 ---
 const currentPath = Astro.url.pathname;
 
-const links = [
-  { href: '/support/', label: 'Guidance' },
-  { href: '/access/', label: 'Access' },
-  { href: '/whole-human/', label: 'Whole Human' },
+// Guidance, Access and Whole Human are grouped under "Our Work" to keep the
+// bar short now that the Collective sits on the end.
+const items = [
+  {
+    label: 'Our Work',
+    children: [
+      { href: '/support/', label: 'Guidance' },
+      { href: '/access/', label: 'Access' },
+      { href: '/whole-human/', label: 'Whole Human' },
+    ],
+  },
   { href: '/resources/', label: 'Resources' },
   { href: '/blog/', label: 'Blog' },
   { href: '/our-team/', label: 'Our Team' },
@@ -12,26 +19,58 @@ const links = [
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/') {
-    return currentPath === '/' || currentPath === '';
-  }
+  if (href === '/') return currentPath === '/' || currentPath === '';
   return currentPath.startsWith(href);
+}
+
+function groupIsActive(children: { href: string }[]): boolean {
+  return children.some((c) => isActive(c.href));
 }
 ---
 
 <nav class="site-nav" aria-label="Main navigation">
   <ul class="nav-list">
-    {links.map((link) => (
-      <li>
-        <a
-          href={link.href}
-          class:list={['nav-link', { 'is-active': isActive(link.href) }]}
-          aria-current={isActive(link.href) ? 'page' : undefined}
-        >
-          {link.label}
-        </a>
-      </li>
-    ))}
+    {items.map((item) =>
+      item.children ? (
+        <li class="nav-group">
+          <button
+            type="button"
+            class:list={['nav-link', 'nav-toggle', { 'is-active': groupIsActive(item.children) }]}
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            {item.label}
+            <svg class="nav-caret" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <path d="M2 4l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="nav-submenu">
+            {item.children.map((child) => (
+              <li>
+                <a
+                  href={child.href}
+                  class:list={['nav-sublink', { 'is-active': isActive(child.href) }]}
+                  aria-current={isActive(child.href) ? 'page' : undefined}
+                >
+                  {child.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ) : (
+        <li>
+          <a
+            href={item.href}
+            class:list={['nav-link', { 'is-active': isActive(item.href!) }]}
+            aria-current={isActive(item.href!) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      )
+    )}
     <li>
       <a
         href="/collective/"
@@ -45,12 +84,42 @@ function isActive(href: string): boolean {
 </nav>
 
 <script>
-  // Members who are already signed in should land in the portal rather than
-  // on the sales page. The session cookie is HttpOnly so it can't be read
-  // here — we have to ask the server.
+  // --- "Our Work" dropdown ------------------------------------
+  // Click rather than hover, so it works on touch as well as with a mouse.
+  const groups = document.querySelectorAll('.nav-group');
+
+  groups.forEach((group) => {
+    const toggle = group.querySelector('.nav-toggle') as HTMLButtonElement | null;
+    if (!toggle) return;
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = group.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+  });
+
+  function closeAll() {
+    groups.forEach((g) => {
+      g.classList.remove('is-open');
+      g.querySelector('.nav-toggle')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!(e.target as Element)?.closest?.('.nav-group')) closeAll();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAll();
+  });
+
+  // --- Collective link ----------------------------------------
+  // Members already signed in should land in the portal rather than on the
+  // sales page. The session cookie is HttpOnly, so we have to ask the server.
   //
-  // Progressive enhancement: the link already works as /collective/, and
-  // this only upgrades it. If the request is slow or fails, nothing breaks.
+  // Progressive enhancement: the link already works as /collective/, and this
+  // only upgrades it. If the request is slow or fails, nothing breaks.
   const link = document.getElementById('collective-link') as HTMLAnchorElement | null;
 
   if (link && !window.location.pathname.startsWith('/collective/')) {
@@ -99,6 +168,71 @@ function isActive(href: string): boolean {
     font-weight: 600;
   }
 
+  /* "Our Work" group */
+  .nav-group {
+    position: relative;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+
+  .nav-caret {
+    transition: transform var(--transition-fast);
+  }
+
+  .nav-group.is-open .nav-caret {
+    transform: rotate(180deg);
+  }
+
+  .nav-submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 190px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-xs);
+    list-style: none;
+    margin: 0.35rem 0 0;
+    z-index: 50;
+  }
+
+  .nav-group.is-open .nav-submenu {
+    display: block;
+  }
+
+  .nav-sublink {
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+  }
+
+  .nav-sublink:hover {
+    color: var(--color-terracotta);
+    background-color: rgba(184, 117, 93, 0.06);
+  }
+
+  .nav-sublink.is-active {
+    color: var(--color-terracotta);
+    font-weight: 600;
+  }
+
   /* Set the Collective apart from the content pages */
   .nav-link--cta {
     margin-left: var(--space-xs);
@@ -129,6 +263,8 @@ function isActive(href: string): boolean {
       border-bottom: 1px solid var(--color-border);
       padding: var(--space-md);
       box-shadow: var(--shadow-md);
+      max-height: calc(100vh - var(--header-height));
+      overflow-y: auto;
     }
 
     .site-nav.is-open {
@@ -146,8 +282,33 @@ function isActive(href: string): boolean {
       border-bottom: 1px solid var(--color-border);
     }
 
-    .nav-link:last-child {
-      border-bottom: none;
+    .nav-toggle {
+      width: 100%;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    /* On a phone the submenu expands in place rather than floating */
+    .nav-submenu {
+      position: static;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-sublink {
+      padding: var(--space-md) var(--space-md) var(--space-md) var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+      border-radius: 0;
+    }
+
+    .nav-link--cta {
+      margin: var(--space-md) 0 0;
+      text-align: center;
+      border-bottom: 1px solid var(--color-purple);
     }
   }
 </style>
