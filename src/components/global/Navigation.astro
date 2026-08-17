@@ -26,7 +26,7 @@ const items = [
       { href: '/contact/', label: 'Contact' },
       // Label and destination swap to the portal for signed-in members,
       // handled by the script below.
-      { href: '/collective/', label: 'Join the Collective', id: 'collective-link' },
+      { href: '/collective/', label: 'Join the Collective', collective: true },
     ],
   },
 ];
@@ -43,9 +43,9 @@ function groupIsActive(children: { href: string }[]): boolean {
 
 <nav class="site-nav" aria-label="Main navigation">
   <ul class="nav-list">
-    {items.map((item) =>
+    {items.map((item, i) =>
       item.children ? (
-        <li class="nav-group">
+        <li class:list={['nav-group', { 'nav-group--right': i === items.length - 1 }]}>
           <button
             type="button"
             class:list={['nav-link', 'nav-toggle', { 'is-active': groupIsActive(item.children) }]}
@@ -63,10 +63,9 @@ function groupIsActive(children: { href: string }[]): boolean {
               <li>
                 <a
                   href={child.href}
-                  id={child.id}
                   class:list={[
                     'nav-sublink',
-                    { 'nav-sublink--cta': child.id === 'collective-link' },
+                    { 'nav-sublink--cta js-collective-link': child.collective },
                     { 'is-active': isActive(child.href) },
                   ]}
                   aria-current={isActive(child.href) ? 'page' : undefined}
@@ -89,6 +88,19 @@ function groupIsActive(children: { href: string }[]): boolean {
         </li>
       )
     )}
+    <li>
+      <a
+        href="/collective/"
+        class:list={[
+          'nav-link',
+          'nav-link--cta',
+          'js-collective-link',
+          { 'is-active': isActive('/collective/') },
+        ]}
+      >
+        Collective
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -129,17 +141,19 @@ function groupIsActive(children: { href: string }[]): boolean {
   //
   // Progressive enhancement: the link already works as /collective/, and this
   // only upgrades it. If the request is slow or fails, nothing breaks.
-  const link = document.getElementById('collective-link') as HTMLAnchorElement | null;
+  // Two of these now: the item inside "Connect" and the standalone pill.
+  const collectiveLinks = document.querySelectorAll<HTMLAnchorElement>('.js-collective-link');
 
-  if (link && !window.location.pathname.startsWith('/collective/')) {
+  if (collectiveLinks.length && !window.location.pathname.startsWith('/collective/')) {
     fetch('/api/community/me')
       .then((r) => r.json())
       .then((me) => {
-        if (me?.signedIn) {
+        if (!me?.signedIn) return;
+        collectiveLinks.forEach((el) => {
           // The portal handles the lapsed-dues case itself.
-          link.href = '/collective/portal/';
-          link.textContent = 'My Collective';
-        }
+          el.href = '/collective/portal/';
+          el.textContent = 'My Collective';
+        });
       })
       .catch(() => {});
   }
@@ -220,9 +234,9 @@ function groupIsActive(children: { href: string }[]): boolean {
     display: block;
   }
 
-  /* The last group sits against the right edge, so open its menu
-     rightwards or it gets clipped off-screen. */
-  .nav-group:last-child .nav-submenu {
+  /* The final menu sits near the right edge, so it opens rightwards or it
+     gets clipped off-screen. */
+  .nav-group--right .nav-submenu {
     left: auto;
     right: 0;
   }
@@ -247,6 +261,25 @@ function groupIsActive(children: { href: string }[]): boolean {
   .nav-sublink.is-active {
     color: var(--color-terracotta);
     font-weight: 600;
+  }
+
+  /* Standalone pill, so joining stays one click from anywhere */
+  .nav-link--cta {
+    margin-left: var(--space-xs);
+    border: 1px solid var(--color-purple);
+    border-radius: 999px;
+    color: var(--color-purple);
+    white-space: nowrap;
+  }
+
+  .nav-link--cta:hover {
+    background-color: var(--color-purple);
+    color: var(--color-white);
+  }
+
+  .nav-link--cta.is-active {
+    background-color: var(--color-purple);
+    color: var(--color-white);
   }
 
   /* Set the Collective apart from the other links in the menu */
@@ -318,6 +351,12 @@ function groupIsActive(children: { href: string }[]): boolean {
     .nav-sublink--cta {
       margin-top: 0;
       border-top: none;
+    }
+
+    .nav-link--cta {
+      margin: var(--space-md) 0 0;
+      text-align: center;
+      border-bottom: 1px solid var(--color-purple);
     }
   }
 </style>
