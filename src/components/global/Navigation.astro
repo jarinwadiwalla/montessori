@@ -1,8 +1,11 @@
 ---
 const currentPath = Astro.url.pathname;
 
-// Guidance, Access and Whole Human are grouped under "Our Work" to keep the
-// bar short now that the Collective sits on the end.
+// The Collective is deliberately not linked from the public navigation.
+// The pages remain live and members reach them directly — see
+// SHOW_COLLECTIVE below to put the links back.
+const SHOW_COLLECTIVE = false;
+
 const items = [
   {
     label: 'Our Work',
@@ -26,7 +29,9 @@ const items = [
       { href: '/contact/', label: 'Contact' },
       // Label and destination swap to the portal for signed-in members,
       // handled by the script below.
-      { href: '/collective/', label: 'Join the Collective', collective: true },
+      ...(SHOW_COLLECTIVE
+        ? [{ href: '/collective/', label: 'Join the Collective', collective: true }]
+        : []),
     ],
   },
 ];
@@ -88,19 +93,21 @@ function groupIsActive(children: { href: string }[]): boolean {
         </li>
       )
     )}
-    <li>
-      <a
-        href="/collective/"
-        class:list={[
-          'nav-link',
-          'nav-link--cta',
-          'js-collective-link',
-          { 'is-active': isActive('/collective/') },
-        ]}
-      >
-        Collective
-      </a>
-    </li>
+    {SHOW_COLLECTIVE && (
+      <li>
+        <a
+          href="/collective/"
+          class:list={[
+            'nav-link',
+            'nav-link--cta',
+            'js-collective-link',
+            { 'is-active': isActive('/collective/') },
+          ]}
+        >
+          Collective
+        </a>
+      </li>
+    )}
   </ul>
 </nav>
 
