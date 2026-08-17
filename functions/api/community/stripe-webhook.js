@@ -113,12 +113,12 @@ export async function onRequestPost(context) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Adolescent Practitioners Collective <newsletter@montessoriforadolescents.com>",
+          from: "Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
           to: [email],
-          subject: "Welcome to the Adolescent Practitioners Collective",
+          subject: "Welcome to the Montessori Adolescent Collective",
           html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
               <p>Welcome${name ? ` ${escapeHtml(name)}` : ""} — you're in.</p>
-              <p>The Adolescent Practitioners Collective is a small, private space for people
+              <p>The Montessori Adolescent Collective is a small, private space for people
               doing this work. Use the link below to sign in and set up your profile.</p>
               <p style="margin:28px 0;">
                 <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>

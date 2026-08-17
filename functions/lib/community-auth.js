@@ -1,4 +1,4 @@
-// Shared auth helpers for the Adolescent Practitioners Collective.
+// Shared auth helpers for the Montessori Adolescent Collective.
 //
 // Design notes:
 // - No passwords exist anywhere in this system. Sign-in is by emailed

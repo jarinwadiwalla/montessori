@@ -10,7 +10,7 @@ import {
 } from "../../lib/community-auth.js";
 
 const SITE = "https://montessoriforadolescents.com";
-const FROM = "Adolescent Practitioners Collective <newsletter@montessoriforadolescents.com>";
+const FROM = "Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>";
 
 async function sendEmail(env, to, subject, html) {
   if (!env.RESEND_API_KEY) return;
@@ -75,7 +75,7 @@ export async function onRequestPost(context) {
         "Your sign-in link for the Collective",
         `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
            <p>Hello${member.name ? ` ${escapeHtml(member.name)}` : ""},</p>
-           <p>Here is your sign-in link for the Adolescent Practitioners Collective:</p>
+           <p>Here is your sign-in link for the Montessori Adolescent Collective:</p>
            <p style="margin:28px 0;">
              <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
            </p>
@@ -92,7 +92,7 @@ export async function onRequestPost(context) {
         email,
         "About your Collective membership",
         `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
-           <p>Your membership in the Adolescent Practitioners Collective is currently paused,
+           <p>Your membership in the Montessori Adolescent Collective is currently paused,
            so we weren't able to send a sign-in link.</p>
            <p>If you think this is a mistake, please reply to this email and we'll sort it out.</p>
          </div>`
@@ -105,10 +105,10 @@ export async function onRequestPost(context) {
       sendEmail(
         env,
         email,
-        "Joining the Adolescent Practitioners Collective",
+        "Joining the Montessori Adolescent Collective",
         `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
            <p>Someone (hopefully you) asked for a sign-in link for the Adolescent
-           Practitioners Collective using this address, but it isn't a member yet.</p>
+           Montessori Adolescent Collective using this address, but it isn't a member yet.</p>
            <p style="margin:28px 0;">
              <a href="${SITE}/collective/" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">See what the Collective is</a>
            </p>

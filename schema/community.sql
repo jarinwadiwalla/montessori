@@ -1,5 +1,5 @@
 -- ============================================================
--- Adolescent Practitioners Collective — community portal
+-- Montessori Adolescent Collective — community portal
 -- Apply with:
 --   npx wrangler d1 execute montessori-db --remote --file schema/community.sql
 -- ============================================================

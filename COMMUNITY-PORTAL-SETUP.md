@@ -1,4 +1,4 @@
-# Adolescent Practitioners Collective — setup guide
+# Montessori Adolescent Collective — setup guide
 
 The code is built and tested. These are the steps only you can do, because
 they need your Stripe and Cloudflare accounts. Do them in order.
@@ -23,7 +23,7 @@ You should see a list of `"success": true` results.
 ## 2. Create the Stripe product
 
 1. Go to **Stripe Dashboard → Product catalog → + Add product**
-2. Name: `Adolescent Practitioners Collective`
+2. Name: `Montessori Adolescent Collective`
 3. Price: **$95.00**, and choose **One-off** (not recurring)
 4. Click **Save product**
 5. On the product page, click **Create payment link**
