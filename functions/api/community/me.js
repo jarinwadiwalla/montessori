@@ -14,10 +14,18 @@ export async function onRequestGet(context) {
   if (!member) {
     return Response.json({ signedIn: false }, { status: 200 });
   }
+  // Folded into /me so the alert badge costs no extra request.
+  const unread = await context.env.SITE_DB.prepare(
+    "SELECT COUNT(*) AS n FROM community_notifications WHERE member_id = ? AND read_at = ''"
+  )
+    .bind(member.id)
+    .first();
+
   return Response.json({
     signedIn: true,
     member: { ...publicMember(member), email: member.email },
     needsProfile: !member.name,
+    unread: unread?.n || 0,
     lapsed: membershipLapsed(member),
     membership: {
       // Empty plan means comped — no dues, nothing to manage.

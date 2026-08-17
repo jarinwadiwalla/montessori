@@ -3,7 +3,7 @@
 // The member name/avatar are filled in by each page's script once
 // /api/community/me returns.
 interface Props {
-  active: 'board' | 'events' | 'members';
+  active: 'board' | 'events' | 'members' | 'alerts';
 }
 const { active } = Astro.props;
 ---
@@ -18,6 +18,12 @@ const { active } = Astro.props;
     <a href="/collective/portal/" class={active === 'board' ? 'is-active' : ''}>Board</a>
     <a href="/collective/events/" class={active === 'events' ? 'is-active' : ''}>Events</a>
     <a href="/collective/members/" class={active === 'members' ? 'is-active' : ''}>Members</a>
+    <a
+      href="/collective/alerts/"
+      class:list={['alerts-link', { 'is-active': active === 'alerts' }]}
+    >
+      Alerts<span class="alert-count" id="alert-count" hidden></span>
+    </a>
     <a href="/collective/guidelines/">Guidelines</a>
     <a href="/collective/portal/?edit=1">Edit profile</a>
     <button id="billing-btn" class="link-btn" type="button" hidden>Billing</button>
@@ -26,18 +32,33 @@ const { active } = Astro.props;
 </header>
 
 <script>
+  // Unread alert badge. The count rides along on /api/community/me, which
+  // this component already calls, so it costs no extra request.
+  function showAlertCount(n: number) {
+    const badge = document.getElementById('alert-count');
+    if (!badge) return;
+    if (n > 0) {
+      badge.textContent = String(n > 99 ? '99+' : n);
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+  }
+
   // Shown only to members who actually pay dues — comped members have no
   // Stripe customer and nothing to manage.
   const billingBtn = document.getElementById('billing-btn') as HTMLButtonElement | null;
 
-  if (billingBtn) {
-    fetch('/api/community/me')
-      .then((r) => r.json())
-      .then((me) => {
-        if (me?.membership?.has_billing) billingBtn.hidden = false;
-      })
-      .catch(() => {});
+  // One call feeds both the badge and the billing button.
+  fetch('/api/community/me')
+    .then((r) => r.json())
+    .then((me) => {
+      showAlertCount(me?.unread || 0);
+      if (billingBtn && me?.membership?.has_billing) billingBtn.hidden = false;
+    })
+    .catch(() => {});
 
+  if (billingBtn) {
     billingBtn.addEventListener('click', async () => {
       billingBtn.disabled = true;
       try {
@@ -106,6 +127,24 @@ const { active } = Astro.props;
   .portal-nav a:hover,
   .link-btn:hover {
     color: var(--color-purple);
+  }
+
+  .alerts-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .alert-count {
+    background: var(--color-terracotta);
+    color: var(--color-white);
+    font-size: 0.65rem;
+    line-height: 1;
+    min-width: 1.1rem;
+    padding: 0.2rem 0.3rem;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 600;
   }
 
   .portal-nav a.is-active {

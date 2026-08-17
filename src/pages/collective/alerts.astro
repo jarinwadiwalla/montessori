@@ -1,0 +1,287 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Alerts"
+  description="Your alerts in the Montessori Adolescent Collective."
+  heroTitle="Alerts"
+  heroSubtitle="When someone mentions you, it shows up here."
+  noindex
+>
+  <div class="container alerts-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="alerts" />
+
+      <div class="alerts-tools">
+        <p class="alerts-count" id="count"></p>
+        <button class="mark-all" id="mark-all" type="button" hidden>Mark all as read</button>
+      </div>
+
+      <div id="list"></div>
+      <p class="alerts-empty" id="empty" hidden>
+        Nothing yet. When another member types your @handle in a post or a
+        comment, you'll see it here.
+      </p>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+
+  function el(tag: string, cls?: string, text?: string) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text; // never innerHTML
+    return n;
+  }
+
+  function timeAgo(iso: string) {
+    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString();
+  }
+
+  async function api(path: string, options: RequestInit = {}) {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    let data: any = {};
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, data };
+  }
+
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+    if (me.lapsed) {
+      window.location.href = '/collective/portal/';
+      return;
+    }
+
+    $('loading').hidden = true;
+    $('main').hidden = false;
+    $('me-name').textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+
+    $('signout-btn').addEventListener('click', async () => {
+      await fetch('/api/community/logout', { method: 'POST' });
+      window.location.href = '/collective/';
+    });
+
+    $('mark-all').addEventListener('click', async () => {
+      await api('/api/community/notifications', {
+        method: 'PUT',
+        body: JSON.stringify({ all: true }),
+      });
+      load();
+    });
+
+    load();
+  }
+
+  async function load() {
+    const { ok, data } = await api('/api/community/notifications');
+    if (!ok) return;
+
+    const list = $('list');
+    list.textContent = '';
+
+    for (const n of data.notifications) {
+      list.appendChild(renderAlert(n));
+    }
+
+    $('empty').hidden = data.notifications.length > 0;
+    ($('mark-all') as HTMLButtonElement).hidden = data.unread === 0;
+    $('count').textContent =
+      data.unread > 0
+        ? `${data.unread} unread`
+        : data.notifications.length
+          ? 'All caught up'
+          : '';
+
+    // Keep the badge in the nav in step with what's on screen.
+    const badge = document.getElementById('alert-count');
+    if (badge) {
+      if (data.unread > 0) {
+        badge.textContent = String(data.unread > 99 ? '99+' : data.unread);
+        badge.hidden = false;
+      } else {
+        badge.hidden = true;
+      }
+    }
+  }
+
+  function renderAlert(n: any) {
+    const card = el('article', 'alert' + (n.read ? '' : ' is-unread'));
+
+    const head = el('div', 'a-head');
+    const where = n.kind === 'mention_comment' ? 'a comment' : 'a post';
+    head.appendChild(el('span', 'a-actor', n.actor_name));
+    head.appendChild(el('span', 'a-what', `mentioned you in ${where}`));
+    head.appendChild(el('span', 'a-time', timeAgo(n.created_at)));
+    card.appendChild(head);
+
+    if (n.excerpt) card.appendChild(el('p', 'a-excerpt', n.excerpt));
+
+    const actions = el('div', 'a-actions');
+    const open = document.createElement('a');
+    open.className = 'a-btn';
+    open.href = '/collective/portal/';
+    open.textContent = 'Open the board';
+    actions.appendChild(open);
+
+    if (!n.read) {
+      const mark = el('button', 'a-link', 'Mark as read');
+      mark.addEventListener('click', async () => {
+        await api('/api/community/notifications', {
+          method: 'PUT',
+          body: JSON.stringify({ id: n.id }),
+        });
+        load();
+      });
+      actions.appendChild(mark);
+    }
+
+    card.appendChild(actions);
+    return card;
+  }
+
+  boot();
+</script>
+
+<style>
+  .alerts-page {
+    max-width: 680px;
+  }
+
+  .loading,
+  .alerts-empty {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) 0;
+    line-height: var(--leading-relaxed);
+  }
+
+  .alerts-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .alerts-count {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .mark-all {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .mark-all:hover {
+    border-color: var(--color-purple);
+    color: var(--color-purple);
+  }
+
+  #list :global(.alert) {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+  }
+
+  #list :global(.alert.is-unread) {
+    border-left: 3px solid var(--color-terracotta);
+    background: #fffdfa;
+  }
+
+  #list :global(.a-head) {
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  #list :global(.a-actor) {
+    color: var(--color-purple);
+    font-weight: 500;
+  }
+
+  #list :global(.a-what) {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  #list :global(.a-time) {
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    margin-left: auto;
+  }
+
+  #list :global(.a-excerpt) {
+    margin-top: var(--space-sm);
+    padding-left: var(--space-md);
+    border-left: 2px solid var(--color-border);
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  #list :global(.a-actions) {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    margin-top: var(--space-md);
+  }
+
+  #list :global(.a-btn) {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 0.45rem 1.1rem;
+    font-size: var(--text-xs);
+    text-decoration: none;
+  }
+
+  #list :global(.a-link) {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  #list :global(.a-link:hover) {
+    color: var(--color-purple);
+  }
+</style>

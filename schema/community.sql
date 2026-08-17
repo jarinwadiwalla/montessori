@@ -148,3 +148,22 @@ CREATE TABLE IF NOT EXISTS community_event_rsvps (
   PRIMARY KEY (event_id, member_id)
 );
 CREATE INDEX IF NOT EXISTS idx_rsvps_event ON community_event_rsvps(event_id);
+
+-- Notifications ----------------------------------------------
+-- In-app alerts rather than email, so a busy thread doesn't fill
+-- anyone's inbox. Each member keeps a running unread count.
+CREATE TABLE IF NOT EXISTS community_notifications (
+  id TEXT PRIMARY KEY,
+  member_id TEXT NOT NULL,                  -- who is being told
+  kind TEXT NOT NULL DEFAULT 'mention',
+  actor_id TEXT DEFAULT '',                 -- who did it
+  actor_name TEXT DEFAULT '',
+  post_id TEXT DEFAULT '',
+  excerpt TEXT DEFAULT '',
+  read_at TEXT DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_member
+  ON community_notifications(member_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread
+  ON community_notifications(member_id, read_at);

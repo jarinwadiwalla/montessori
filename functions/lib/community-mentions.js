@@ -65,8 +65,14 @@ export function extractHandles(text) {
   return [...found];
 }
 
-// Email everyone named in a post or comment. Never emails the author for
-// mentioning themselves, and skips members whose dues have lapsed.
+// Record an in-app alert for everyone named in a post or comment.
+//
+// Deliberately not email: mentions in a busy thread would fill people's
+// inboxes. These sit in the portal with an unread count instead, and the
+// member clears them when they're ready.
+//
+// Nobody is notified for mentioning themselves, and suspended members are
+// skipped.
 export async function notifyMentions(context, { text, author, kind, postId }) {
   const { env } = context;
   const handles = extractHandles(text);
@@ -74,7 +80,7 @@ export async function notifyMentions(context, { text, author, kind, postId }) {
 
   const placeholders = handles.map(() => "?").join(",");
   const { results } = await env.SITE_DB.prepare(
-    `SELECT id, email, name, handle FROM community_members
+    `SELECT id, name, handle FROM community_members
      WHERE handle IN (${placeholders}) AND status = 'active'`
   )
     .bind(...handles)
@@ -83,44 +89,34 @@ export async function notifyMentions(context, { text, author, kind, postId }) {
   const targets = results.filter((m) => m.id !== author.id).slice(0, MAX_NOTIFIED);
   if (!targets.length) return [];
 
-  const where = kind === "comment" ? "a comment" : "a post";
-  const link = `${SITE}/collective/portal/`;
-  const excerpt = String(text).trim().slice(0, 280);
+  const now = new Date().toISOString();
+  const excerpt = String(text).trim().slice(0, 240);
 
   for (const target of targets) {
-    if (!env.RESEND_API_KEY) break;
-    context.waitUntil(
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
-          to: [target.email],
-          subject: `${author.name || "Someone"} mentioned you in the Collective`,
-          html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
-              <p><strong>${escapeHtml(author.name || "Someone")}</strong> mentioned you in ${where}:</p>
-              <blockquote style="margin:20px 0;padding:12px 18px;border-left:3px solid #d0905b;background:#faf7f3;color:#4a3f35;">
-                ${escapeHtml(excerpt)}${String(text).length > 280 ? "…" : ""}
-              </blockquote>
-              <p style="margin:28px 0;">
-                <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Read it in the Collective</a>
-              </p>
-              <p style="color:#6b5b7d;font-size:14px;">You're getting this because someone typed
-              @${escapeHtml(target.handle)} in the Collective.</p>
-            </div>`,
-        }),
-      }).catch(() => {})
-    );
+    await env.SITE_DB.prepare(
+      `INSERT INTO community_notifications
+         (id, member_id, kind, actor_id, actor_name, post_id, excerpt, read_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, '', ?)`
+    )
+      .bind(
+        generateNotificationId(),
+        target.id,
+        kind === "comment" ? "mention_comment" : "mention_post",
+        author.id,
+        author.name || "A member",
+        postId || "",
+        excerpt,
+        now
+      )
+      .run();
   }
 
   return targets.map((t) => t.handle);
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  })[c]);
+function generateNotificationId() {
+  return `ntf_${Date.now().toString(36)}-${crypto
+    .randomUUID()
+    .replace(/-/g, "")
+    .slice(0, 12)}`;
 }
