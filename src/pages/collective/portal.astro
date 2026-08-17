@@ -207,8 +207,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       return;
     }
 
-    // "Edit profile" links here with ?edit=1
-    const wantsEdit = new URLSearchParams(window.location.search).has('edit');
+    // Set by the "Edit profile" link immediately before navigating here.
+    // Read once and cleared, so a refresh returns to the board and no URL
+    // can reopen the editor.
+    const wantsEdit = sessionStorage.getItem('apc_edit_profile') === '1';
+    sessionStorage.removeItem('apc_edit_profile');
 
     if (data.needsProfile || wantsEdit) {
       showProfileSetup();

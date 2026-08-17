@@ -25,13 +25,25 @@ const { active } = Astro.props;
       Alerts<span class="alert-count" id="alert-count" hidden></span>
     </a>
     <a href="/collective/guidelines/">Guidelines</a>
-    <a href="/collective/portal/?edit=1">Edit profile</a>
+    <a href="/collective/portal/" data-edit-profile>Edit profile</a>
     <button id="billing-btn" class="link-btn" type="button" hidden>Billing</button>
     <button id="signout-btn" class="link-btn" type="button">Sign out</button>
   </nav>
 </header>
 
 <script>
+  // "Edit profile" used to be /collective/portal/?edit=1. A URL that opens
+  // the editor is sticky: refresh it, or let the browser autocomplete it
+  // later, and you land back in the editor looking trapped. The intent is
+  // now recorded for one navigation only and cannot be bookmarked.
+  //
+  // Delegated from the document so it also catches the link on the members
+  // page, not just the one in this nav.
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element)?.closest?.('[data-edit-profile]');
+    if (link) sessionStorage.setItem('apc_edit_profile', '1');
+  });
+
   // Unread alert badge. The count rides along on /api/community/me, which
   // this component already calls, so it costs no extra request.
   function showAlertCount(n: number) {
