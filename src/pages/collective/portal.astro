@@ -58,7 +58,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       <input id="profile-avatar" type="file" accept="image/*" />
       <img class="avatar-preview" id="avatar-preview" alt="" hidden />
 
-      <button id="profile-save">Save and continue</button>
+      <div class="setup-actions">
+        <button id="profile-save">Save and continue</button>
+        <button id="profile-cancel" type="button" class="ghost" hidden>Cancel</button>
+      </div>
       <p class="form-error" id="profile-error" role="alert"></p>
     </section>
 
@@ -208,6 +211,18 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   function showProfileSetup() {
     $('profile-setup').hidden = false;
     $('portal-main').hidden = true;
+
+    // Drop ?edit=1 from the address bar straight away. Leaving it there
+    // means a refresh — or the browser autocompleting the URL later —
+    // reopens the editor, which feels like being stuck in it.
+    if (window.location.search) {
+      window.history.replaceState({}, '', '/collective/portal/');
+    }
+
+    // Someone who already has a name is editing, not setting up, so give
+    // them a way out without saving. A brand-new member needs a name, so
+    // they don't get one.
+    $('profile-cancel').hidden = !me?.name;
     (document.getElementById('profile-name') as HTMLInputElement).value = me?.name || '';
     (document.getElementById('profile-bio') as HTMLTextAreaElement).value = me?.bio || '';
     (document.getElementById('profile-location') as HTMLInputElement).value = me?.location || '';
@@ -295,6 +310,14 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
 
     me = data.member;
+    stagedAvatarUrl = null;
+    showPortal();
+    loadFeed(true);
+  });
+
+  // Leave the editor without saving. The feed may not have loaded yet,
+  // because boot() skips it when it opens the editor straight away.
+  $('profile-cancel').addEventListener('click', () => {
     stagedAvatarUrl = null;
     showPortal();
     loadFeed(true);
@@ -696,6 +719,23 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     border-radius: 50%;
     object-fit: cover;
     margin: var(--space-sm) 0 var(--space-lg);
+  }
+
+  .setup-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+
+  .profile-setup .ghost {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light);
+  }
+
+  .profile-setup .ghost:hover {
+    border-color: var(--color-purple);
+    color: var(--color-purple);
   }
 
   .profile-setup button,

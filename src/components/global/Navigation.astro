@@ -12,8 +12,13 @@ const items = [
       { href: '/whole-human/', label: 'Whole Human' },
     ],
   },
-  { href: '/resources/', label: 'Resources' },
-  { href: '/blog/', label: 'Blog' },
+  {
+    label: 'Resources',
+    children: [
+      { href: '/resources/', label: 'Downloads' },
+      { href: '/blog/', label: 'Blog' },
+    ],
+  },
   { href: '/our-team/', label: 'Our Team' },
   { href: '/contact/', label: 'Contact' },
 ];
