@@ -2,9 +2,13 @@
 -- Seed the Collective directory with the Montessori for Adolescents
 -- team, so the room isn't empty on day one.
 --
--- BEFORE YOU RUN THIS: replace the two placeholder email addresses
--- below with Alex's and Lola's real ones. Sign-in is by email, so a
--- wrong address means they cannot get in. Jarin's is already correct.
+-- This file keeps PLACEHOLDER emails on purpose: the montessori repo is
+-- public, so real addresses must never be committed here.
+--
+-- The version with everyone's real emails lives beside this one as
+-- schema/seed-collective-team.local.sql, which is gitignored. Run that
+-- one. If it is ever lost, copy this file to *.local.sql and fill the
+-- addresses in there.
 --
 -- Apply with:
 --   npx wrangler d1 execute montessori-db --remote --file schema/seed-collective-team.sql

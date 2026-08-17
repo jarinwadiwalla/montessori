@@ -122,16 +122,18 @@ and bios from the website, so the room isn't empty on day one. It also
 makes you an organiser, which is what lets you add events and remove any
 post or comment.
 
-**First**, open `schema/seed-collective-team.sql` and replace the two
-placeholder email addresses with Alex's and Lola's real ones. Sign-in is
-by email, so a wrong address means they can't get in. Yours is already
-correct.
-
-Then:
+Run the **`.local.sql`** version — it already has everyone's real email
+addresses in it:
 
 ```bash
-npx wrangler d1 execute montessori-db --remote --file schema/seed-collective-team.sql
+npx wrangler d1 execute montessori-db --remote --file schema/seed-collective-team.local.sql
 ```
+
+> **Why two files.** This repo is public, so real email addresses can't be
+> committed to it — they'd be readable by anyone and scraped by spam bots.
+> The committed `seed-collective-team.sql` keeps placeholders; the
+> `.local.sql` file sits on your computer only and is gitignored. Don't
+> commit it, and don't paste its contents anywhere public.
 
 Safe to run more than once — it updates rather than duplicates.
 

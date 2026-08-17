@@ -16,6 +16,10 @@ dist/
 .dev.vars
 .dev.vars.*
 
+# Local SQL holding real people's email addresses. This repo is public,
+# so these must never be committed.
+schema/*.local.sql
+
 # OS files
 .DS_Store
 Thumbs.db
