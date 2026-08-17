@@ -5,6 +5,8 @@ Disallow: /collective/portal/
 Disallow: /collective/login/
 Disallow: /collective/verify/
 Disallow: /collective/welcome/
+Disallow: /collective/members/
+Disallow: /collective/events/
 Disallow: /community-media/
 
 Sitemap: https://montessoriforadolescents.com/sitemap-index.xml

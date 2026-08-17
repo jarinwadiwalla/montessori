@@ -7,15 +7,22 @@ export default defineConfig({
   integrations: [
     sitemap({
       // Keep purchase-confirmation, paid-recording, and members-only pages
-      // out of search results. The Collective's landing and guidelines pages
-      // stay in — those are public and worth ranking.
-      filter: (page) =>
-        !page.includes('/webinars/thank-you') &&
-        !page.endsWith('/watch/') &&
-        !page.includes('/collective/login') &&
-        !page.includes('/collective/verify') &&
-        !page.includes('/collective/portal') &&
-        !page.includes('/collective/welcome'),
+      // out of search results.
+      //
+      // Everything under /collective/ is members-only EXCEPT the landing and
+      // guidelines pages, which are public and worth ranking. Written as an
+      // allow-list so a new page added in there is private by default.
+      filter: (page) => {
+        if (page.includes('/webinars/thank-you')) return false;
+        if (page.endsWith('/watch/')) return false;
+
+        const collective = page.match(/\/collective\/(.*)$/);
+        if (collective) {
+          const rest = collective[1];
+          return rest === '' || rest === 'guidelines/';
+        }
+        return true;
+      },
     }),
   ],
   redirects: {

@@ -1,0 +1,83 @@
+---
+// Shared top bar for the signed-in areas of the Collective.
+// The member name/avatar are filled in by each page's script once
+// /api/community/me returns.
+interface Props {
+  active: 'board' | 'events' | 'members';
+}
+const { active } = Astro.props;
+---
+
+<header class="portal-bar">
+  <div class="portal-me">
+    <img class="me-avatar" id="me-avatar" alt="" hidden />
+    <span id="me-name"></span>
+  </div>
+
+  <nav class="portal-nav" aria-label="Collective">
+    <a href="/collective/portal/" class={active === 'board' ? 'is-active' : ''}>Board</a>
+    <a href="/collective/events/" class={active === 'events' ? 'is-active' : ''}>Events</a>
+    <a href="/collective/members/" class={active === 'members' ? 'is-active' : ''}>Members</a>
+    <a href="/collective/guidelines/">Guidelines</a>
+    <a href="/collective/portal/?edit=1">Edit profile</a>
+    <button id="signout-btn" class="link-btn" type="button">Sign out</button>
+  </nav>
+</header>
+
+<style>
+  .portal-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .portal-me {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 500;
+    color: var(--color-purple);
+  }
+
+  .me-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .portal-nav {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .portal-nav a,
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+  }
+
+  .portal-nav a:hover,
+  .link-btn:hover {
+    color: var(--color-purple);
+  }
+
+  .portal-nav a.is-active {
+    color: var(--color-purple);
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-terracotta);
+  }
+</style>

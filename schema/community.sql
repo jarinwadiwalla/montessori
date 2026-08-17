@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS community_members (
   name TEXT DEFAULT '',
   avatar_url TEXT DEFAULT '',
   bio TEXT DEFAULT '',
+  location TEXT DEFAULT '',                 -- shown in the member directory
+  open_to_exchange INTEGER DEFAULT 0,       -- opted in to exchange / pen pal
   role TEXT NOT NULL DEFAULT 'member',      -- member | admin
   status TEXT NOT NULL DEFAULT 'active',    -- active | suspended
   joined_at TEXT NOT NULL,
@@ -101,3 +103,35 @@ CREATE TABLE IF NOT EXISTS community_reports (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_reports_status ON community_reports(status, created_at DESC);
+
+-- Events -----------------------------------------------------
+-- Covers monthly gatherings, guest presentations and in-person
+-- retreats. Created by admins; any member can RSVP.
+CREATE TABLE IF NOT EXISTS community_events (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,                       -- gathering | presentation | retreat
+  title TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  starts_at TEXT NOT NULL,                  -- ISO 8601, UTC
+  ends_at TEXT DEFAULT '',
+  timezone_note TEXT DEFAULT '',            -- e.g. "9am SGT / 6pm PDT"
+  location TEXT DEFAULT '',                 -- "Online" or a real place
+  link TEXT DEFAULT '',                     -- meeting or booking link
+  host_name TEXT DEFAULT '',                -- guest presenter, if any
+  capacity INTEGER DEFAULT 0,               -- 0 = unlimited
+  status TEXT NOT NULL DEFAULT 'visible',   -- visible | cancelled
+  created_by TEXT DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_events_start ON community_events(starts_at);
+CREATE INDEX IF NOT EXISTS idx_events_status ON community_events(status);
+
+-- Who's coming ------------------------------------------------
+CREATE TABLE IF NOT EXISTS community_event_rsvps (
+  event_id TEXT NOT NULL,
+  member_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (event_id, member_id)
+);
+CREATE INDEX IF NOT EXISTS idx_rsvps_event ON community_event_rsvps(event_id);

@@ -16,6 +16,17 @@ const stripeJoinLink = '';
 >
   <div class="container collective">
     <section class="intro">
+      <img
+        src="/images/collective/logo-dark.png"
+        alt="The Montessori Adolescent Collective"
+        class="collective-logo"
+        width="996"
+        height="172"
+      />
+      <p class="tagline">
+        A collaborative online community for all things third plane of development.
+      </p>
+      <p class="est">Est. 2026</p>
       <p class="lede">
         Working with adolescents can be isolating. Most of us are the only person
         in our setting doing it, improvising against a philosophy that was never
@@ -29,7 +40,7 @@ const stripeJoinLink = '';
       <h2>What's inside</h2>
       <div class="what-grid">
         <div class="what-item">
-          <h3>A shared conversation</h3>
+          <h3>Communication board</h3>
           <p>
             One common room rather than a maze of channels. Post a question, a
             plan, a photograph of your space, or a document you're working on —
@@ -37,7 +48,22 @@ const stripeJoinLink = '';
           </p>
         </div>
         <div class="what-item">
-          <h3>Share real materials</h3>
+          <h3>Monthly gatherings</h3>
+          <p>
+            We meet as a group each month to think out loud together — bring the
+            thing you're stuck on. Dates and joining links live in the Events
+            section, with times given for the timezones our members are in.
+          </p>
+        </div>
+        <div class="what-item">
+          <h3>Guest presentations</h3>
+          <p>
+            Sessions with practitioners and specialists working at the edges of
+            adolescent work — inside and outside Montessori.
+          </p>
+        </div>
+        <div class="what-item">
+          <h3>Resource sharing</h3>
           <p>
             Attach images and PDFs to a post, or link a video. Work plans,
             schedules, land project notes, budgets — the practical artefacts that
@@ -45,20 +71,27 @@ const stripeJoinLink = '';
           </p>
         </div>
         <div class="what-item">
-          <h3>People who've done it</h3>
+          <h3>Exchange &amp; pen pal programmes</h3>
           <p>
-            Our team all carry the AMI 12–18 diploma and have worked in adolescent
-            environments from the U.S. to France to Bali. We're in here too.
+            Find the members open to connecting their community with yours, from
+            student pen pals to guide-to-guide exchanges. Say you're open to it on
+            your profile and you'll appear in the directory.
           </p>
         </div>
         <div class="what-item">
-          <h3>Genuinely private</h3>
+          <h3>In-person retreats</h3>
           <p>
-            Members only. Nothing posted here is visible to the public web or to
-            search engines, and your email address is never shown to other members.
+            Time together away from screens. Retreats are announced in Events with
+            the details and how to book a place.
           </p>
         </div>
       </div>
+
+      <p class="what-note">
+        Everything here is members-only. Nothing posted is visible to the public
+        web or to search engines, and your email address is never shown to other
+        members.
+      </p>
     </section>
 
     <section class="join-card">
@@ -95,10 +128,48 @@ const stripeJoinLink = '';
     max-width: 820px;
   }
 
+  .collective-logo {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin: 0 auto var(--space-lg);
+  }
+
+  .tagline {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-style: italic;
+    color: var(--color-purple);
+    line-height: var(--leading-relaxed);
+  }
+
+  .est {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: var(--text-xs);
+    color: var(--color-terracotta-dark);
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-2xl);
+  }
+
   .lede {
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
     color: var(--color-text);
+  }
+
+  .what-note {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-white);
+    border-left: 3px solid var(--color-terracotta);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+    font-size: var(--text-sm);
   }
 
   .what {

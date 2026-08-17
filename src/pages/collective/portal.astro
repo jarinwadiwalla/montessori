@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
 ---
 
 <PageLayout
@@ -21,8 +22,19 @@ import PageLayout from '../../layouts/PageLayout.astro';
       <label for="profile-name">Display name</label>
       <input id="profile-name" type="text" maxlength="60" placeholder="How you'd like to be known" />
 
+      <label for="profile-location">Where you are <span>(optional)</span></label>
+      <input id="profile-location" type="text" maxlength="80" placeholder="Ubud, Bali" />
+
       <label for="profile-bio">A line about your work <span>(optional)</span></label>
       <textarea id="profile-bio" maxlength="400" rows="2" placeholder="Guide, 12–18 environment, Bali"></textarea>
+
+      <label class="checkbox-row">
+        <input id="profile-exchange" type="checkbox" />
+        <span>
+          I'm open to exchanges and pen pal programmes
+          <small>Shows a badge on your directory listing so others can find you.</small>
+        </span>
+      </label>
 
       <label for="profile-avatar">Profile picture <span>(optional)</span></label>
       <input id="profile-avatar" type="file" accept="image/*" />
@@ -34,17 +46,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
 
     <!-- Main portal -->
     <div id="portal-main" hidden>
-      <header class="portal-bar">
-        <div class="portal-me">
-          <img class="me-avatar" id="me-avatar" alt="" hidden />
-          <span id="me-name"></span>
-        </div>
-        <nav class="portal-links">
-          <a href="/collective/guidelines/">Guidelines</a>
-          <button id="edit-profile-btn" class="link-btn">Edit profile</button>
-          <button id="signout-btn" class="link-btn">Sign out</button>
-        </nav>
-      </header>
+      <PortalNav active="board" />
 
       <!-- Composer -->
       <section class="composer">
@@ -145,7 +147,10 @@ import PageLayout from '../../layouts/PageLayout.astro';
     me = data.member;
     $('loading').hidden = true;
 
-    if (data.needsProfile) {
+    // "Edit profile" links here with ?edit=1
+    const wantsEdit = new URLSearchParams(window.location.search).has('edit');
+
+    if (data.needsProfile || wantsEdit) {
       showProfileSetup();
     } else {
       showPortal();
@@ -158,6 +163,9 @@ import PageLayout from '../../layouts/PageLayout.astro';
     $('portal-main').hidden = true;
     (document.getElementById('profile-name') as HTMLInputElement).value = me?.name || '';
     (document.getElementById('profile-bio') as HTMLTextAreaElement).value = me?.bio || '';
+    (document.getElementById('profile-location') as HTMLInputElement).value = me?.location || '';
+    (document.getElementById('profile-exchange') as HTMLInputElement).checked =
+      !!me?.open_to_exchange;
     if (me?.avatar_url) {
       const preview = document.getElementById('avatar-preview') as HTMLImageElement;
       preview.src = me.avatar_url;
@@ -168,6 +176,10 @@ import PageLayout from '../../layouts/PageLayout.astro';
   function showPortal() {
     $('profile-setup').hidden = true;
     $('portal-main').hidden = false;
+    // drop ?edit=1 so a refresh doesn't reopen the editor
+    if (window.location.search) {
+      window.history.replaceState({}, '', '/collective/portal/');
+    }
     $('me-name').textContent = me?.name || 'Member';
     const avatar = document.getElementById('me-avatar') as HTMLImageElement;
     if (me?.avatar_url) {
@@ -224,6 +236,8 @@ import PageLayout from '../../layouts/PageLayout.astro';
       body: JSON.stringify({
         name,
         bio,
+        location: (document.getElementById('profile-location') as HTMLInputElement).value.trim(),
+        open_to_exchange: (document.getElementById('profile-exchange') as HTMLInputElement).checked,
         avatar_url: stagedAvatarUrl ?? me?.avatar_url ?? '',
       }),
     });
@@ -238,8 +252,6 @@ import PageLayout from '../../layouts/PageLayout.astro';
     showPortal();
     loadFeed(true);
   });
-
-  $('edit-profile-btn').addEventListener('click', () => showProfileSetup());
 
   $('signout-btn').addEventListener('click', async () => {
     await fetch('/api/community/logout', { method: 'POST' });
@@ -619,7 +631,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
 
   .profile-setup input[type='text'],
   .profile-setup textarea,
-  .comment-form textarea,
+  .feed :global(.comment-form textarea),
   .composer textarea {
     width: 100%;
     padding: 0.8rem 1rem;
@@ -631,7 +643,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     resize: vertical;
   }
 
-  .avatar-preview {
+  .feed :global(.avatar-preview) {
     width: 72px;
     height: 72px;
     border-radius: 50%;
@@ -641,7 +653,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
 
   .profile-setup button,
   .post-btn,
-  .comment-send {
+  .feed :global(.comment-send) {
     background: var(--color-purple);
     color: var(--color-white);
     border: none;
@@ -659,54 +671,27 @@ import PageLayout from '../../layouts/PageLayout.astro';
     margin-top: var(--space-xs);
   }
 
-  /* Top bar */
-  .portal-bar {
+  /* Exchange opt-in */
+  .checkbox-row {
+    flex-direction: row;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-md);
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: var(--space-xl);
-    flex-wrap: wrap;
-  }
-
-  .portal-me {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-weight: 500;
-    color: var(--color-purple);
-  }
-
-  .me-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .portal-links {
-    display: flex;
-    gap: var(--space-md);
-    align-items: center;
-  }
-
-  .portal-links a,
-  .link-btn {
-    background: none;
-    border: none;
-    color: var(--color-text-light);
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: var(--space-lg);
     cursor: pointer;
-    text-decoration: none;
-    padding: 0;
+    color: var(--color-text);
   }
 
-  .portal-links a:hover,
-  .link-btn:hover {
-    color: var(--color-purple);
+  .checkbox-row input {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .checkbox-row small {
+    display: block;
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    margin-top: 0.1rem;
   }
 
   /* Composer */
@@ -729,7 +714,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     margin-bottom: var(--space-sm);
   }
 
-  .attachment-chip {
+  .composer-attachments :global(.attachment-chip) {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -740,7 +725,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     font-size: var(--text-xs);
   }
 
-  .chip-remove {
+  .composer-attachments :global(.chip-remove) {
     background: none;
     border: none;
     color: var(--color-purple);
@@ -773,12 +758,12 @@ import PageLayout from '../../layouts/PageLayout.astro';
     color: var(--color-purple);
   }
 
-  .post-btn {
+  .feed :global(.post-btn) {
     margin-left: auto;
   }
 
   /* Posts */
-  .post {
+  .feed :global(.post) {
     background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
@@ -786,14 +771,14 @@ import PageLayout from '../../layouts/PageLayout.astro';
     margin-bottom: var(--space-lg);
   }
 
-  .post-head {
+  .feed :global(.post-head) {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
     margin-bottom: var(--space-sm);
   }
 
-  .avatar {
+  .feed :global(.avatar) {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -801,7 +786,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     flex-shrink: 0;
   }
 
-  .avatar--initial {
+  .feed :global(.avatar--initial) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -810,45 +795,45 @@ import PageLayout from '../../layouts/PageLayout.astro';
     font-family: var(--font-heading);
   }
 
-  .post-meta {
+  .feed :global(.post-meta) {
     display: flex;
     flex-direction: column;
   }
 
-  .post-author,
-  .comment-author {
+  .feed :global(.post-author),
+  .feed :global(.comment-author) {
     color: var(--color-purple);
     font-weight: 500;
   }
 
-  .post-time,
-  .comment-time {
+  .feed :global(.post-time),
+  .feed :global(.comment-time) {
     color: var(--color-text-light);
     font-size: var(--text-xs);
   }
 
-  .post-body,
-  .comment-body {
+  .feed :global(.post-body),
+  .feed :global(.comment-body) {
     line-height: var(--leading-relaxed);
     color: var(--color-text);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
 
-  .post-attachments {
+  .feed :global(.post-attachments) {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
     margin-top: var(--space-md);
   }
 
-  .attachment-image {
+  .feed :global(.attachment-image) {
     width: 100%;
     border-radius: var(--radius-lg);
     display: block;
   }
 
-  .attachment-file {
+  .feed :global(.attachment-file) {
     display: inline-block;
     background: var(--color-cream);
     border-radius: var(--radius-md);
@@ -858,7 +843,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     font-size: var(--text-sm);
   }
 
-  .attachment-video {
+  .feed :global(.attachment-video) {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -867,7 +852,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
     background: #000;
   }
 
-  .attachment-video iframe {
+  .feed :global(.attachment-video iframe) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -875,14 +860,14 @@ import PageLayout from '../../layouts/PageLayout.astro';
     border: 0;
   }
 
-  .post-actions,
-  .comment-actions {
+  .feed :global(.post-actions),
+  .feed :global(.comment-actions) {
     display: flex;
     gap: var(--space-md);
     margin-top: var(--space-md);
   }
 
-  .action-btn {
+  .feed :global(.action-btn) {
     background: none;
     border: none;
     padding: 0;
@@ -892,43 +877,43 @@ import PageLayout from '../../layouts/PageLayout.astro';
     cursor: pointer;
   }
 
-  .action-btn:hover {
+  .feed :global(.action-btn:hover) {
     color: var(--color-purple);
   }
 
-  .action-btn--danger:hover {
+  .feed :global(.action-btn--danger:hover) {
     color: var(--color-terracotta-dark);
   }
 
   /* Comments */
-  .comments {
+  .feed :global(.comments) {
     margin-top: var(--space-lg);
     padding-top: var(--space-md);
     border-top: 1px solid var(--color-border);
   }
 
-  .comment {
+  .feed :global(.comment) {
     display: flex;
     gap: var(--space-sm);
     margin-bottom: var(--space-md);
   }
 
-  .comment .avatar {
+  .feed :global(.comment .avatar) {
     width: 30px;
     height: 30px;
   }
 
-  .comment-main {
+  .feed :global(.comment-main) {
     flex: 1;
   }
 
-  .comment-head {
+  .feed :global(.comment-head) {
     display: flex;
     gap: var(--space-sm);
     align-items: baseline;
   }
 
-  .comment-form textarea {
+  .feed :global(.comment-form textarea) {
     margin-bottom: var(--space-xs);
   }
 

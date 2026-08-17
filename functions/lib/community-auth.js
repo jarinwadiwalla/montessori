@@ -183,6 +183,8 @@ export function publicMember(m) {
     name: m.name || "Member",
     avatar_url: m.avatar_url || "",
     bio: m.bio || "",
+    location: m.location || "",
+    open_to_exchange: !!m.open_to_exchange,
     role: m.role,
   };
 }

@@ -1,0 +1,292 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Members"
+  description="The Montessori Adolescent Collective member directory."
+  heroTitle="Members"
+  heroSubtitle="Who else is in the room."
+  noindex
+>
+  <div class="container directory">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="members" />
+
+      <div class="dir-tools">
+        <input
+          type="search"
+          id="search"
+          placeholder="Search by name, place, or work…"
+          aria-label="Search members"
+        />
+        <label class="filter">
+          <input type="checkbox" id="exchange-only" />
+          Open to exchange &amp; pen pal only
+        </label>
+      </div>
+
+      <p class="dir-count" id="count"></p>
+      <div class="member-grid" id="grid"></div>
+      <p class="dir-empty" id="empty" hidden>No members match that search.</p>
+
+      <p class="dir-note">
+        Want to appear here as open to exchanges? Turn it on in
+        <a href="/collective/portal/?edit=1">your profile</a>.
+      </p>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+  let timer: number | undefined;
+
+  function el(tag: string, cls?: string, text?: string) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text; // never innerHTML
+    return n;
+  }
+
+  function avatarFor(m: any) {
+    if (m.avatar_url) {
+      const img = document.createElement('img');
+      img.className = 'm-avatar';
+      img.src = m.avatar_url;
+      img.alt = '';
+      img.width = 56;
+      img.height = 56;
+      img.loading = 'lazy';
+      return img;
+    }
+    return el('span', 'm-avatar m-avatar--initial', (m.name || 'M').trim().charAt(0).toUpperCase());
+  }
+
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+
+    $('loading').hidden = true;
+    $('main').hidden = false;
+    $('me-name').textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+
+    $('signout-btn').addEventListener('click', async () => {
+      await fetch('/api/community/logout', { method: 'POST' });
+      window.location.href = '/collective/';
+    });
+
+    (document.getElementById('search') as HTMLInputElement).addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(load, 250);
+    });
+    (document.getElementById('exchange-only') as HTMLInputElement).addEventListener('change', load);
+
+    load();
+  }
+
+  async function load() {
+    const q = (document.getElementById('search') as HTMLInputElement).value.trim();
+    const ex = (document.getElementById('exchange-only') as HTMLInputElement).checked;
+
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (ex) params.set('exchange', '1');
+
+    const res = await fetch(`/api/community/members?${params}`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const grid = $('grid');
+    grid.textContent = '';
+
+    for (const m of data.members) {
+      const card = el('article', 'member-card');
+
+      const head = el('div', 'm-head');
+      head.appendChild(avatarFor(m));
+
+      const who = el('div', 'm-who');
+      const nameRow = el('div', 'm-name-row');
+      nameRow.appendChild(el('span', 'm-name', m.name));
+      if (m.role === 'admin') nameRow.appendChild(el('span', 'm-badge', 'Organiser'));
+      if (m.is_you) nameRow.appendChild(el('span', 'm-badge m-badge--you', 'You'));
+      who.appendChild(nameRow);
+      if (m.location) who.appendChild(el('span', 'm-location', m.location));
+      head.appendChild(who);
+      card.appendChild(head);
+
+      if (m.bio) card.appendChild(el('p', 'm-bio', m.bio));
+      if (m.open_to_exchange) {
+        card.appendChild(el('span', 'm-exchange', 'Open to exchange & pen pal'));
+      }
+
+      grid.appendChild(card);
+    }
+
+    $('count').textContent =
+      data.total === 1 ? '1 member' : `${data.total} members`;
+    $('empty').hidden = data.total > 0;
+  }
+
+  boot();
+</script>
+
+<style>
+  .directory {
+    max-width: 860px;
+  }
+
+  .loading,
+  .dir-empty {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) 0;
+  }
+
+  .dir-tools {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-md);
+  }
+
+  #search {
+    flex: 1 1 240px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+  }
+
+  .filter {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+
+  .dir-count {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-lg);
+  }
+
+  .member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .member-grid :global(.member-card) {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+  }
+
+  .member-grid :global(.m-head) {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+
+  .member-grid :global(.m-avatar) {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .member-grid :global(.m-avatar--initial) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-lavender);
+    color: var(--color-purple);
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+  }
+
+  .member-grid :global(.m-who) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .member-grid :global(.m-name-row) {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .member-grid :global(.m-name) {
+    color: var(--color-purple);
+    font-weight: 500;
+  }
+
+  .member-grid :global(.m-badge) {
+    background: var(--color-lavender);
+    color: var(--color-purple);
+    font-size: var(--text-xs);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  .member-grid :global(.m-badge--you) {
+    background: var(--color-cream-dark);
+    color: var(--color-earth);
+  }
+
+  .member-grid :global(.m-location) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .member-grid :global(.m-bio) {
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+  }
+
+  .member-grid :global(.m-exchange) {
+    display: inline-block;
+    margin-top: var(--space-sm);
+    font-size: var(--text-xs);
+    color: var(--color-sage-dark);
+    border: 1px solid var(--color-sage-light);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .dir-note {
+    margin-top: var(--space-2xl);
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .dir-note a {
+    color: var(--color-purple);
+  }
+</style>

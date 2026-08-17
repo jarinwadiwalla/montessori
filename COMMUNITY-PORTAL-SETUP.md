@@ -75,16 +75,31 @@ if you picked a different amount. Until you do this, the page shows
 
 ---
 
-## 5. Make yourself an admin
+## 5. Add the team (and make yourself an organiser)
 
-Being an admin lets you delete anyone's post or comment from inside the
-portal. First join the Collective yourself (or add yourself by hand):
+This puts you, Alex and Lola in the member directory with your headshots
+and bios from the website, so the room isn't empty on day one. It also
+makes you an organiser, which is what lets you add events and remove any
+post or comment.
+
+**First**, open `schema/seed-collective-team.sql` and replace the two
+placeholder email addresses with Alex's and Lola's real ones. Sign-in is
+by email, so a wrong address means they can't get in. Yours is already
+correct.
+
+Then:
 
 ```bash
-npx wrangler d1 execute montessori-db --remote --command "INSERT INTO community_members (id, email, name, role, status, joined_at, stripe_session_id, amount_paid) VALUES ('mem_jarin', 'jarin.wadiwalla@gmail.com', 'Jarin', 'admin', 'active', datetime('now'), 'manual', 0);"
+npx wrangler d1 execute montessori-db --remote --file schema/seed-collective-team.sql
 ```
 
-Then sign in at `/collective/login/` with that address.
+Safe to run more than once — it updates rather than duplicates.
+
+Then sign in at `/collective/login/` with your address.
+
+By default Alex and Lola join as ordinary members. If you'd like them to
+be able to run events and moderate too, the command to promote them is at
+the bottom of that same file.
 
 ---
 
@@ -109,6 +124,21 @@ a welcome email with a sign-in link. You get a "new member" email.
 
 **Posting:** members write a post, optionally attaching images or PDFs, or
 pasting a YouTube/Vimeo link. Posts appear immediately. Others comment below.
+
+**Events:** the Events page covers all three kinds — monthly gatherings,
+guest presentations, and in-person retreats. Only organisers see the "Add
+an event" form. Fill in the type, title, date and time, where it is, and a
+link; members then RSVP with one click. Use the *Time note* field for
+something like "9am SGT / 6pm PDT" so people in other timezones aren't
+guessing. Set a capacity for retreats and the RSVP button closes itself
+once it's full. Cancelling keeps the event visible, marked as cancelled,
+so anyone who RSVP'd can see what happened.
+
+**Members & pen pals:** the Members page lists everyone with their photo,
+place and a line about their work. Members who tick "open to exchanges and
+pen pal programmes" in their profile get a badge, and there's a filter to
+show only those people — that's how exchanges get started. Email addresses
+are never shown; people connect through the board.
 
 **Moderation:** every post and comment has a **Report** button. Reports email
 you and appear in the admin list. As an admin you can delete any post or

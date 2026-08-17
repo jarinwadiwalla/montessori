@@ -31,6 +31,15 @@ export async function onRequestPut(context) {
   const name = String(payload.name ?? member.name ?? "").trim();
   const bio = String(payload.bio ?? member.bio ?? "").trim();
   const avatarUrl = String(payload.avatar_url ?? member.avatar_url ?? "").trim();
+  const location = String(payload.location ?? member.location ?? "").trim();
+  const openToExchange =
+    payload.open_to_exchange === undefined
+      ? member.open_to_exchange
+        ? 1
+        : 0
+      : payload.open_to_exchange
+        ? 1
+        : 0;
 
   if (!name) {
     return Response.json({ error: "Please add a display name." }, { status: 400 });
@@ -41,6 +50,9 @@ export async function onRequestPut(context) {
   if (bio.length > 400) {
     return Response.json({ error: "Bio must be 400 characters or fewer." }, { status: 400 });
   }
+  if (location.length > 80) {
+    return Response.json({ error: "Location must be 80 characters or fewer." }, { status: 400 });
+  }
   // Only accept avatars we host, so a profile image can't be used to
   // point at arbitrary third-party URLs.
   if (avatarUrl && !isAllowedMediaUrl(env, avatarUrl)) {
@@ -48,9 +60,11 @@ export async function onRequestPut(context) {
   }
 
   await env.SITE_DB.prepare(
-    "UPDATE community_members SET name = ?, bio = ?, avatar_url = ? WHERE id = ?"
+    `UPDATE community_members
+     SET name = ?, bio = ?, avatar_url = ?, location = ?, open_to_exchange = ?
+     WHERE id = ?`
   )
-    .bind(name, bio, avatarUrl, member.id)
+    .bind(name, bio, avatarUrl, location, openToExchange, member.id)
     .run();
 
   const updated = await env.SITE_DB.prepare(
@@ -65,5 +79,8 @@ export async function onRequestPut(context) {
 function isAllowedMediaUrl(env, url) {
   const cdn = (env.CDN_URL || "").replace(/\/+$/, "");
   if (cdn && url.startsWith(cdn + "/")) return true;
-  return url.startsWith("/community-media/");
+  // Member uploads, plus our own static images (team headshots are
+  // seeded from /images/, and must survive a profile edit).
+  if (url.startsWith("/community-media/")) return true;
+  return url.startsWith("/images/") && !url.includes("..");
 }
