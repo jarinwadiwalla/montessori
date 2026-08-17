@@ -32,8 +32,40 @@ function isActive(href: string): boolean {
         </a>
       </li>
     ))}
+    <li>
+      <a
+        href="/collective/"
+        id="collective-link"
+        class:list={['nav-link', 'nav-link--cta', { 'is-active': isActive('/collective/') }]}
+      >
+        Collective
+      </a>
+    </li>
   </ul>
 </nav>
+
+<script>
+  // Members who are already signed in should land in the portal rather than
+  // on the sales page. The session cookie is HttpOnly so it can't be read
+  // here — we have to ask the server.
+  //
+  // Progressive enhancement: the link already works as /collective/, and
+  // this only upgrades it. If the request is slow or fails, nothing breaks.
+  const link = document.getElementById('collective-link') as HTMLAnchorElement | null;
+
+  if (link && !window.location.pathname.startsWith('/collective/')) {
+    fetch('/api/community/me')
+      .then((r) => r.json())
+      .then((me) => {
+        if (me?.signedIn) {
+          // The portal handles the lapsed-dues case itself.
+          link.href = '/collective/portal/';
+          link.textContent = 'My Collective';
+        }
+      })
+      .catch(() => {});
+  }
+</script>
 
 <style>
   .nav-list {
@@ -65,6 +97,25 @@ function isActive(href: string): boolean {
   .nav-link.is-active {
     color: var(--color-terracotta);
     font-weight: 600;
+  }
+
+  /* Set the Collective apart from the content pages */
+  .nav-link--cta {
+    margin-left: var(--space-xs);
+    border: 1px solid var(--color-purple);
+    border-radius: 999px;
+    color: var(--color-purple);
+    white-space: nowrap;
+  }
+
+  .nav-link--cta:hover {
+    background-color: var(--color-purple);
+    color: var(--color-white);
+  }
+
+  .nav-link--cta.is-active {
+    background-color: var(--color-purple);
+    color: var(--color-white);
   }
 
   @media (max-width: 768px) {
