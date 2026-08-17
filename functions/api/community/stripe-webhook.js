@@ -190,17 +190,33 @@ async function handleInvoicePaid(context, event) {
   if (!subscriptionId) return Response.json({ received: true });
 
   const sub = await fetchSubscription(env, subscriptionId);
-  const periodEnd = sub?.current_period_end
-    ? new Date(sub.current_period_end * 1000).toISOString()
+
+  // Prefer the period end Stripe reports; fall back to the invoice's own
+  // line item, which is present on the webhook payload itself.
+  const periodEndUnix =
+    sub?.current_period_end || invoice.lines?.data?.[0]?.period?.end || null;
+  const periodEnd = periodEndUnix
+    ? new Date(periodEndUnix * 1000).toISOString()
     : "";
 
+  // Only overwrite the renewal date when we actually learned a new one.
+  // Writing "" here would erase it, and a blank date makes membershipLapsed
+  // fall back to the status alone — which would keep a failing card in.
   await env.SITE_DB.prepare(
     `UPDATE community_members
-     SET subscription_status = ?, current_period_end = ?, amount_paid = ?,
+     SET subscription_status = ?,
+         current_period_end = CASE WHEN ? != '' THEN ? ELSE current_period_end END,
+         amount_paid = ?,
          status = CASE WHEN status = 'suspended' THEN 'suspended' ELSE 'active' END
      WHERE subscription_id = ?`
   )
-    .bind(sub?.status || "active", periodEnd, invoice.amount_paid || 0, subscriptionId)
+    .bind(
+      sub?.status || "active",
+      periodEnd,
+      periodEnd,
+      invoice.amount_paid || 0,
+      subscriptionId
+    )
     .run();
 
   return Response.json({ received: true });
