@@ -19,8 +19,16 @@ const items = [
       { href: '/blog/', label: 'Blog' },
     ],
   },
-  { href: '/our-team/', label: 'Our Team' },
-  { href: '/contact/', label: 'Contact' },
+  {
+    label: 'Connect',
+    children: [
+      { href: '/our-team/', label: 'Our Team' },
+      { href: '/contact/', label: 'Contact' },
+      // Label and destination swap to the portal for signed-in members,
+      // handled by the script below.
+      { href: '/collective/', label: 'Join the Collective', id: 'collective-link' },
+    ],
+  },
 ];
 
 function isActive(href: string): boolean {
@@ -55,7 +63,12 @@ function groupIsActive(children: { href: string }[]): boolean {
               <li>
                 <a
                   href={child.href}
-                  class:list={['nav-sublink', { 'is-active': isActive(child.href) }]}
+                  id={child.id}
+                  class:list={[
+                    'nav-sublink',
+                    { 'nav-sublink--cta': child.id === 'collective-link' },
+                    { 'is-active': isActive(child.href) },
+                  ]}
                   aria-current={isActive(child.href) ? 'page' : undefined}
                 >
                   {child.label}
@@ -76,15 +89,6 @@ function groupIsActive(children: { href: string }[]): boolean {
         </li>
       )
     )}
-    <li>
-      <a
-        href="/collective/"
-        id="collective-link"
-        class:list={['nav-link', 'nav-link--cta', { 'is-active': isActive('/collective/') }]}
-      >
-        Collective
-      </a>
-    </li>
   </ul>
 </nav>
 
@@ -216,6 +220,13 @@ function groupIsActive(children: { href: string }[]): boolean {
     display: block;
   }
 
+  /* The last group sits against the right edge, so open its menu
+     rightwards or it gets clipped off-screen. */
+  .nav-group:last-child .nav-submenu {
+    left: auto;
+    right: 0;
+  }
+
   .nav-sublink {
     display: block;
     padding: var(--space-sm) var(--space-md);
@@ -238,23 +249,17 @@ function groupIsActive(children: { href: string }[]): boolean {
     font-weight: 600;
   }
 
-  /* Set the Collective apart from the content pages */
-  .nav-link--cta {
-    margin-left: var(--space-xs);
-    border: 1px solid var(--color-purple);
-    border-radius: 999px;
+  /* Set the Collective apart from the other links in the menu */
+  .nav-sublink--cta {
+    margin-top: var(--space-xs);
+    border-top: 1px solid var(--color-border);
     color: var(--color-purple);
-    white-space: nowrap;
+    font-weight: 600;
   }
 
-  .nav-link--cta:hover {
-    background-color: var(--color-purple);
-    color: var(--color-white);
-  }
-
-  .nav-link--cta.is-active {
-    background-color: var(--color-purple);
-    color: var(--color-white);
+  .nav-sublink--cta:hover {
+    background-color: var(--color-lavender);
+    color: var(--color-purple);
   }
 
   @media (max-width: 768px) {
@@ -310,10 +315,9 @@ function groupIsActive(children: { href: string }[]): boolean {
       border-radius: 0;
     }
 
-    .nav-link--cta {
-      margin: var(--space-md) 0 0;
-      text-align: center;
-      border-bottom: 1px solid var(--color-purple);
+    .nav-sublink--cta {
+      margin-top: 0;
+      border-top: none;
     }
   }
 </style>
