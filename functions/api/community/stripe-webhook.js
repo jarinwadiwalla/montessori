@@ -76,18 +76,36 @@ async function handleCheckout(context, event) {
     .first();
   if (already) return Response.json({ received: true, deduped: true });
 
-  const subscriptionId = session.subscription || "";
   const customerId = session.customer || "";
   const name = (session.customer_details?.name || "").slice(0, 60);
   const now = new Date().toISOString();
 
   // Ask Stripe what they actually bought, so plan and renewal date are
   // right rather than guessed from the amount.
-  const sub = subscriptionId ? await fetchSubscription(env, subscriptionId) : null;
-  const plan = planFromSubscription(sub);
-  const periodEnd = sub?.current_period_end
+  const sub = session.subscription
+    ? await fetchSubscription(env, session.subscription)
+    : null;
+
+  let subscriptionId = session.subscription || "";
+  let plan = planFromSubscription(sub);
+  let periodEnd = sub?.current_period_end
     ? new Date(sub.current_period_end * 1000).toISOString()
     : "";
+  let oneTime = false;
+
+  if (!subscriptionId) {
+    // Money arrived with no subscription attached — the Stripe price is
+    // almost certainly configured as one-off rather than recurring.
+    //
+    // A blank subscription_id would mark this person comped, and comped
+    // members never lapse, so they'd get free access forever. Give a year
+    // instead and tell Jarin, so a misconfigured price costs one year
+    // rather than a lifetime membership.
+    oneTime = true;
+    subscriptionId = `onetime_${session.id}`;
+    plan = "one_time";
+    periodEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+  }
 
   const existing = await env.SITE_DB.prepare(
     "SELECT * FROM community_members WHERE email = ?"
@@ -141,7 +159,24 @@ async function handleCheckout(context, event) {
   }
 
   await sendWelcome(context, email, name, plan);
-  await notifyAdmin(context, `${name || email} joined the Collective (${plan || "member"}).`);
+
+  if (oneTime) {
+    await notifyAdmin(
+      context,
+      `<strong>${escapeHtml(name || email)}</strong> paid, but Stripe sent no subscription
+       with it — that price is probably set to <em>one-off</em> rather than
+       <em>recurring</em>. They've been given one year of access rather than
+       permanent access, so nothing is broken for them, but the price should be
+       fixed so it renews. Check Product catalog → Montessori Adolescent
+       Collective in Stripe.`,
+      "Check your Stripe pricing — a payment arrived without a subscription"
+    );
+  } else {
+    await notifyAdmin(
+      context,
+      `<strong>${escapeHtml(name || email)}</strong> just joined the Collective (${plan || "member"}).`
+    );
+  }
 
   return Response.json({ received: true });
 }
@@ -271,7 +306,9 @@ async function sendWelcome(context, email, name, plan) {
   );
 }
 
-async function notifyAdmin(context, message) {
+// `message` is trusted HTML built by the callers above; any member-supplied
+// values inside it are escaped at the call site.
+async function notifyAdmin(context, message, subject = "New Collective member") {
   const { env } = context;
   if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
   context.waitUntil(
@@ -284,8 +321,8 @@ async function notifyAdmin(context, message) {
       body: JSON.stringify({
         from: "Montessori for Adolescents <newsletter@montessoriforadolescents.com>",
         to: [env.ADMIN_EMAIL],
-        subject: "New Collective member",
-        html: `<p>${escapeHtml(message)}</p>`,
+        subject,
+        html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">${message}</div>`,
       }),
     }).catch(() => {})
   );

@@ -55,7 +55,7 @@ VALUES (
   'Montessori Guide. Working with Erdkinder communities since 2019, guiding adolescents through purposeful work on the land and in the classroom. Currently establishing a residential Erdkinder community in southern France.',
   'France',
   1,
-  'member',
+  'admin',
   'active',
   datetime('now'),
   'team',
@@ -66,6 +66,7 @@ ON CONFLICT(email) DO UPDATE SET
   avatar_url = excluded.avatar_url,
   bio = excluded.bio,
   location = excluded.location,
+  role = 'admin',
   status = 'active';
 
 -- Lola Odessey Waters ------------------------------------------
@@ -81,7 +82,7 @@ VALUES (
   'Montessori Guide and Educational Program Coordinator. Her study of contemplative practices guides adolescents toward success in their studies and social connections. Also a Tibetan–French interpreter in Buddhist philosophy.',
   'France',
   1,
-  'member',
+  'admin',
   'active',
   datetime('now'),
   'team',
@@ -92,14 +93,15 @@ ON CONFLICT(email) DO UPDATE SET
   avatar_url = excluded.avatar_url,
   bio = excluded.bio,
   location = excluded.location,
+  role = 'admin',
   status = 'active';
 
 -- ------------------------------------------------------------
--- Afterwards, if you want Alex and Lola to be able to run events
--- and moderate posts as well, promote them:
+-- All three are organisers: they can add events and remove any post
+-- or comment. To step someone back to an ordinary member later:
 --
---   UPDATE community_members SET role = 'admin'
---   WHERE email IN ('alex@...', 'lola@...');
+--   UPDATE community_members SET role = 'member'
+--   WHERE email = 'them@example.com';
 --
 -- To correct an email address later:
 --
