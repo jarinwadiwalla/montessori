@@ -1,0 +1,106 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Welcome to the Collective"
+  description="Your membership in the Adolescent Practitioners Collective is confirmed."
+  heroTitle="You're in."
+  heroSubtitle="Welcome to the Adolescent Practitioners Collective."
+  noindex
+>
+  <div class="container welcome">
+    <div class="welcome-card">
+      <h2>Check your email</h2>
+      <p>
+        We've sent a sign-in link to the address you used at checkout. Click it
+        and you'll be taken straight into the Collective — there's no password
+        to set or remember.
+      </p>
+      <p class="welcome-note">
+        The link works once and expires in 20 minutes. If it expires, you can
+        always request a fresh one.
+      </p>
+
+      <div class="welcome-actions">
+        <a href="/collective/login/" class="btn-primary">Request a sign-in link</a>
+        <a href="/collective/guidelines/" class="btn-secondary">Read the guidelines</a>
+      </div>
+    </div>
+
+    <p class="welcome-help">
+      Nothing in your inbox after a few minutes? Check your spam folder, then
+      <a href="/contact/">get in touch</a> and we'll sort it out.
+    </p>
+  </div>
+</PageLayout>
+
+<style>
+  .welcome {
+    max-width: 560px;
+  }
+
+  .welcome-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+  }
+
+  .welcome-card h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-purple);
+    margin-bottom: var(--space-md);
+  }
+
+  .welcome-card p {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .welcome-note {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .welcome-actions {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: var(--space-xl);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    display: inline-block;
+    padding: 0.85rem 1.6rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-primary {
+    background: var(--color-purple);
+    color: var(--color-white);
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--color-purple);
+    color: var(--color-purple);
+  }
+
+  .welcome-help {
+    margin-top: var(--space-xl);
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .welcome-help a {
+    color: var(--color-purple);
+  }
+</style>

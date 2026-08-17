@@ -1,0 +1,212 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Community Guidelines"
+  description="The shared agreements that make the Adolescent Practitioners Collective a place worth being — how we talk to each other, what we share, and how concerns are handled."
+  heroTitle="Community Guidelines"
+  heroSubtitle="The agreements that keep this a place worth being."
+>
+  <div class="container guidelines">
+    <p class="lede">
+      The Collective is a small, private space for people doing real work with
+      adolescents. It works because of how we treat each other, not because of
+      rules. These guidelines exist so that expectations are clear, and so that
+      when something goes wrong there is a fair way to handle it.
+    </p>
+
+    <section class="guideline">
+      <h2>Assume good faith</h2>
+      <p>
+        Everyone here is working with young people in demanding circumstances,
+        often with limited resources and support. When a post reads badly, start
+        by asking what the person meant. Disagreement is welcome; contempt is not.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>Protect the privacy of children and families</h2>
+      <p>
+        This is the one we hold most firmly. Do not share a student's full name,
+        photograph, school, family circumstances, diagnosis, or any detail that
+        could identify them — including in a document or image you attach.
+        Anonymise before you post. If you are describing a difficult situation,
+        change identifying details.
+      </p>
+      <p>
+        If you have photographs of young people you want to share, make sure you
+        have permission from their family for that specific use, and remember
+        that anything posted here can be seen by every member.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>What stays here, stays here</h2>
+      <p>
+        Members share honestly about struggles in their schools and homes. Do
+        not screenshot, forward, or repost what someone writes here without
+        their permission.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>Share what you have a right to share</h2>
+      <p>
+        Post your own materials freely. Do not upload training manuals, albums,
+        purchased curricula, or copyrighted books that aren't yours to
+        distribute — including AMI course materials. Linking to a source is
+        always safe; uploading a copy often isn't.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>No selling</h2>
+      <p>
+        This is not a marketplace. Mentioning your own work when it genuinely
+        answers someone's question is fine. Promotional posts, recruitment, and
+        unsolicited pitches are not.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>Not a substitute for professional help</h2>
+      <p>
+        Members are educators, not clinicians. If a young person is at risk of
+        harm, contact the appropriate professionals and services where you are —
+        not this forum.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>What isn't allowed</h2>
+      <ul>
+        <li>Harassment, personal attacks, or demeaning language about any person or group</li>
+        <li>Content that identifies a child without their family's consent</li>
+        <li>Sexual content, graphic violence, or material illegal where you or we are</li>
+        <li>Impersonating another person or misrepresenting your credentials</li>
+        <li>Spam, scraping, or bulk-messaging other members</li>
+      </ul>
+    </section>
+
+    <section class="guideline">
+      <h2>How concerns are handled</h2>
+      <p>
+        Every post and comment has a <strong>Report</strong> option. Reports come
+        directly to us and are read by a person.
+      </p>
+      <p>
+        Most issues are resolved with a quiet conversation. Where something needs
+        more, we may remove the content, ask you to change it, or pause an
+        account. Content that puts a child at risk, or that is illegal, is
+        removed immediately and without warning.
+      </p>
+      <p>
+        If your membership is paused and you think that's wrong, reply to any
+        email from us and a person will look at it again.
+      </p>
+    </section>
+
+    <section class="guideline">
+      <h2>Your information</h2>
+      <p>
+        Your profile shows the name and picture you choose. Your email address is
+        never shown to other members. Files you upload are visible only to
+        signed-in members, not to the public web or search engines.
+      </p>
+      <p>
+        If you want your account and posts deleted, ask us and we'll do it.
+      </p>
+    </section>
+
+    <p class="closing">
+      Short version: protect the children in your care, be generous with what you
+      know, and treat people the way you'd want a colleague to treat you on a
+      hard day.
+    </p>
+
+    <div class="guidelines-cta">
+      <a href="/collective/" class="btn-primary">About the Collective</a>
+      <a href="/collective/portal/" class="btn-secondary">Go to the Collective</a>
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  .guidelines {
+    max-width: 720px;
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .guideline {
+    margin-top: var(--space-2xl);
+  }
+
+  .guideline h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-purple);
+    margin-bottom: var(--space-sm);
+  }
+
+  .guideline p {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .guideline ul {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    padding-left: 1.25rem;
+  }
+
+  .guideline li {
+    margin-bottom: var(--space-xs);
+  }
+
+  .closing {
+    margin-top: var(--space-2xl);
+    padding: var(--space-lg);
+    background: var(--color-lavender);
+    border-radius: var(--radius-lg);
+    color: var(--color-purple);
+    line-height: var(--leading-relaxed);
+    font-size: var(--text-lg);
+  }
+
+  .guidelines-cta {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: var(--space-2xl);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    display: inline-block;
+    padding: 0.9rem 1.75rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: var(--text-sm);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: var(--color-purple);
+    color: var(--color-white);
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--color-purple);
+    color: var(--color-purple);
+  }
+</style>

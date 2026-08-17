@@ -1,0 +1,156 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Sign in to the Collective"
+  description="Sign in to the Adolescent Practitioners Collective."
+  heroTitle="Sign in"
+  heroSubtitle="No password — we'll email you a link."
+  noindex
+>
+  <div class="container login-wrap">
+    <form id="login-form" class="login-card">
+      <label for="email">Your email address</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        autocomplete="email"
+        placeholder="you@example.com"
+      />
+      <button type="submit" id="submit-btn">Email me a sign-in link</button>
+      <p class="login-hint">
+        Use the address you joined with. The link works once and expires in 20 minutes.
+      </p>
+      <p class="login-message" id="message" role="status" aria-live="polite"></p>
+    </form>
+
+    <p class="login-alt">
+      Not a member yet? <a href="/collective/">Read about the Collective</a>.
+    </p>
+  </div>
+</PageLayout>
+
+<script>
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const button = document.getElementById('submit-btn') as HTMLButtonElement;
+  const message = document.getElementById('message') as HTMLParagraphElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    message.textContent = '';
+    message.className = 'login-message';
+    button.disabled = true;
+    button.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/community/auth-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        message.textContent = data.message || 'Check your email for a sign-in link.';
+        message.className = 'login-message login-message--ok';
+        form.reset();
+      } else {
+        message.textContent = data.error || 'Something went wrong. Please try again.';
+        message.className = 'login-message login-message--error';
+      }
+    } catch {
+      message.textContent = 'Could not reach the server. Please try again.';
+      message.className = 'login-message login-message--error';
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Email me a sign-in link';
+    }
+  });
+</script>
+
+<style>
+  .login-wrap {
+    max-width: 460px;
+  }
+
+  .login-card {
+    background: var(--color-white);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-xs);
+  }
+
+  input {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-lg);
+  }
+
+  input:focus {
+    outline: 2px solid var(--color-lavender-dark);
+    outline-offset: 1px;
+  }
+
+  button {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border: none;
+    padding: 0.95rem 1.5rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .login-hint {
+    margin-top: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .login-message {
+    margin-top: var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  .login-message--ok {
+    color: var(--color-sage-dark);
+  }
+
+  .login-message--error {
+    color: var(--color-terracotta-dark);
+  }
+
+  .login-alt {
+    margin-top: var(--space-xl);
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .login-alt a {
+    color: var(--color-purple);
+  }
+</style>

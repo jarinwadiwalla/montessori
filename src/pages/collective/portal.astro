@@ -1,0 +1,947 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="The Collective"
+  description="The Adolescent Practitioners Collective member portal."
+  heroTitle="The Collective"
+  heroSubtitle="A shared room for people doing this work."
+  noindex
+>
+  <div class="container portal" id="portal">
+    <p class="portal-loading" id="loading">Loading…</p>
+
+    <!-- Profile setup, shown on first sign-in -->
+    <section class="profile-setup" id="profile-setup" hidden>
+      <h2>Set up your profile</h2>
+      <p class="setup-note">
+        This is what other members see. Your email address is never shown.
+      </p>
+      <label for="profile-name">Display name</label>
+      <input id="profile-name" type="text" maxlength="60" placeholder="How you'd like to be known" />
+
+      <label for="profile-bio">A line about your work <span>(optional)</span></label>
+      <textarea id="profile-bio" maxlength="400" rows="2" placeholder="Guide, 12–18 environment, Bali"></textarea>
+
+      <label for="profile-avatar">Profile picture <span>(optional)</span></label>
+      <input id="profile-avatar" type="file" accept="image/*" />
+      <img class="avatar-preview" id="avatar-preview" alt="" hidden />
+
+      <button id="profile-save">Save and continue</button>
+      <p class="form-error" id="profile-error" role="alert"></p>
+    </section>
+
+    <!-- Main portal -->
+    <div id="portal-main" hidden>
+      <header class="portal-bar">
+        <div class="portal-me">
+          <img class="me-avatar" id="me-avatar" alt="" hidden />
+          <span id="me-name"></span>
+        </div>
+        <nav class="portal-links">
+          <a href="/collective/guidelines/">Guidelines</a>
+          <button id="edit-profile-btn" class="link-btn">Edit profile</button>
+          <button id="signout-btn" class="link-btn">Sign out</button>
+        </nav>
+      </header>
+
+      <!-- Composer -->
+      <section class="composer">
+        <textarea
+          id="composer-body"
+          rows="3"
+          maxlength="5000"
+          placeholder="Share something you're working on, or ask a question…"
+        ></textarea>
+
+        <div class="composer-attachments" id="composer-attachments"></div>
+
+        <div class="composer-tools">
+          <label class="tool-btn">
+            Attach image or PDF
+            <input type="file" id="file-input" accept="image/*,application/pdf" multiple hidden />
+          </label>
+          <button class="tool-btn" id="add-video-btn" type="button">Add video link</button>
+          <button class="post-btn" id="post-btn" type="button">Post</button>
+        </div>
+        <p class="form-error" id="composer-error" role="alert"></p>
+      </section>
+
+      <!-- Feed -->
+      <section class="feed" id="feed"></section>
+      <button class="load-more" id="load-more" hidden>Load older posts</button>
+      <p class="feed-empty" id="feed-empty" hidden>
+        Nothing here yet. Be the first to post something.
+      </p>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  type Member = { id: string; name: string; avatar_url: string; bio?: string; role?: string };
+
+  let me: Member | null = null;
+  let page = 1;
+  let pendingAttachments: any[] = [];
+
+  const $ = (id: string) => document.getElementById(id)!;
+
+  // ---- helpers ------------------------------------------------
+
+  function timeAgo(iso: string) {
+    const then = new Date(iso).getTime();
+    const mins = Math.floor((Date.now() - then) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString();
+  }
+
+  function el(tag: string, className?: string, text?: string) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text; // never innerHTML
+    return node;
+  }
+
+  function avatarFor(m: { name: string; avatar_url: string }) {
+    if (m.avatar_url) {
+      const img = document.createElement('img');
+      img.className = 'avatar';
+      img.src = m.avatar_url;
+      img.alt = '';
+      img.width = 40;
+      img.height = 40;
+      return img;
+    }
+    const initials = (m.name || 'M').trim().charAt(0).toUpperCase();
+    return el('span', 'avatar avatar--initial', initials);
+  }
+
+  async function api(path: string, options: RequestInit = {}) {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    let data: any = {};
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  // ---- boot ---------------------------------------------------
+
+  async function boot() {
+    const { data } = await api('/api/community/me');
+
+    if (!data.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+
+    me = data.member;
+    $('loading').hidden = true;
+
+    if (data.needsProfile) {
+      showProfileSetup();
+    } else {
+      showPortal();
+      loadFeed(true);
+    }
+  }
+
+  function showProfileSetup() {
+    $('profile-setup').hidden = false;
+    $('portal-main').hidden = true;
+    (document.getElementById('profile-name') as HTMLInputElement).value = me?.name || '';
+    (document.getElementById('profile-bio') as HTMLTextAreaElement).value = me?.bio || '';
+    if (me?.avatar_url) {
+      const preview = document.getElementById('avatar-preview') as HTMLImageElement;
+      preview.src = me.avatar_url;
+      preview.hidden = false;
+    }
+  }
+
+  function showPortal() {
+    $('profile-setup').hidden = true;
+    $('portal-main').hidden = false;
+    $('me-name').textContent = me?.name || 'Member';
+    const avatar = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me?.avatar_url) {
+      avatar.src = me.avatar_url;
+      avatar.hidden = false;
+    } else {
+      avatar.hidden = true;
+    }
+  }
+
+  // ---- profile ------------------------------------------------
+
+  let stagedAvatarUrl: string | null = null;
+
+  (document.getElementById('profile-avatar') as HTMLInputElement).addEventListener(
+    'change',
+    async (e) => {
+      const input = e.target as HTMLInputElement;
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const error = $('profile-error');
+      error.textContent = 'Uploading…';
+
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/community/upload', { method: 'POST', body: form });
+      const data = await res.json();
+
+      if (!res.ok) {
+        error.textContent = data.error || 'That image could not be uploaded.';
+        return;
+      }
+      stagedAvatarUrl = data.url;
+      const preview = document.getElementById('avatar-preview') as HTMLImageElement;
+      preview.src = data.url;
+      preview.hidden = false;
+      error.textContent = '';
+    }
+  );
+
+  $('profile-save').addEventListener('click', async () => {
+    const name = (document.getElementById('profile-name') as HTMLInputElement).value.trim();
+    const bio = (document.getElementById('profile-bio') as HTMLTextAreaElement).value.trim();
+    const error = $('profile-error');
+
+    if (!name) {
+      error.textContent = 'Please add a display name.';
+      return;
+    }
+
+    const { ok, data } = await api('/api/community/me', {
+      method: 'PUT',
+      body: JSON.stringify({
+        name,
+        bio,
+        avatar_url: stagedAvatarUrl ?? me?.avatar_url ?? '',
+      }),
+    });
+
+    if (!ok) {
+      error.textContent = data.error || 'Could not save your profile.';
+      return;
+    }
+
+    me = data.member;
+    stagedAvatarUrl = null;
+    showPortal();
+    loadFeed(true);
+  });
+
+  $('edit-profile-btn').addEventListener('click', () => showProfileSetup());
+
+  $('signout-btn').addEventListener('click', async () => {
+    await fetch('/api/community/logout', { method: 'POST' });
+    window.location.href = '/collective/';
+  });
+
+  // ---- composer -----------------------------------------------
+
+  function renderPendingAttachments() {
+    const wrap = $('composer-attachments');
+    wrap.textContent = '';
+    pendingAttachments.forEach((a, i) => {
+      const chip = el('span', 'attachment-chip');
+      chip.appendChild(
+        el('span', '', a.kind === 'video' ? 'Video link' : a.filename || a.kind)
+      );
+      const remove = el('button', 'chip-remove', '×');
+      remove.setAttribute('aria-label', 'Remove attachment');
+      remove.addEventListener('click', () => {
+        pendingAttachments.splice(i, 1);
+        renderPendingAttachments();
+      });
+      chip.appendChild(remove);
+      wrap.appendChild(chip);
+    });
+  }
+
+  (document.getElementById('file-input') as HTMLInputElement).addEventListener(
+    'change',
+    async (e) => {
+      const input = e.target as HTMLInputElement;
+      const files = Array.from(input.files || []);
+      const error = $('composer-error');
+      error.textContent = '';
+
+      for (const file of files) {
+        if (pendingAttachments.length >= 6) {
+          error.textContent = 'You can attach up to 6 items.';
+          break;
+        }
+        error.textContent = `Uploading ${file.name}…`;
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch('/api/community/upload', { method: 'POST', body: form });
+        const data = await res.json();
+
+        if (!res.ok) {
+          error.textContent = data.error || `Could not upload ${file.name}.`;
+          continue;
+        }
+        pendingAttachments.push({
+          kind: data.kind,
+          url: data.url,
+          filename: data.filename,
+          size: data.size,
+          r2_key: data.r2_key,
+        });
+        error.textContent = '';
+      }
+      input.value = '';
+      renderPendingAttachments();
+    }
+  );
+
+  $('add-video-btn').addEventListener('click', () => {
+    const url = window.prompt('Paste a YouTube or Vimeo link:');
+    if (!url) return;
+    if (pendingAttachments.length >= 6) {
+      $('composer-error').textContent = 'You can attach up to 6 items.';
+      return;
+    }
+    pendingAttachments.push({ kind: 'video', url: url.trim() });
+    renderPendingAttachments();
+  });
+
+  $('post-btn').addEventListener('click', async () => {
+    const body = (document.getElementById('composer-body') as HTMLTextAreaElement).value.trim();
+    const error = $('composer-error');
+    const button = $('post-btn') as HTMLButtonElement;
+
+    if (!body && pendingAttachments.length === 0) {
+      error.textContent = 'Add a message or an attachment before posting.';
+      return;
+    }
+
+    button.disabled = true;
+    const { ok, data } = await api('/api/community/posts', {
+      method: 'POST',
+      body: JSON.stringify({ body, attachments: pendingAttachments }),
+    });
+    button.disabled = false;
+
+    if (!ok) {
+      error.textContent = data.error || 'Could not post.';
+      return;
+    }
+
+    (document.getElementById('composer-body') as HTMLTextAreaElement).value = '';
+    pendingAttachments = [];
+    renderPendingAttachments();
+    error.textContent = '';
+    page = 1;
+    loadFeed(true);
+  });
+
+  // ---- feed ---------------------------------------------------
+
+  async function loadFeed(reset = false) {
+    if (reset) {
+      page = 1;
+      $('feed').textContent = '';
+    }
+
+    const { ok, data } = await api(`/api/community/posts?page=${page}`);
+    if (!ok) return;
+
+    const feed = $('feed');
+    for (const post of data.posts) {
+      feed.appendChild(renderPost(post));
+    }
+
+    $('feed-empty').hidden = !(reset && data.posts.length === 0);
+    ($('load-more') as HTMLButtonElement).hidden = !data.hasMore;
+  }
+
+  $('load-more').addEventListener('click', () => {
+    page += 1;
+    loadFeed(false);
+  });
+
+  function renderPost(post: any) {
+    const article = el('article', 'post');
+    article.dataset.postId = post.id;
+
+    const head = el('header', 'post-head');
+    head.appendChild(avatarFor(post.author));
+    const meta = el('div', 'post-meta');
+    meta.appendChild(el('span', 'post-author', post.author.name));
+    meta.appendChild(el('span', 'post-time', timeAgo(post.created_at)));
+    head.appendChild(meta);
+    article.appendChild(head);
+
+    if (post.body) {
+      article.appendChild(el('p', 'post-body', post.body));
+    }
+
+    if (post.attachments?.length) {
+      const wrap = el('div', 'post-attachments');
+      for (const a of post.attachments) {
+        wrap.appendChild(renderAttachment(a));
+      }
+      article.appendChild(wrap);
+    }
+
+    // Actions
+    const actions = el('div', 'post-actions');
+
+    const commentToggle = el(
+      'button',
+      'action-btn',
+      post.comment_count ? `Comments (${post.comment_count})` : 'Comment'
+    );
+    actions.appendChild(commentToggle);
+
+    const reportBtn = el('button', 'action-btn', 'Report');
+    reportBtn.addEventListener('click', () => reportItem('post', post.id));
+    actions.appendChild(reportBtn);
+
+    if (post.can_delete) {
+      const del = el('button', 'action-btn action-btn--danger', 'Delete');
+      del.addEventListener('click', async () => {
+        if (!window.confirm('Delete this post? This cannot be undone.')) return;
+        const { ok } = await api('/api/community/posts', {
+          method: 'DELETE',
+          body: JSON.stringify({ id: post.id }),
+        });
+        if (ok) article.remove();
+      });
+      actions.appendChild(del);
+    }
+
+    article.appendChild(actions);
+
+    const commentsWrap = el('div', 'comments');
+    commentsWrap.hidden = true;
+    article.appendChild(commentsWrap);
+
+    let loaded = false;
+    commentToggle.addEventListener('click', async () => {
+      commentsWrap.hidden = !commentsWrap.hidden;
+      if (!loaded && !commentsWrap.hidden) {
+        loaded = true;
+        await loadComments(post.id, commentsWrap);
+      }
+    });
+
+    return article;
+  }
+
+  function renderAttachment(a: any) {
+    if (a.kind === 'image') {
+      const link = document.createElement('a');
+      link.href = a.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      const img = document.createElement('img');
+      img.className = 'attachment-image';
+      img.src = a.url;
+      img.alt = a.filename || '';
+      img.loading = 'lazy';
+      link.appendChild(img);
+      return link;
+    }
+
+    if (a.kind === 'pdf') {
+      const link = document.createElement('a');
+      link.className = 'attachment-file';
+      link.href = a.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = `📄 ${a.filename || 'Document'}`;
+      return link;
+    }
+
+    // video — src is an embed URL the server already validated
+    const frame = el('div', 'attachment-video');
+    const iframe = document.createElement('iframe');
+    iframe.src = a.url;
+    iframe.loading = 'lazy';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('title', 'Shared video');
+    frame.appendChild(iframe);
+    return frame;
+  }
+
+  // ---- comments -----------------------------------------------
+
+  async function loadComments(postId: string, wrap: HTMLElement) {
+    wrap.textContent = '';
+    const { ok, data } = await api(`/api/community/comments?post_id=${encodeURIComponent(postId)}`);
+    if (!ok) return;
+
+    const list = el('div', 'comment-list');
+    for (const c of data.comments) {
+      list.appendChild(renderComment(c));
+    }
+    wrap.appendChild(list);
+
+    const form = el('div', 'comment-form');
+    const input = document.createElement('textarea');
+    input.rows = 2;
+    input.maxLength = 3000;
+    input.placeholder = 'Write a reply…';
+    const send = el('button', 'comment-send', 'Reply');
+    const err = el('p', 'form-error');
+
+    send.addEventListener('click', async () => {
+      const body = input.value.trim();
+      if (!body) return;
+      (send as HTMLButtonElement).disabled = true;
+      const { ok, data } = await api('/api/community/comments', {
+        method: 'POST',
+        body: JSON.stringify({ post_id: postId, body }),
+      });
+      (send as HTMLButtonElement).disabled = false;
+
+      if (!ok) {
+        err.textContent = data.error || 'Could not post your reply.';
+        return;
+      }
+      err.textContent = '';
+      input.value = '';
+      list.appendChild(renderComment(data.comment));
+    });
+
+    form.appendChild(input);
+    form.appendChild(send);
+    form.appendChild(err);
+    wrap.appendChild(form);
+  }
+
+  function renderComment(c: any) {
+    const node = el('div', 'comment');
+    node.appendChild(avatarFor(c.author));
+
+    const main = el('div', 'comment-main');
+    const head = el('div', 'comment-head');
+    head.appendChild(el('span', 'comment-author', c.author.name));
+    head.appendChild(el('span', 'comment-time', timeAgo(c.created_at)));
+    main.appendChild(head);
+    main.appendChild(el('p', 'comment-body', c.body));
+
+    const actions = el('div', 'comment-actions');
+    const report = el('button', 'action-btn', 'Report');
+    report.addEventListener('click', () => reportItem('comment', c.id));
+    actions.appendChild(report);
+
+    if (c.can_delete) {
+      const del = el('button', 'action-btn action-btn--danger', 'Delete');
+      del.addEventListener('click', async () => {
+        if (!window.confirm('Delete this comment?')) return;
+        const { ok } = await api('/api/community/comments', {
+          method: 'DELETE',
+          body: JSON.stringify({ id: c.id }),
+        });
+        if (ok) node.remove();
+      });
+      actions.appendChild(del);
+    }
+
+    main.appendChild(actions);
+    node.appendChild(main);
+    return node;
+  }
+
+  // ---- reporting ----------------------------------------------
+
+  async function reportItem(type: string, id: string) {
+    const reason = window.prompt(
+      'What is the problem with this ' + type + '? (optional, but it helps)'
+    );
+    if (reason === null) return;
+
+    const { data } = await api('/api/community/report', {
+      method: 'POST',
+      body: JSON.stringify({ target_type: type, target_id: id, reason }),
+    });
+    window.alert(data.message || 'Thank you — we\'ll take a look.');
+  }
+
+  boot();
+</script>
+
+<style>
+  .portal {
+    max-width: 680px;
+  }
+
+  .portal-loading,
+  .feed-empty {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) 0;
+  }
+
+  /* Profile setup */
+  .profile-setup {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .profile-setup h2 {
+    font-family: var(--font-heading);
+    color: var(--color-purple);
+    font-size: var(--text-2xl);
+  }
+
+  .setup-note {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .profile-setup label {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-xs);
+  }
+
+  .profile-setup label span {
+    opacity: 0.7;
+  }
+
+  .profile-setup input[type='text'],
+  .profile-setup textarea,
+  .comment-form textarea,
+  .composer textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-lg);
+    resize: vertical;
+  }
+
+  .avatar-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: var(--space-sm) 0 var(--space-lg);
+  }
+
+  .profile-setup button,
+  .post-btn,
+  .comment-send {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .form-error {
+    color: var(--color-terracotta-dark);
+    font-size: var(--text-sm);
+    margin-top: var(--space-xs);
+  }
+
+  /* Top bar */
+  .portal-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .portal-me {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 500;
+    color: var(--color-purple);
+  }
+
+  .me-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .portal-links {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+  }
+
+  .portal-links a,
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+  }
+
+  .portal-links a:hover,
+  .link-btn:hover {
+    color: var(--color-purple);
+  }
+
+  /* Composer */
+  .composer {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .composer textarea {
+    margin-bottom: var(--space-sm);
+  }
+
+  .composer-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+  }
+
+  .attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--color-lavender);
+    color: var(--color-purple);
+    border-radius: 999px;
+    padding: 0.3rem 0.5rem 0.3rem 0.8rem;
+    font-size: var(--text-xs);
+  }
+
+  .chip-remove {
+    background: none;
+    border: none;
+    color: var(--color-purple);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 0.2rem;
+  }
+
+  .composer-tools {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .tool-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .tool-btn:hover {
+    border-color: var(--color-purple);
+    color: var(--color-purple);
+  }
+
+  .post-btn {
+    margin-left: auto;
+  }
+
+  /* Posts */
+  .post {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .post-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .avatar--initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-lavender);
+    color: var(--color-purple);
+    font-family: var(--font-heading);
+  }
+
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-author,
+  .comment-author {
+    color: var(--color-purple);
+    font-weight: 500;
+  }
+
+  .post-time,
+  .comment-time {
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+  }
+
+  .post-body,
+  .comment-body {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .post-attachments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .attachment-image {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    display: block;
+  }
+
+  .attachment-file {
+    display: inline-block;
+    background: var(--color-cream);
+    border-radius: var(--radius-md);
+    padding: 0.7rem 1rem;
+    color: var(--color-purple);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .attachment-video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #000;
+  }
+
+  .attachment-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .post-actions,
+  .comment-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .action-btn:hover {
+    color: var(--color-purple);
+  }
+
+  .action-btn--danger:hover {
+    color: var(--color-terracotta-dark);
+  }
+
+  /* Comments */
+  .comments {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .comment {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .comment .avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .comment-main {
+    flex: 1;
+  }
+
+  .comment-head {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: baseline;
+  }
+
+  .comment-form textarea {
+    margin-bottom: var(--space-xs);
+  }
+
+  .load-more {
+    display: block;
+    margin: 0 auto var(--space-2xl);
+    background: none;
+    border: 1px solid var(--color-purple);
+    color: var(--color-purple);
+    border-radius: 999px;
+    padding: 0.7rem 1.6rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+</style>

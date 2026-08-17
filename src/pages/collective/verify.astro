@@ -1,0 +1,89 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Signing you in"
+  description="Completing sign-in to the Adolescent Practitioners Collective."
+  heroTitle="Signing you in…"
+  heroSubtitle="One moment."
+  noindex
+>
+  <div class="container verify-wrap">
+    <p class="verify-status" id="status" role="status" aria-live="polite">
+      Checking your sign-in link…
+    </p>
+    <p class="verify-actions" id="actions" hidden>
+      <a href="/collective/login/" class="btn-retry">Request a new link</a>
+    </p>
+  </div>
+</PageLayout>
+
+<script>
+  const status = document.getElementById('status') as HTMLParagraphElement;
+  const actions = document.getElementById('actions') as HTMLParagraphElement;
+
+  async function verify() {
+    const token = new URLSearchParams(window.location.search).get('token');
+
+    if (!token) {
+      status.textContent = 'That link is missing its sign-in code.';
+      actions.hidden = false;
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/community/auth-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // Clear the token from the address bar before leaving the page.
+        window.history.replaceState({}, '', '/collective/verify/');
+        status.textContent = 'Signed in. Taking you to the Collective…';
+        window.location.href = data.needsProfile
+          ? '/collective/portal/?welcome=1'
+          : '/collective/portal/';
+      } else {
+        status.textContent = data.error || 'That sign-in link did not work.';
+        actions.hidden = false;
+      }
+    } catch {
+      status.textContent = 'Could not reach the server. Please try again.';
+      actions.hidden = false;
+    }
+  }
+
+  verify();
+</script>
+
+<style>
+  .verify-wrap {
+    max-width: 460px;
+    text-align: center;
+  }
+
+  .verify-status {
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+  }
+
+  .verify-actions {
+    margin-top: var(--space-xl);
+  }
+
+  .btn-retry {
+    display: inline-block;
+    background: var(--color-purple);
+    color: var(--color-white);
+    padding: 0.9rem 1.75rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>

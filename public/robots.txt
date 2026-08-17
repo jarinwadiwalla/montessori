@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /guru/
+Disallow: /collective/portal/
+Disallow: /collective/login/
+Disallow: /collective/verify/
+Disallow: /collective/welcome/
+Disallow: /community-media/
 
 Sitemap: https://montessoriforadolescents.com/sitemap-index.xml

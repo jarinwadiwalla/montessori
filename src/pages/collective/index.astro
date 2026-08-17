@@ -1,0 +1,202 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+// One-time joining fee. Replace stripeJoinLink with your live Payment Link
+// once it exists — see COMMUNITY-PORTAL-SETUP.md, step 3.
+const price = 95;
+const stripeJoinLink = '';
+---
+
+<PageLayout
+  title="Adolescent Practitioners Collective"
+  description="A small, private community for Montessori adolescent practitioners — share your work, ask hard questions, and think alongside people who understand the third plane."
+  heroTitle="The Adolescent Practitioners Collective"
+  heroSubtitle="A private place to think alongside people who do this work."
+  heroImage="/images/webinars/market-day-group.jpg"
+>
+  <div class="container collective">
+    <section class="intro">
+      <p class="lede">
+        Working with adolescents can be isolating. Most of us are the only person
+        in our setting doing it, improvising against a philosophy that was never
+        fully written down. The Collective is a small, private space to share what
+        you are actually trying, ask the questions you'd rather not ask publicly,
+        and hear from people who have run into the same walls.
+      </p>
+    </section>
+
+    <section class="what">
+      <h2>What's inside</h2>
+      <div class="what-grid">
+        <div class="what-item">
+          <h3>A shared conversation</h3>
+          <p>
+            One common room rather than a maze of channels. Post a question, a
+            plan, a photograph of your space, or a document you're working on —
+            and get responses from practitioners, not strangers.
+          </p>
+        </div>
+        <div class="what-item">
+          <h3>Share real materials</h3>
+          <p>
+            Attach images and PDFs to a post, or link a video. Work plans,
+            schedules, land project notes, budgets — the practical artefacts that
+            rarely make it into books.
+          </p>
+        </div>
+        <div class="what-item">
+          <h3>People who've done it</h3>
+          <p>
+            Our team all carry the AMI 12–18 diploma and have worked in adolescent
+            environments from the U.S. to France to Bali. We're in here too.
+          </p>
+        </div>
+        <div class="what-item">
+          <h3>Genuinely private</h3>
+          <p>
+            Members only. Nothing posted here is visible to the public web or to
+            search engines, and your email address is never shown to other members.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="join-card">
+      <p class="join-eyebrow">Membership</p>
+      <p class="join-price">${price} <span>one time</span></p>
+      <p class="join-note">
+        One payment, not a subscription. There is no renewal and nothing to cancel.
+      </p>
+
+      {stripeJoinLink ? (
+        <a href={stripeJoinLink} class="btn-join">Join the Collective</a>
+      ) : (
+        <p class="join-pending">
+          Joining opens shortly — the payment link is being set up.
+        </p>
+      )}
+
+      <p class="join-fine">
+        By joining you agree to our <a href="/collective/guidelines/">community guidelines</a>.
+      </p>
+    </section>
+
+    <section class="already">
+      <p>
+        Already a member? <a href="/collective/login/">Sign in</a> — there's no
+        password, we'll email you a link.
+      </p>
+    </section>
+  </div>
+</PageLayout>
+
+<style>
+  .collective {
+    max-width: 820px;
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .what {
+    margin-top: var(--space-3xl);
+  }
+
+  .what h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-purple);
+    margin-bottom: var(--space-xl);
+  }
+
+  .what-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  .what-item h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-purple);
+    margin-bottom: var(--space-xs);
+  }
+
+  .what-item p {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .join-card {
+    margin-top: var(--space-3xl);
+    padding: var(--space-2xl);
+    background: var(--color-lavender);
+    border-radius: var(--radius-xl);
+    text-align: center;
+  }
+
+  .join-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--text-xs);
+    color: var(--color-purple-light);
+  }
+
+  .join-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-5xl);
+    color: var(--color-purple);
+    margin: var(--space-xs) 0;
+  }
+
+  .join-price span {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-purple-light);
+  }
+
+  .join-note {
+    color: var(--color-purple-light);
+    margin-bottom: var(--space-lg);
+  }
+
+  .btn-join {
+    display: inline-block;
+    background: var(--color-purple);
+    color: var(--color-white);
+    padding: 1rem 2.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--text-sm);
+  }
+
+  .join-pending {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border: 1px dashed var(--color-purple-light);
+    border-radius: 999px;
+    color: var(--color-purple-light);
+  }
+
+  .join-fine {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-purple-light);
+  }
+
+  .join-fine a,
+  .already a {
+    color: var(--color-purple);
+  }
+
+  .already {
+    margin-top: var(--space-2xl);
+    text-align: center;
+    color: var(--color-text-light);
+  }
+</style>
