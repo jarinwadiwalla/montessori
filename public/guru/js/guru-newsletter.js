@@ -214,6 +214,7 @@ async function nlSendToAudience() {
   // quoting a total that does not apply to a single-tier send.
   const tierLabel = tier === "founding" ? "founding members"
     : tier === "donor" ? "donors"
+    : tier === "collective" ? "Collective members"
     : `${count} subscribers (donors not included)`;
 
   openModal("Send Newsletter", `Send "${subject}" to ${tierLabel}?${isAnnouncement ? " (announcement mode)" : ""} This cannot be undone.`, async () => {

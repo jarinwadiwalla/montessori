@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS community_members (
   avatar_url TEXT DEFAULT '',
   bio TEXT DEFAULT '',
   location TEXT DEFAULT '',                 -- shown in the member directory
+  handle TEXT DEFAULT '',                   -- @mention name, derived from name
   open_to_exchange INTEGER DEFAULT 0,       -- opted in to exchange / pen pal
   role TEXT NOT NULL DEFAULT 'member',      -- member | admin
   status TEXT NOT NULL DEFAULT 'active',    -- active | suspended
@@ -32,6 +33,9 @@ CREATE TABLE IF NOT EXISTS community_members (
   cancel_at_period_end INTEGER DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_members_email ON community_members(email);
+-- Partial, so the many members with no handle yet don't collide on ''.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_members_handle
+  ON community_members(handle) WHERE handle != '';
 CREATE INDEX IF NOT EXISTS idx_members_status ON community_members(status);
 
 -- Magic-link sign-in tokens ----------------------------------

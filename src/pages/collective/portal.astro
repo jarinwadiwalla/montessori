@@ -75,7 +75,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
           id="composer-body"
           rows="3"
           maxlength="5000"
-          placeholder="Share something you're working on, or ask a question…"
+          placeholder="Share something you're working on, or ask a question… type @name to notify someone"
         ></textarea>
 
         <div class="composer-attachments" id="composer-attachments"></div>
@@ -107,6 +107,9 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   let me: Member | null = null;
   let page = 1;
   let pendingAttachments: any[] = [];
+  // Handles that actually belong to someone. Until this loads, nothing is
+  // highlighted — better to under-promise than to imply a mention landed.
+  let knownHandles = new Set<string>();
 
   const $ = (id: string) => document.getElementById(id)!;
 
@@ -128,6 +131,37 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     const node = document.createElement(tag);
     if (className) node.className = className;
     if (text !== undefined) node.textContent = text; // never innerHTML
+    return node;
+  }
+
+
+  // Render body text with @mentions picked out. Every piece is added as a
+  // text node or via textContent, so member-written text still can't inject
+  // markup — the highlight is built from the matched handle, not from HTML.
+  function withMentions(className: string, text: string) {
+    const node = document.createElement('p');
+    node.className = className;
+    const re = /(^|[^\w@.])@([a-z0-9]{2,30})\b/gi;
+    let last = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text))) {
+      const at = m.index + m[1].length;
+      if (at > last) node.appendChild(document.createTextNode(text.slice(last, at)));
+      const handle = m[2].toLowerCase();
+      const end = at + 1 + m[2].length;
+      if (knownHandles.has(handle)) {
+        const span = document.createElement('span');
+        span.className = 'mention';
+        span.textContent = '@' + m[2];
+        node.appendChild(span);
+      } else {
+        // Not a member — leave it as ordinary text so it doesn't look
+        // like someone was notified when they weren't.
+        node.appendChild(document.createTextNode(text.slice(at, end)));
+      }
+      last = end;
+    }
+    if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
     return node;
   }
 
@@ -180,7 +214,15 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       showProfileSetup();
     } else {
       showPortal();
+      await loadHandles();
       loadFeed(true);
+    }
+  }
+
+  async function loadHandles() {
+    const { ok, data } = await api('/api/community/handles');
+    if (ok && Array.isArray(data.handles)) {
+      knownHandles = new Set(data.handles.map((h: string) => h.toLowerCase()));
     }
   }
 
@@ -465,7 +507,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     article.appendChild(head);
 
     if (post.body) {
-      article.appendChild(el('p', 'post-body', post.body));
+      article.appendChild(withMentions('post-body', post.body));
     }
 
     if (post.attachments?.length) {
@@ -612,7 +654,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     head.appendChild(el('span', 'comment-author', c.author.name));
     head.appendChild(el('span', 'comment-time', timeAgo(c.created_at)));
     main.appendChild(head);
-    main.appendChild(el('p', 'comment-body', c.body));
+    main.appendChild(withMentions('comment-body', c.body));
 
     const actions = el('div', 'comment-actions');
     const report = el('button', 'action-btn', 'Report');
@@ -954,6 +996,14 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     color: var(--color-text);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+
+  .feed :global(.mention) {
+    color: var(--color-purple);
+    background: var(--color-lavender);
+    border-radius: 4px;
+    padding: 0 3px;
+    font-weight: 500;
   }
 
   .feed :global(.post-attachments) {

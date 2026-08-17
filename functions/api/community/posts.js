@@ -7,6 +7,7 @@ import {
   generateId,
   publicMember,
 } from "../../lib/community-auth.js";
+import { notifyMentions } from "../../lib/community-mentions.js";
 
 const PAGE_SIZE = 20;
 const MAX_BODY = 5000;
@@ -172,6 +173,8 @@ export async function onRequestPost(context) {
       .bind(generateId("att_"), id, a.kind, a.url, a.filename, a.size, a.r2_key, now)
       .run();
   }
+
+  await notifyMentions(context, { text: body, author: member, kind: "post", postId: id });
 
   return Response.json({
     ok: true,

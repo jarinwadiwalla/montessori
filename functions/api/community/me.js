@@ -1,6 +1,7 @@
 // GET  /api/community/me — who am I?
 // PUT  /api/community/me — update my profile (name, avatar, bio)
 
+import { ensureHandle } from "../../lib/community-mentions.js";
 import {
   getMember,
   requireMember,
@@ -80,6 +81,9 @@ export async function onRequestPut(context) {
   )
     .bind(name, bio, avatarUrl, location, openToExchange, member.id)
     .run();
+
+  // Their @handle follows their display name.
+  await ensureHandle(env, member.id, name);
 
   const updated = await env.SITE_DB.prepare(
     "SELECT * FROM community_members WHERE id = ?"

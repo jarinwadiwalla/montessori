@@ -74,7 +74,21 @@ export async function onRequestPost(context) {
     let query = "SELECT email, firstName, lastName, tier, preferences FROM subscribers WHERE unsubscribed = 0";
     const params = [];
 
-    if (tier === "founding") {
+    if (tier === "collective") {
+      // Derived from the Collective itself rather than a stored tier, so the
+      // list is always current: suspended members drop out automatically, and
+      // nobody has to remember to maintain it. Unsubscribes are still
+      // honoured via the subscribers table.
+      query =
+        `SELECT m.email AS email, s.firstName AS firstName, s.lastName AS lastName,
+                'collective' AS tier, s.preferences AS preferences
+         FROM community_members m
+         LEFT JOIN subscribers s ON s.email = m.email
+         WHERE m.status = 'active'
+           AND m.name != ''
+           AND COALESCE(s.unsubscribed, 0) = 0`;
+      sendTier = "collective";
+    } else if (tier === "founding") {
       query += " AND tier = 'founding'";
       sendTier = "founding";
     } else if (tier === "donor") {

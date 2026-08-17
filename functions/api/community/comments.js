@@ -3,6 +3,7 @@
 // DELETE /api/community/comments             — remove one (author or admin)
 
 import { requireMember, generateId } from "../../lib/community-auth.js";
+import { notifyMentions } from "../../lib/community-mentions.js";
 
 const MAX_BODY = 3000;
 
@@ -106,6 +107,8 @@ export async function onRequestPost(context) {
   )
     .bind(postId)
     .run();
+
+  await notifyMentions(context, { text: body, author: member, kind: "comment", postId });
 
   return Response.json({
     ok: true,

@@ -9,21 +9,18 @@ import PageLayout from '../../layouts/PageLayout.astro';
   heroSubtitle="The agreements that keep this a place worth being."
 >
   <div class="container guidelines">
+    <p class="closing">
+      Short version: protect the children in your care, be generous with what you
+      know, and treat people the way you'd want a colleague to treat you on a
+      hard day.
+    </p>
+
     <p class="lede">
       The Collective is a small, private space for people doing real work with
       adolescents. It works because of how we treat each other, not because of
       rules. These guidelines exist so that expectations are clear, and so that
       when something goes wrong there is a fair way to handle it.
     </p>
-
-    <section class="guideline">
-      <h2>Assume good faith</h2>
-      <p>
-        Everyone here is working with young people in demanding circumstances,
-        often with limited resources and support. When a post reads badly, start
-        by asking what the person meant. Disagreement is welcome; contempt is not.
-      </p>
-    </section>
 
     <section class="guideline">
       <h2>Protect the privacy of children and families</h2>
@@ -134,12 +131,6 @@ import PageLayout from '../../layouts/PageLayout.astro';
       </p>
     </section>
 
-    <p class="closing">
-      Short version: protect the children in your care, be generous with what you
-      know, and treat people the way you'd want a colleague to treat you on a
-      hard day.
-    </p>
-
     <div class="guidelines-cta">
       <a href="/collective/" class="btn-primary">About the Collective</a>
       <a href="/collective/portal/" class="btn-secondary">Go to the Collective</a>
@@ -188,7 +179,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
   }
 
   .closing {
-    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-xl);
     padding: var(--space-lg);
     background: var(--color-lavender);
     border-radius: var(--radius-lg);

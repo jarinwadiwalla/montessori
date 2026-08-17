@@ -13,6 +13,8 @@
 // otherwise anyone could POST "they paid" and let themselves in free.
 
 import { generateId, normalizeEmail, createLoginToken } from "../../lib/community-auth.js";
+import { ensureSubscriber } from "../../lib/community-list.js";
+import { ensureHandle } from "../../lib/community-mentions.js";
 
 const SITE = "https://montessoriforadolescents.com";
 const TOLERANCE_SECONDS = 300;
@@ -156,6 +158,17 @@ async function handleCheckout(context, event) {
         periodEnd
       )
       .run();
+  }
+
+  // Put them on the mailing list so event announcements can reach them,
+  // and so the unsubscribe link has something to act on.
+  await ensureSubscriber(env, email, name);
+
+  if (name) {
+    const row = await env.SITE_DB.prepare(
+      "SELECT id FROM community_members WHERE email = ?"
+    ).bind(email).first();
+    if (row) await ensureHandle(env, row.id, name);
   }
 
   await sendWelcome(context, email, name, plan);

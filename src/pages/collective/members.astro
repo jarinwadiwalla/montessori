@@ -20,7 +20,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
         <input
           type="search"
           id="search"
-          placeholder="Search by name, place, or work…"
+          placeholder="Search by name, @handle, place, or work…"
           aria-label="Search members"
         />
         <label class="filter">
@@ -128,6 +128,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       if (m.role === 'admin') nameRow.appendChild(el('span', 'm-badge', 'Organiser'));
       if (m.is_you) nameRow.appendChild(el('span', 'm-badge m-badge--you', 'You'));
       who.appendChild(nameRow);
+      // Show the handle so people know what to type to reach them.
+      if (m.handle) who.appendChild(el('span', 'm-handle', '@' + m.handle));
       if (m.location) who.appendChild(el('span', 'm-location', m.location));
       head.appendChild(who);
       card.appendChild(head);
@@ -259,6 +261,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .member-grid :global(.m-badge--you) {
     background: var(--color-cream-dark);
     color: var(--color-earth);
+  }
+
+  .member-grid :global(.m-handle) {
+    font-size: var(--text-xs);
+    color: var(--color-purple);
   }
 
   .member-grid :global(.m-location) {

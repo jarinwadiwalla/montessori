@@ -8,6 +8,8 @@
 
 import { requireAdminStrict } from "../../lib/auth.js";
 import { generateId, normalizeEmail, isValidEmail } from "../../lib/community-auth.js";
+import { ensureSubscriber } from "../../lib/community-list.js";
+import { ensureHandle } from "../../lib/community-mentions.js";
 
 export async function onRequestGet(context) {
   const authErr = requireAdminStrict(context);
@@ -92,6 +94,15 @@ export async function onRequestPost(context) {
        (id, email, name, avatar_url, bio, role, status, joined_at, stripe_session_id, amount_paid)
      VALUES (?, ?, ?, '', '', 'member', 'active', ?, 'manual', 0)`
   ).bind(generateId("mem_"), email, name, new Date().toISOString()).run();
+
+  await ensureSubscriber(env, email, name);
+
+  if (name) {
+    const row = await env.SITE_DB.prepare(
+      "SELECT id FROM community_members WHERE email = ?"
+    ).bind(email).first();
+    if (row) await ensureHandle(env, row.id, name);
+  }
 
   return Response.json({ ok: true, created: true });
 }
