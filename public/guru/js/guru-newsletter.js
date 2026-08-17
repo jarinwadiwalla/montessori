@@ -215,6 +215,7 @@ async function nlSendToAudience() {
   const tierLabel = tier === "founding" ? "founding members"
     : tier === "donor" ? "donors"
     : tier === "collective" ? "Collective members"
+    : tier === "waitlist" ? "the Collective waitlist"
     : `${count} subscribers (donors not included)`;
 
   openModal("Send Newsletter", `Send "${subject}" to ${tierLabel}?${isAnnouncement ? " (announcement mode)" : ""} This cannot be undone.`, async () => {

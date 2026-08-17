@@ -91,6 +91,9 @@ export async function onRequestPost(context) {
     } else if (tier === "founding") {
       query += " AND tier = 'founding'";
       sendTier = "founding";
+    } else if (tier === "waitlist") {
+      query += " AND tier = 'waitlist'";
+      sendTier = "waitlist";
     } else if (tier === "donor") {
       query += " AND tier = 'donor'";
       sendTier = "donor";
@@ -98,9 +101,11 @@ export async function onRequestPost(context) {
       query += " AND (tier = 'subscriber' OR tier IS NULL)";
       sendTier = "subscriber";
     } else {
-      // Donors are a separate list: they are reached only by choosing
-      // "Donors Only", never by a general send.
-      query += " AND (tier IS NULL OR tier != 'donor')";
+      // Donors and the Collective waitlist are separate lists: each is
+      // reached only by choosing it explicitly, never by a general send.
+      // Waitlist sign-ups asked to hear when the Collective opens, which is
+      // narrower than a newsletter subscription.
+      query += " AND (tier IS NULL OR tier NOT IN ('donor', 'waitlist'))";
       sendTier = "all";
     }
 
