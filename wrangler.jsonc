@@ -1,5 +1,7 @@
 {
-  "name": "montessori-website",
+  // Must match the real Cloudflare Pages project name, or wrangler CLI
+  // commands (secrets, deploys) fail with "Project does not exist".
+  "name": "montessori",
   "compatibility_date": "2026-04-11",
   "pages_build_output_dir": "./dist",
   "d1_databases": [

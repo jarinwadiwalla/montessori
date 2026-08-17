@@ -81,11 +81,11 @@ This is what grants access when someone pays, and removes it when dues stop.
 7. Run each of these and paste the matching value when prompted:
 
 ```bash
-npx wrangler pages secret put STRIPE_WEBHOOK_SECRET
+npx wrangler pages secret put STRIPE_WEBHOOK_SECRET --project-name montessori
 ```
 
 ```bash
-npx wrangler pages secret put STRIPE_SECRET_KEY
+npx wrangler pages secret put STRIPE_SECRET_KEY --project-name montessori
 ```
 
 **Both are required.** Without the webhook secret, every webhook is
@@ -104,12 +104,12 @@ Open `src/pages/collective/index.astro`. Near the top you'll see:
 ```js
 const monthlyPrice = 5;
 const annualPrice = 50;
-const monthlyLink = '';
-const annualLink = '';
+const monthlyLink = 'https://buy.stripe.com/...';
+const annualLink = 'https://buy.stripe.com/...';
 ```
 
-Paste your two links from step 2 between the matching quotes, and adjust the
-prices if you chose different amounts. The "Save $10" badge works itself out
+Both links are already filled in. If you ever change a price in Stripe you
+will need a new payment link, and it goes here. The "Save $10" badge works itself out
 from those two numbers. Until you fill the links in, both buttons show
 "Opening shortly" rather than breaking.
 
@@ -139,9 +139,9 @@ Safe to run more than once — it updates rather than duplicates.
 
 Then sign in at `/collective/login/` with your address.
 
-By default Alex and Lola join as ordinary members. If you'd like them to
-be able to run events and moderate too, the command to promote them is at
-the bottom of that same file.
+All three of you are organisers, so you can each add events and remove any
+post or comment. The command to step someone back to an ordinary member is
+at the bottom of that same file.
 
 ---
 
