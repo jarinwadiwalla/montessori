@@ -20,9 +20,42 @@ const { active } = Astro.props;
     <a href="/collective/members/" class={active === 'members' ? 'is-active' : ''}>Members</a>
     <a href="/collective/guidelines/">Guidelines</a>
     <a href="/collective/portal/?edit=1">Edit profile</a>
+    <button id="billing-btn" class="link-btn" type="button" hidden>Billing</button>
     <button id="signout-btn" class="link-btn" type="button">Sign out</button>
   </nav>
 </header>
+
+<script>
+  // Shown only to members who actually pay dues — comped members have no
+  // Stripe customer and nothing to manage.
+  const billingBtn = document.getElementById('billing-btn') as HTMLButtonElement | null;
+
+  if (billingBtn) {
+    fetch('/api/community/me')
+      .then((r) => r.json())
+      .then((me) => {
+        if (me?.membership?.has_billing) billingBtn.hidden = false;
+      })
+      .catch(() => {});
+
+    billingBtn.addEventListener('click', async () => {
+      billingBtn.disabled = true;
+      try {
+        const res = await fetch('/api/community/billing', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          window.location.href = data.url;
+          return;
+        }
+        window.alert(data.error || 'Could not open the billing page.');
+      } catch {
+        window.alert('Could not reach the server. Please try again.');
+      } finally {
+        billingBtn.disabled = false;
+      }
+    });
+  }
+</script>
 
 <style>
   .portal-bar {

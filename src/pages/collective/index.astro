@@ -1,10 +1,15 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 
-// One-time joining fee. Replace stripeJoinLink with your live Payment Link
-// once it exists — see COMMUNITY-PORTAL-SETUP.md, step 3.
-const price = 95;
-const stripeJoinLink = '';
+// Membership dues. Paste your two Stripe Payment Links here once they
+// exist — see COMMUNITY-PORTAL-SETUP.md, step 2.
+const monthlyPrice = 5;
+const annualPrice = 50; // 12 months for the price of 10
+const monthlyLink = '';
+const annualLink = '';
+
+const annualFull = monthlyPrice * 12;
+const annualSaving = annualFull - annualPrice;
 ---
 
 <PageLayout
@@ -94,21 +99,41 @@ const stripeJoinLink = '';
       </p>
     </section>
 
-    <section class="join-card">
-      <p class="join-eyebrow">Membership</p>
-      <p class="join-price">${price} <span>one time</span></p>
-      <p class="join-note">
-        One payment, not a subscription. There is no renewal and nothing to cancel.
+    <section class="join">
+      <p class="join-eyebrow">Membership dues</p>
+
+      <div class="plans">
+        <div class="plan">
+          <p class="plan-name">Monthly</p>
+          <p class="plan-price">${monthlyPrice}<span>/month</span></p>
+          <p class="plan-note">Cancel any time, from inside the Collective.</p>
+          {monthlyLink ? (
+            <a href={monthlyLink} class="btn-join">Join monthly</a>
+          ) : (
+            <p class="join-pending">Opening shortly</p>
+          )}
+        </div>
+
+        <div class="plan plan--featured">
+          <p class="plan-badge">Save ${annualSaving}</p>
+          <p class="plan-name">Yearly</p>
+          <p class="plan-price">${annualPrice}<span>/year</span></p>
+          <p class="plan-note">
+            Twelve months for the price of ten, paid once a year.
+          </p>
+          {annualLink ? (
+            <a href={annualLink} class="btn-join">Join yearly</a>
+          ) : (
+            <p class="join-pending">Opening shortly</p>
+          )}
+        </div>
+      </div>
+
+      <p class="join-fine">
+        Dues keep the Collective running and stay deliberately low. You can
+        switch between monthly and yearly, or cancel, at any time — cancelling
+        leaves your access running until the period you've paid for ends.
       </p>
-
-      {stripeJoinLink ? (
-        <a href={stripeJoinLink} class="btn-join">Join the Collective</a>
-      ) : (
-        <p class="join-pending">
-          Joining opens shortly — the payment link is being set up.
-        </p>
-      )}
-
       <p class="join-fine">
         By joining you agree to our <a href="/collective/guidelines/">community guidelines</a>.
       </p>
@@ -201,7 +226,7 @@ const stripeJoinLink = '';
     color: var(--color-text);
   }
 
-  .join-card {
+  .join {
     margin-top: var(--space-3xl);
     padding: var(--space-2xl);
     background: var(--color-lavender);
@@ -214,24 +239,70 @@ const stripeJoinLink = '';
     letter-spacing: 0.12em;
     font-size: var(--text-xs);
     color: var(--color-purple-light);
+    margin-bottom: var(--space-lg);
   }
 
-  .join-price {
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+    text-align: center;
+  }
+
+  .plan {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl) var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .plan--featured {
+    outline: 2px solid var(--color-purple);
+  }
+
+  .plan-badge {
+    position: absolute;
+    top: -0.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-terracotta);
+    color: var(--color-white);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.8rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .plan-price {
     font-family: var(--font-heading);
-    font-size: var(--text-5xl);
+    font-size: var(--text-4xl);
     color: var(--color-purple);
     margin: var(--space-xs) 0;
   }
 
-  .join-price span {
+  .plan-price span {
     font-family: var(--font-body);
     font-size: var(--text-base);
     color: var(--color-purple-light);
   }
 
-  .join-note {
-    color: var(--color-purple-light);
+  .plan-note {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
     margin-bottom: var(--space-lg);
+    flex: 1;
   }
 
   .btn-join {

@@ -12,6 +12,10 @@ dist/
 .env.*
 !.env.example
 
+# Local Cloudflare secrets for `wrangler pages dev` — never commit
+.dev.vars
+.dev.vars.*
+
 # OS files
 .DS_Store
 Thumbs.db

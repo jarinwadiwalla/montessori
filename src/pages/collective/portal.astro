@@ -13,6 +13,24 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   <div class="container portal" id="portal">
     <p class="portal-loading" id="loading">Loading…</p>
 
+    <!-- Shown when dues are unpaid -->
+    <section class="lapsed" id="lapsed" hidden>
+      <h2>Your membership is on hold</h2>
+      <p>
+        We weren't able to collect your dues, so the Collective is paused
+        rather than closed. Nothing you've posted has been deleted.
+      </p>
+      <p class="lapsed-note">
+        Usually this is just an expired card. Updating it puts everything back
+        straight away.
+      </p>
+      <button id="lapsed-billing" type="button">Update payment details</button>
+      <p class="lapsed-help">
+        Something else going on? <a href="/contact/">Get in touch</a> — we'd
+        rather sort it out than lose you.
+      </p>
+    </section>
+
     <!-- Profile setup, shown on first sign-in -->
     <section class="profile-setup" id="profile-setup" hidden>
       <h2>Set up your profile</h2>
@@ -147,6 +165,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     me = data.member;
     $('loading').hidden = true;
 
+    if (data.lapsed) {
+      showLapsed();
+      return;
+    }
+
     // "Edit profile" links here with ?edit=1
     const wantsEdit = new URLSearchParams(window.location.search).has('edit');
 
@@ -157,6 +180,30 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       loadFeed(true);
     }
   }
+
+  function showLapsed() {
+    $('lapsed').hidden = false;
+    $('profile-setup').hidden = true;
+    $('portal-main').hidden = true;
+  }
+
+  $('lapsed-billing').addEventListener('click', async () => {
+    const btn = $('lapsed-billing') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/community/billing', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      window.alert(data.error || 'Could not open the billing page.');
+    } catch {
+      window.alert('Could not reach the server. Please try again.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   function showProfileSetup() {
     $('profile-setup').hidden = false;
@@ -669,6 +716,55 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     color: var(--color-terracotta-dark);
     font-size: var(--text-sm);
     margin-top: var(--space-xs);
+  }
+
+  /* Dues unpaid */
+  .lapsed {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-terracotta);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    text-align: center;
+  }
+
+  .lapsed h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-purple);
+    margin-bottom: var(--space-md);
+  }
+
+  .lapsed p {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .lapsed-note {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .lapsed button {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border: none;
+    padding: 0.9rem 1.8rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .lapsed-help {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .lapsed-help a {
+    color: var(--color-purple);
   }
 
   /* Exchange opt-in */

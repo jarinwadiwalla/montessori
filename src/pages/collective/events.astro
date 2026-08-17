@@ -138,6 +138,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       window.location.href = '/collective/login/';
       return;
     }
+    if (me.lapsed) {
+      // The portal shows the "update your payment details" panel.
+      window.location.href = '/collective/portal/';
+      return;
+    }
 
     $('loading').hidden = true;
     $('main').hidden = false;

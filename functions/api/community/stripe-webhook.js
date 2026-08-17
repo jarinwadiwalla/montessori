@@ -1,9 +1,16 @@
 // POST /api/community/stripe-webhook
-// Stripe calls this when someone pays to join the Collective. It verifies
-// the signature, creates the member, and emails them a sign-in link.
 //
-// Requires the STRIPE_WEBHOOK_SECRET secret (see SETUP notes in
-// COMMUNITY-PORTAL-SETUP.md).
+// Stripe tells us about membership dues here. Because dues recur, this
+// handles the whole lifecycle, not just the first payment:
+//
+//   checkout.session.completed  — someone joined
+//   invoice.paid                — a renewal went through
+//   customer.subscription.updated — plan change, cancellation scheduled,
+//                                   payment trouble
+//   customer.subscription.deleted — subscription ended; access stops
+//
+// Requires STRIPE_WEBHOOK_SECRET. Without it every request is refused —
+// otherwise anyone could POST "they paid" and let themselves in free.
 
 import { generateId, normalizeEmail, createLoginToken } from "../../lib/community-auth.js";
 
@@ -14,16 +21,12 @@ export async function onRequestPost(context) {
   const { env, request } = context;
 
   const secret = env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) {
-    // Fail closed: without a secret we cannot trust anything Stripe sends.
-    return new Response("Webhook not configured", { status: 503 });
-  }
+  if (!secret) return new Response("Webhook not configured", { status: 503 });
 
   const signature = request.headers.get("Stripe-Signature") || "";
   const rawBody = await request.text();
 
-  const verified = await verifyStripeSignature(rawBody, signature, secret);
-  if (!verified) {
+  if (!(await verifyStripeSignature(rawBody, signature, secret))) {
     return new Response("Invalid signature", { status: 400 });
   }
 
@@ -34,35 +37,57 @@ export async function onRequestPost(context) {
     return new Response("Invalid payload", { status: 400 });
   }
 
-  if (event.type !== "checkout.session.completed") {
-    // Acknowledge everything else so Stripe stops retrying.
-    return Response.json({ received: true });
+  switch (event.type) {
+    case "checkout.session.completed":
+      return handleCheckout(context, event);
+    case "invoice.paid":
+      return handleInvoicePaid(context, event);
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted":
+      return handleSubscriptionChange(context, event);
+    default:
+      // Acknowledge everything else so Stripe stops retrying.
+      return Response.json({ received: true });
   }
+}
 
+// --- someone joined -------------------------------------------
+
+async function handleCheckout(context, event) {
+  const { env } = context;
   const session = event.data?.object || {};
 
-  // Only grant access when the money actually cleared.
-  if (session.payment_status !== "paid") {
+  // Subscriptions can complete before the first invoice settles; "paid"
+  // or "no_payment_required" both mean we're good.
+  if (!["paid", "no_payment_required"].includes(session.payment_status)) {
     return Response.json({ received: true, skipped: "not paid" });
   }
 
   const email = normalizeEmail(
     session.customer_details?.email || session.customer_email || ""
   );
-  if (!email) {
-    return Response.json({ received: true, skipped: "no email" });
-  }
+  if (!email) return Response.json({ received: true, skipped: "no email" });
 
-  // Idempotency: Stripe retries webhooks, so the same session must not
-  // create two members or two welcome emails.
+  // Stripe retries webhooks; the same session must not be processed twice.
   const already = await env.SITE_DB.prepare(
     "SELECT id FROM community_members WHERE stripe_session_id = ?"
   )
     .bind(session.id || "")
     .first();
-  if (already) {
-    return Response.json({ received: true, deduped: true });
-  }
+  if (already) return Response.json({ received: true, deduped: true });
+
+  const subscriptionId = session.subscription || "";
+  const customerId = session.customer || "";
+  const name = (session.customer_details?.name || "").slice(0, 60);
+  const now = new Date().toISOString();
+
+  // Ask Stripe what they actually bought, so plan and renewal date are
+  // right rather than guessed from the amount.
+  const sub = subscriptionId ? await fetchSubscription(env, subscriptionId) : null;
+  const plan = planFromSubscription(sub);
+  const periodEnd = sub?.current_period_end
+    ? new Date(sub.current_period_end * 1000).toISOString()
+    : "";
 
   const existing = await env.SITE_DB.prepare(
     "SELECT * FROM community_members WHERE email = ?"
@@ -70,24 +95,34 @@ export async function onRequestPost(context) {
     .bind(email)
     .first();
 
-  const now = new Date().toISOString();
-  const name = (session.customer_details?.name || "").slice(0, 60);
-
   if (existing) {
-    // Someone who already has a membership paid again — reactivate rather
-    // than duplicate, and record the new session id.
+    // Rejoining, or switching plan. Reactivate rather than duplicate.
     await env.SITE_DB.prepare(
       `UPDATE community_members
-       SET status = 'active', stripe_session_id = ?, amount_paid = ?
+       SET status = 'active', stripe_session_id = ?, amount_paid = ?,
+           stripe_customer_id = ?, subscription_id = ?, subscription_status = ?,
+           plan = ?, current_period_end = ?, cancel_at_period_end = 0
        WHERE id = ?`
     )
-      .bind(session.id || "", session.amount_total || 0, existing.id)
+      .bind(
+        session.id || "",
+        session.amount_total || 0,
+        customerId,
+        subscriptionId,
+        sub?.status || "active",
+        plan,
+        periodEnd,
+        existing.id
+      )
       .run();
   } else {
     await env.SITE_DB.prepare(
       `INSERT INTO community_members
-         (id, email, name, avatar_url, bio, role, status, joined_at, stripe_session_id, amount_paid)
-       VALUES (?, ?, ?, '', '', 'member', 'active', ?, ?, ?)`
+         (id, email, name, avatar_url, bio, location, open_to_exchange,
+          role, status, joined_at, stripe_session_id, amount_paid,
+          stripe_customer_id, subscription_id, subscription_status, plan,
+          current_period_end, cancel_at_period_end)
+       VALUES (?, ?, ?, '', '', '', 0, 'member', 'active', ?, ?, ?, ?, ?, ?, ?, ?, 0)`
     )
       .bind(
         generateId("mem_"),
@@ -95,63 +130,165 @@ export async function onRequestPost(context) {
         name,
         now,
         session.id || "",
-        session.amount_total || 0
+        session.amount_total || 0,
+        customerId,
+        subscriptionId,
+        sub?.status || "active",
+        plan,
+        periodEnd
       )
       .run();
   }
 
-  // Welcome them straight in with a working sign-in link.
-  if (env.RESEND_API_KEY) {
-    const { token, expiresMinutes } = await createLoginToken(env, email, "stripe");
-    const link = `${SITE}/collective/verify/?token=${encodeURIComponent(token)}`;
-
-    context.waitUntil(
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
-          to: [email],
-          subject: "Welcome to the Montessori Adolescent Collective",
-          html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
-              <p>Welcome${name ? ` ${escapeHtml(name)}` : ""} — you're in.</p>
-              <p>The Montessori Adolescent Collective is a small, private space for people
-              doing this work. Use the link below to sign in and set up your profile.</p>
-              <p style="margin:28px 0;">
-                <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
-              </p>
-              <p style="color:#6b5b7d;font-size:14px;">This link works once and expires in ${expiresMinutes} minutes.
-              You can always request a fresh one at ${SITE}/collective/login/ — there's no password to remember.</p>
-              <p style="color:#6b5b7d;font-size:14px;">Please take a moment to read our
-              <a href="${SITE}/collective/guidelines/">community guidelines</a> before posting.</p>
-            </div>`,
-        }),
-      }).catch(() => {})
-    );
-  }
-
-  if (env.RESEND_API_KEY && env.ADMIN_EMAIL) {
-    context.waitUntil(
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Montessori for Adolescents <newsletter@montessoriforadolescents.com>",
-          to: [env.ADMIN_EMAIL],
-          subject: "New Collective member",
-          html: `<p><strong>${escapeHtml(name || email)}</strong> just joined the Collective.</p>`,
-        }),
-      }).catch(() => {})
-    );
-  }
+  await sendWelcome(context, email, name, plan);
+  await notifyAdmin(context, `${name || email} joined the Collective (${plan || "member"}).`);
 
   return Response.json({ received: true });
+}
+
+// --- a renewal went through -----------------------------------
+
+async function handleInvoicePaid(context, event) {
+  const { env } = context;
+  const invoice = event.data?.object || {};
+  const subscriptionId = invoice.subscription;
+  if (!subscriptionId) return Response.json({ received: true });
+
+  const sub = await fetchSubscription(env, subscriptionId);
+  const periodEnd = sub?.current_period_end
+    ? new Date(sub.current_period_end * 1000).toISOString()
+    : "";
+
+  await env.SITE_DB.prepare(
+    `UPDATE community_members
+     SET subscription_status = ?, current_period_end = ?, amount_paid = ?,
+         status = CASE WHEN status = 'suspended' THEN 'suspended' ELSE 'active' END
+     WHERE subscription_id = ?`
+  )
+    .bind(sub?.status || "active", periodEnd, invoice.amount_paid || 0, subscriptionId)
+    .run();
+
+  return Response.json({ received: true });
+}
+
+// --- cancelled, lapsed, or plan changed -----------------------
+
+async function handleSubscriptionChange(context, event) {
+  const { env } = context;
+  const sub = event.data?.object || {};
+  if (!sub.id) return Response.json({ received: true });
+
+  const ended = event.type === "customer.subscription.deleted";
+  const periodEnd = sub.current_period_end
+    ? new Date(sub.current_period_end * 1000).toISOString()
+    : "";
+
+  await env.SITE_DB.prepare(
+    `UPDATE community_members
+     SET subscription_status = ?, current_period_end = ?, plan = ?,
+         cancel_at_period_end = ?
+     WHERE subscription_id = ?`
+  )
+    .bind(
+      ended ? "canceled" : sub.status || "",
+      periodEnd,
+      planFromSubscription(sub),
+      sub.cancel_at_period_end ? 1 : 0,
+      sub.id
+    )
+    .run();
+
+  // Note: access is decided by membershipLapsed() at request time, not by
+  // flipping `status` here. That keeps "suspended by a moderator" and
+  // "dues unpaid" as separate things.
+  return Response.json({ received: true });
+}
+
+// --- helpers --------------------------------------------------
+
+// Read a subscription back from Stripe. Optional: without a secret key we
+// fall back to whatever the webhook payload carried.
+async function fetchSubscription(env, id) {
+  if (!env.STRIPE_SECRET_KEY) return null;
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/subscriptions/${id}`, {
+      headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+function planFromSubscription(sub) {
+  const interval = sub?.items?.data?.[0]?.price?.recurring?.interval;
+  if (interval === "year") return "annual";
+  if (interval === "month") return "monthly";
+  return "";
+}
+
+async function sendWelcome(context, email, name, plan) {
+  const { env } = context;
+  if (!env.RESEND_API_KEY) return;
+
+  const { token, expiresMinutes } = await createLoginToken(env, email, "stripe");
+  const link = `${SITE}/collective/verify/?token=${encodeURIComponent(token)}`;
+  const dues =
+    plan === "annual"
+      ? "Your dues are paid for the year."
+      : plan === "monthly"
+        ? "Your dues renew monthly, and you can change or cancel them any time from Billing inside the Collective."
+        : "";
+
+  context.waitUntil(
+    fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
+        to: [email],
+        subject: "Welcome to the Montessori Adolescent Collective",
+        html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
+            <p>Welcome${name ? ` ${escapeHtml(name)}` : ""} — you're in.</p>
+            <p>The Montessori Adolescent Collective is a collaborative online community
+            for all things third plane of development. Use the link below to sign in
+            and set up your profile.</p>
+            <p style="margin:28px 0;">
+              <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
+            </p>
+            <p style="color:#6b5b7d;font-size:14px;">This link works once and expires in ${expiresMinutes} minutes.
+            You can always request a fresh one at ${SITE}/collective/login/ — there's no password to remember.</p>
+            ${dues ? `<p style="color:#6b5b7d;font-size:14px;">${dues}</p>` : ""}
+            <p style="color:#6b5b7d;font-size:14px;">Please take a moment to read our
+            <a href="${SITE}/collective/guidelines/">community guidelines</a> before posting.</p>
+          </div>`,
+      }),
+    }).catch(() => {})
+  );
+}
+
+async function notifyAdmin(context, message) {
+  const { env } = context;
+  if (!env.RESEND_API_KEY || !env.ADMIN_EMAIL) return;
+  context.waitUntil(
+    fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Montessori for Adolescents <newsletter@montessoriforadolescents.com>",
+        to: [env.ADMIN_EMAIL],
+        subject: "New Collective member",
+        html: `<p>${escapeHtml(message)}</p>`,
+      }),
+    }).catch(() => {})
+  );
 }
 
 // Stripe's scheme: sign "<timestamp>.<raw body>" with HMAC-SHA256.
@@ -168,7 +305,6 @@ async function verifyStripeSignature(rawBody, header, secret) {
   const provided = parts.v1;
   if (!timestamp || !provided) return false;
 
-  // Reject old signatures so a captured request can't be replayed later.
   const age = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
   if (!Number.isFinite(age) || age > TOLERANCE_SECONDS) return false;
 
@@ -196,9 +332,7 @@ async function verifyStripeSignature(rawBody, header, secret) {
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
   let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
 }
 

@@ -109,14 +109,55 @@ export async function getMember(context) {
   return row;
 }
 
+// Days of access after a payment fails, before we close the door. Stripe
+// retries during this window, so a card that expires on a Friday doesn't
+// lock someone out over the weekend.
+const GRACE_DAYS = 3;
+
+// Has this member's subscription lapsed?
+//
+// A member with no subscription_id is comped — that covers Jarin, the
+// team, and anyone added by hand — and never lapses.
+export function membershipLapsed(member) {
+  if (!member?.subscription_id) return false;
+
+  // Signed up but never actually paid.
+  if (member.subscription_status === "incomplete_expired") return true;
+
+  const endsAt = Date.parse(member.current_period_end || "");
+
+  if (Number.isNaN(endsAt)) {
+    // No period we can trust, so fall back to the status alone.
+    return ["canceled", "unpaid"].includes(member.subscription_status);
+  }
+
+  // Otherwise the paid-for period decides it, including after a
+  // cancellation — we promise access runs to the end of what you paid for,
+  // so cancelling mid-period must not lock someone out on the spot.
+  return Date.now() > endsAt + GRACE_DAYS * 24 * 60 * 60 * 1000;
+}
+
 // Guard for member-only endpoints. Returns { member } or { response }.
 export async function requireMember(context) {
   const member = await getMember(context);
   if (!member) {
     return {
       response: Response.json(
-        { error: "Please sign in to continue." },
+        { error: "Please sign in to continue.", code: "signed_out" },
         { status: 401 }
+      ),
+    };
+  }
+  if (membershipLapsed(member)) {
+    // 402 rather than 403: this is fixable by the member, and the client
+    // uses the code to send them to billing instead of to the login page.
+    return {
+      response: Response.json(
+        {
+          error: "Your membership dues are unpaid, so the Collective is on hold.",
+          code: "lapsed",
+        },
+        { status: 402 }
       ),
     };
   }

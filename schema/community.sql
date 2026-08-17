@@ -20,7 +20,16 @@ CREATE TABLE IF NOT EXISTS community_members (
   joined_at TEXT NOT NULL,
   last_seen_at TEXT DEFAULT '',
   stripe_session_id TEXT DEFAULT '',        -- guards against double-granting
-  amount_paid INTEGER DEFAULT 0             -- cents, for your records
+  amount_paid INTEGER DEFAULT 0,            -- cents, most recent payment
+
+  -- Membership dues. A member with no subscription_id is comped (you,
+  -- the team, anyone you add by hand) and never lapses.
+  stripe_customer_id TEXT DEFAULT '',
+  subscription_id TEXT DEFAULT '',
+  subscription_status TEXT DEFAULT '',      -- active | past_due | canceled | unpaid
+  plan TEXT DEFAULT '',                     -- monthly | annual
+  current_period_end TEXT DEFAULT '',       -- ISO; access runs to here (+grace)
+  cancel_at_period_end INTEGER DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_members_email ON community_members(email);
 CREATE INDEX IF NOT EXISTS idx_members_status ON community_members(status);

@@ -3,7 +3,7 @@
 The code is built and tested. These are the steps only you can do, because
 they need your Stripe and Cloudflare accounts. Do them in order.
 
-Nothing is live until step 6.
+Nothing is live until step 7.
 
 ---
 
@@ -20,62 +20,102 @@ You should see a list of `"success": true` results.
 
 ---
 
-## 2. Create the Stripe product
+## 2. Create the Stripe product and its two prices
+
+Membership runs on recurring dues: $5 a month, or $50 a year (twelve months
+for the price of ten). Both are **subscriptions** — the yearly one simply
+renews once a year instead of monthly. That keeps access rules identical for
+everyone and means yearly members renew automatically.
 
 1. Go to **Stripe Dashboard → Product catalog → + Add product**
 2. Name: `Montessori Adolescent Collective`
-3. Price: **$95.00**, and choose **One-off** (not recurring)
-4. Click **Save product**
-5. On the product page, click **Create payment link**
-6. Under **After payment**, choose **Don't show confirmation page** →
+3. First price: **$5.00**, **Recurring**, billing period **Monthly** → **Save**
+4. On the product page, click **+ Add another price**
+5. Second price: **$50.00**, **Recurring**, billing period **Yearly** → **Save**
+
+Now make a payment link for each price:
+
+6. On the product page, next to the **monthly** price, click
+   **Create payment link**
+7. Under **After payment**, choose **Don't show confirmation page** →
    **Redirect customers to your website**, and enter:
    `https://montessoriforadolescents.com/collective/welcome/`
-7. Under **Options**, tick **Collect customers' names**
-8. Click **Create link** and **copy the link** — you need it in step 4
-
-> Leave "Allow promotion codes" off unless you want discounts. If you do turn
-> it on, see the note in your to-do list about how promo codes work.
+8. Under **Options**, tick **Collect customers' names**
+9. **Create link**, then copy it — this is your monthly link
+10. Repeat steps 6–9 for the **yearly** price to get your yearly link
 
 ---
 
-## 3. Connect the payment to the portal (the webhook)
+## 3. Turn on the billing portal
 
-This is what automatically gives someone access the moment they pay.
+This is what lets members change their card, switch between monthly and
+yearly, or cancel — without emailing you. It matters more with recurring
+dues than it did with a one-off payment.
+
+1. Go to **Stripe Dashboard → Settings → Billing → Customer portal**
+2. Turn on **Customers can update payment methods**
+3. Turn on **Customers can cancel subscriptions**, and set it to
+   **At end of billing period** (not immediately — this matches what the
+   site promises them)
+4. Turn on **Customers can switch plans**, and allow both your prices
+5. **Save**
+
+---
+
+## 4. Connect Stripe to the portal (webhook + keys)
+
+This is what grants access when someone pays, and removes it when dues stop.
 
 1. Go to **Stripe Dashboard → Developers → Webhooks → + Add endpoint**
 2. Endpoint URL:
    `https://montessoriforadolescents.com/api/community/stripe-webhook`
-3. Under **Select events**, choose **`checkout.session.completed`** (just that one)
+3. Under **Select events**, choose these **four**:
+   - `checkout.session.completed` — someone joined
+   - `invoice.paid` — a renewal went through
+   - `customer.subscription.updated` — plan change, cancellation, payment trouble
+   - `customer.subscription.deleted` — membership ended
 4. Click **Add endpoint**
-5. On the endpoint page, find **Signing secret** → click **Reveal** → copy it
-   (it starts with `whsec_`)
-6. In your terminal, run this and paste the secret when prompted:
+5. Find **Signing secret** → **Reveal** → copy it (starts with `whsec_`)
+6. Also go to **Developers → API keys** and copy your **Secret key**
+   (starts with `sk_live_`)
+7. Run each of these and paste the matching value when prompted:
 
 ```bash
 npx wrangler pages secret put STRIPE_WEBHOOK_SECRET
 ```
 
-**This step is required.** Until the secret is set, the webhook refuses every
-request — that is deliberate. Without it, anyone could send a fake "they paid"
-message and grant themselves free access.
+```bash
+npx wrangler pages secret put STRIPE_SECRET_KEY
+```
+
+**Both are required.** Without the webhook secret, every webhook is
+refused — deliberately, because otherwise anyone could send a fake "they
+paid" message and let themselves in free. Without the secret key, the
+billing portal won't open and renewal dates won't be recorded.
+
+Treat the secret key like a password: don't paste it into email or chat.
 
 ---
 
-## 4. Put your payment link on the page
+## 5. Put your payment links on the page
 
 Open `src/pages/collective/index.astro`. Near the top you'll see:
 
 ```js
-const stripeJoinLink = '';
+const monthlyPrice = 5;
+const annualPrice = 50;
+const monthlyLink = '';
+const annualLink = '';
 ```
 
-Paste your payment link from step 2 between the quotes, and change `price`
-if you picked a different amount. Until you do this, the page shows
-"Joining opens shortly" instead of a broken button.
+Paste your two links from step 2 between the matching quotes, and adjust the
+prices if you chose different amounts. The "Save $10" badge works itself out
+from those two numbers. Until you fill the links in, both buttons show
+"Opening shortly" rather than breaking.
 
 ---
 
-## 5. Add the team (and make yourself an organiser)
+## 6. Add the team (and make yourself an organiser)
 
 This puts you, Alex and Lola in the member directory with your headshots
 and bios from the website, so the room isn't empty on day one. It also
@@ -103,7 +143,7 @@ the bottom of that same file.
 
 ---
 
-## 6. Go live
+## 7. Go live
 
 The portal is on a branch called `community-portal`, so it is **not** on your
 live site yet. When you're ready:
@@ -118,6 +158,21 @@ git checkout main && git merge community-portal && git push origin main
 
 **Someone joins:** they pay → Stripe tells the site → they're added → they get
 a welcome email with a sign-in link. You get a "new member" email.
+
+**Dues and renewals:** monthly and yearly members renew automatically. You
+don't do anything — Stripe collects, tells the site, and access continues.
+
+**If a payment fails:** the member keeps access for 3 more days while Stripe
+retries the card. After that the Collective goes on hold for them: they see a
+page explaining it with a button to update their card, and nothing they posted
+is deleted. Fixing the card restores everything immediately.
+
+**If someone cancels:** they keep access until the end of the period they've
+already paid for, then it lapses. They can cancel themselves from **Billing**
+inside the Collective, so it shouldn't reach your inbox.
+
+**You and the team don't pay dues.** Anyone added by hand — you, Alex, Lola,
+anyone you comp — has no subscription attached and never lapses.
 
 **Signing in:** there are no passwords. A member enters their email at
 `/collective/login/` and gets a link that works once and expires in 20 minutes.

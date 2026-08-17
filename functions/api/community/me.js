@@ -1,7 +1,12 @@
 // GET  /api/community/me — who am I?
 // PUT  /api/community/me — update my profile (name, avatar, bio)
 
-import { getMember, requireMember, publicMember } from "../../lib/community-auth.js";
+import {
+  getMember,
+  requireMember,
+  publicMember,
+  membershipLapsed,
+} from "../../lib/community-auth.js";
 
 export async function onRequestGet(context) {
   const member = await getMember(context);
@@ -12,6 +17,15 @@ export async function onRequestGet(context) {
     signedIn: true,
     member: { ...publicMember(member), email: member.email },
     needsProfile: !member.name,
+    lapsed: membershipLapsed(member),
+    membership: {
+      // Empty plan means comped — no dues, nothing to manage.
+      plan: member.plan || "",
+      status: member.subscription_status || "",
+      renews_at: member.current_period_end || "",
+      cancelling: !!member.cancel_at_period_end,
+      has_billing: !!member.stripe_customer_id,
+    },
   });
 }
 
