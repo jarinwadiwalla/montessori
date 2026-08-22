@@ -4,11 +4,12 @@ Working list agreed 2026-08-23. Iterate top to bottom; move finished items to
 CHANGELOG.md with the version they shipped in.
 
 ## Phase 0 — before anything else
-- [ ] **Fix the Stripe webhook product filter** (HANDOFF.md §5). Any checkout on
-      the account currently enrols the buyer as a Collective member. Must land
-      before more traffic flows.
-- [ ] Resolve the one accidentally-enrolled member (invite early, or remove +
-      personal note).
+- [x] **Fix the Stripe webhook product filter** (HANDOFF.md §5). Shipped
+      2026-08-23; `STRIPE_COLLECTIVE_PRODUCT_ID` secret set (both plans).
+      Still to verify: replay the 2026-08-20 event in Stripe → should skip.
+- [x] Resolve the one accidentally-enrolled member — removed 2026-08-23
+      (membership + login token deleted, tier back to `subscriber`; they had
+      never signed in). Re-invite at launch if they're interested.
 
 ## Phase 1 — private test environment
 - [ ] Add `test.montessoriforadolescents.com` as a custom domain on the Pages
