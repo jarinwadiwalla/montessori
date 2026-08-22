@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - 2026-08-23
+
+### Fixed
+- Stripe webhook now verifies the purchased product before granting Collective
+  membership. Previously any checkout on the account (webinar, guide, donation)
+  enrolled the buyer as a member. Requires the new
+  `STRIPE_COLLECTIVE_PRODUCT_ID` secret; until it is set the webhook grants
+  nothing and emails the admin.
+
+### Added
+- `ROADMAP.md` — the working list for the Collective rollout.
+
 ## [1.0.0] - 2026-04-11
 
 ### Added

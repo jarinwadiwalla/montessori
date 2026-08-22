@@ -65,6 +65,34 @@ async function handleCheckout(context, event) {
     return Response.json({ received: true, skipped: "not paid" });
   }
 
+  // This webhook receives every checkout on the whole Stripe account —
+  // webinar recordings, guides, donations, all of it. Only a purchase of
+  // the Collective product itself may grant membership.
+  const productId = env.STRIPE_COLLECTIVE_PRODUCT_ID;
+  if (!productId) {
+    await notifyAdmin(
+      context,
+      `A checkout completed but <code>STRIPE_COLLECTIVE_PRODUCT_ID</code> is not
+       set, so no membership was granted. Set it with
+       <code>npx wrangler pages secret put STRIPE_COLLECTIVE_PRODUCT_ID --project-name montessori</code>
+       using the product id from Stripe → Product catalog → Montessori
+       Adolescent Collective.`,
+      "Collective webhook is not configured — a checkout was ignored"
+    );
+    return Response.json({ received: true, skipped: "no product id configured" });
+  }
+
+  const items = await fetchLineItems(env, session.id);
+  if (items === null) {
+    // Couldn't ask Stripe what was bought. Refuse for now; Stripe will
+    // retry the event and we can decide correctly then.
+    return new Response("Could not fetch line items", { status: 500 });
+  }
+  const isCollective = items.some((i) => i.price?.product === productId);
+  if (!isCollective) {
+    return Response.json({ received: true, skipped: "not a Collective purchase" });
+  }
+
   const email = normalizeEmail(
     session.customer_details?.email || session.customer_email || ""
   );
@@ -280,6 +308,24 @@ async function fetchSubscription(env, id) {
     });
     if (!res.ok) return null;
     return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// Read a checkout session's line items back from Stripe, so we can tell a
+// Collective purchase apart from anything else sold on the account.
+// Returns an array, or null when Stripe couldn't be asked.
+async function fetchLineItems(env, sessionId) {
+  if (!env.STRIPE_SECRET_KEY || !sessionId) return null;
+  try {
+    const res = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${sessionId}/line_items?limit=100`,
+      { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
+    );
+    if (!res.ok) return null;
+    const body = await res.json();
+    return Array.isArray(body.data) ? body.data : null;
   } catch {
     return null;
   }
