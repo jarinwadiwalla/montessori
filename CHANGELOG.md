@@ -15,6 +15,13 @@
   member can't skip naming themselves and get re-prompted on every login.
 
 ### Added
+- Guru **Payments** tab: donation totals per donor, Collective MRR and
+  member counts, and a full payment history — backed by a new `payments`
+  mirror table in D1, fed live by the Stripe webhook and backfillable with
+  a one-click "Sync from Stripe".
+- Guru **Collective** tab: invite comped members, suspend/reactivate,
+  email one-time sign-in links, see plan/location/last-seen per member,
+  and resolve open reports.
 - Optional passwords for Collective members: set or change one from the
   profile editor, sign in with it at `/collective/login/` (PBKDF2-hashed,
   never required — the magic link keeps working and doubles as the

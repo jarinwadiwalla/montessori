@@ -15,6 +15,7 @@
 import { generateId, normalizeEmail, createLoginToken } from "../../lib/community-auth.js";
 import { ensureSubscriber } from "../../lib/community-list.js";
 import { ensureHandle } from "../../lib/community-mentions.js";
+import { classifyPayment, recordPayment } from "../../lib/payments.js";
 
 const SITE = "https://montessoriforadolescents.com";
 const TOLERANCE_SECONDS = 300;
@@ -93,8 +94,25 @@ async function handleCheckout(context, event) {
     // retry the event and we can decide correctly then.
     return new Response("Could not fetch line items", { status: 500 });
   }
-  const isCollective = items.some((i) => productIds.includes(i.price?.product));
-  if (!isCollective) {
+  // Mirror every paid checkout — donations, webinars, the lot — so Guru
+  // can show money received without asking Stripe each time.
+  const { kind, description } = classifyPayment(items, env);
+  await recordPayment(env, {
+    id: session.payment_intent || session.id,
+    email: normalizeEmail(session.customer_details?.email || session.customer_email || ""),
+    name: (session.customer_details?.name || "").slice(0, 60),
+    amount: session.amount_total || 0,
+    currency: session.currency || "usd",
+    description,
+    kind,
+    source: "checkout",
+    stripe_customer_id: session.customer || "",
+    created_at: session.created
+      ? new Date(session.created * 1000).toISOString()
+      : new Date().toISOString(),
+  });
+
+  if (kind !== "collective") {
     return Response.json({ received: true, skipped: "not a Collective purchase" });
   }
 
@@ -236,6 +254,25 @@ async function handleInvoicePaid(context, event) {
   if (!subscriptionId) return Response.json({ received: true });
 
   const sub = await fetchSubscription(env, subscriptionId);
+
+  // Renewals are payments too. The very first invoice of a subscription is
+  // already mirrored by its checkout session, so skip that one.
+  if (invoice.billing_reason !== "subscription_create") {
+    await recordPayment(env, {
+      id: invoice.payment_intent || invoice.id,
+      email: normalizeEmail(invoice.customer_email || ""),
+      name: (invoice.customer_name || "").slice(0, 60),
+      amount: invoice.amount_paid || 0,
+      currency: invoice.currency || "usd",
+      description: "Collective dues renewal",
+      kind: "collective",
+      source: "invoice",
+      stripe_customer_id: invoice.customer || "",
+      created_at: invoice.created
+        ? new Date(invoice.created * 1000).toISOString()
+        : new Date().toISOString(),
+    });
+  }
 
   // Prefer the period end Stripe reports; fall back to the invoice's own
   // line item, which is present on the webhook payload itself.

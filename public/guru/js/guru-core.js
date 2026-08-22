@@ -78,6 +78,8 @@ function switchTab(sectionName) {
   if (sectionName === "blog") blogLoadDrafts();
   if (sectionName === "newsletter") { nlLoadTemplates(); nlLoadCampaigns(); nlLoadSubscriberCount(); nlLoadRetries(); nlLoadNewsletterDrafts(); nlRestoreAutosave(); }
   if (sectionName === "subscribers") loadSubscribers();
+  if (sectionName === "payments") payLoad();
+  if (sectionName === "collective") colLoad();
   if (sectionName === "comments") loadComments();
   if (sectionName === "notes") notesLoad();
 }

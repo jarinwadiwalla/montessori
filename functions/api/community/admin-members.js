@@ -23,7 +23,9 @@ export async function onRequestGet(context) {
   const { env } = context;
 
   const { results: members } = await env.SITE_DB.prepare(
-    `SELECT id, email, name, role, status, joined_at, last_seen_at, amount_paid
+    `SELECT id, email, name, role, status, joined_at, last_seen_at, amount_paid,
+            location, plan, subscription_status, current_period_end,
+            (subscription_id = '') AS comped
      FROM community_members ORDER BY joined_at DESC`
   ).all();
 
