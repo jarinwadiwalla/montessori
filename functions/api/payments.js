@@ -69,9 +69,11 @@ export async function onRequestPost(context) {
   }
 
   let imported = 0;
+  const errors = [];
 
   // 1. Checkout sessions: donations, webinars, guides, Collective joins.
   imported += await syncPaged(
+    errors,
     env,
     "https://api.stripe.com/v1/checkout/sessions?limit=100&expand[]=data.line_items",
     async (session) => {
@@ -96,6 +98,7 @@ export async function onRequestPost(context) {
 
   // 2. Paid subscription invoices — the renewals checkout never sees.
   imported += await syncPaged(
+    errors,
     env,
     "https://api.stripe.com/v1/invoices?status=paid&limit=100",
     async (invoice) => {
@@ -117,12 +120,12 @@ export async function onRequestPost(context) {
     }
   );
 
-  return Response.json({ ok: true, imported });
+  return Response.json({ ok: errors.length === 0, imported, errors });
 }
 
 // Walk a paginated Stripe list, applying `handle` to each object.
 // Capped at 10 pages (1000 objects) — far beyond this account's volume.
-async function syncPaged(env, baseUrl, handle) {
+async function syncPaged(errors, env, baseUrl, handle) {
   let count = 0;
   let startingAfter = "";
 
@@ -133,7 +136,11 @@ async function syncPaged(env, baseUrl, handle) {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
     });
-    if (!res.ok) break;
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      errors.push(`${res.status} from ${baseUrl.split("?")[0]}: ${detail.slice(0, 300)}`);
+      break;
+    }
     const body = await res.json();
     const data = body.data || [];
     for (const obj of data) {
