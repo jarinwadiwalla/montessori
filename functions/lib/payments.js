@@ -18,8 +18,14 @@ export function classifyPayment(items, env) {
     kind = "collective";
   } else if (haystack.includes("donat") || haystack.includes("coffee")) {
     kind = "donation";
-  } else if (haystack.includes("webinar")) {
+  } else if (
+    haystack.includes("webinar") ||
+    haystack.includes("recording") ||
+    haystack.includes("overview of the montessori adolescent environment")
+  ) {
     kind = "webinar";
+  } else if (haystack.includes("101")) {
+    kind = "guide";
   }
 
   return { kind, description: names.join(", ").slice(0, 200) };
