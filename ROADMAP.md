@@ -36,7 +36,9 @@ CHANGELOG.md with the version they shipped in.
 
 ## Phase 4 — portal features (Circle-inspired)
 - [ ] Left-hand sidebar spaces: Start Here, Say Hello, Events & Announcements
-      (feed remains the landing view after login).
+      (feed remains the landing view after login). Per the Circle screenshot
+      (2026-08-23): left sidebar nav ONLY — no top bar tabs, no Trending
+      posts column.
 - [ ] Downloadable resources section (PDFs etc., served through the
       authenticated media route).
 - [ ] Webinar section (the existing webinar recording, members-only).

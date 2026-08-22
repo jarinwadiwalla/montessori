@@ -30,7 +30,10 @@ CREATE TABLE IF NOT EXISTS community_members (
   subscription_status TEXT DEFAULT '',      -- active | past_due | canceled | unpaid
   plan TEXT DEFAULT '',                     -- monthly | annual
   current_period_end TEXT DEFAULT '',       -- ISO; access runs to here (+grace)
-  cancel_at_period_end INTEGER DEFAULT 0
+  cancel_at_period_end INTEGER DEFAULT 0,
+
+  -- Optional password (PBKDF2, "v1$iter$salt$hash"). Empty = magic link only.
+  password_hash TEXT DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_members_email ON community_members(email);
 -- Partial, so the many members with no handle yet don't collide on ''.

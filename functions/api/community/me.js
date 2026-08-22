@@ -25,6 +25,7 @@ export async function onRequestGet(context) {
     signedIn: true,
     member: { ...publicMember(member), email: member.email },
     needsProfile: !member.name,
+    hasPassword: !!member.password_hash,
     unread: unread?.n || 0,
     lapsed: membershipLapsed(member),
     membership: {

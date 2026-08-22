@@ -6,7 +6,7 @@ import PageLayout from '../../layouts/PageLayout.astro';
   title="Sign in to the Collective"
   description="Sign in to the Montessori Adolescent Collective."
   heroTitle="Sign in"
-  heroSubtitle="No password — we'll email you a link."
+  heroSubtitle="With your password, or an emailed link."
   noindex
 >
   <div class="container login-wrap">
@@ -20,9 +20,23 @@ import PageLayout from '../../layouts/PageLayout.astro';
         autocomplete="email"
         placeholder="you@example.com"
       />
-      <button type="submit" id="submit-btn">Email me a sign-in link</button>
+      <label for="password">Password <span class="label-hint">(if you've set one)</span></label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        autocomplete="current-password"
+        placeholder="Your password"
+      />
+      <button type="submit" id="submit-btn">Sign in</button>
+
+      <div class="login-divider" role="presentation"><span>or</span></div>
+
+      <button type="button" id="link-btn" class="btn-secondary">Email me a sign-in link</button>
       <p class="login-hint">
-        Use the address you joined with. The link works once and expires in 20 minutes.
+        No password, or forgotten it? The emailed link signs you in without one —
+        it works once and expires in 20 minutes. You can set or change your
+        password afterwards from Edit profile.
       </p>
       <p class="login-message" id="message" role="status" aria-live="polite"></p>
     </form>
@@ -36,15 +50,59 @@ import PageLayout from '../../layouts/PageLayout.astro';
 <script>
   const form = document.getElementById('login-form') as HTMLFormElement;
   const emailInput = document.getElementById('email') as HTMLInputElement;
-  const button = document.getElementById('submit-btn') as HTMLButtonElement;
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+  const signinBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const linkBtn = document.getElementById('link-btn') as HTMLButtonElement;
   const message = document.getElementById('message') as HTMLParagraphElement;
 
+  function setMessage(text: string, ok = false) {
+    message.textContent = text;
+    message.className = `login-message${text ? (ok ? ' login-message--ok' : ' login-message--error') : ''}`;
+  }
+
+  // Password sign-in.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    message.textContent = '';
-    message.className = 'login-message';
-    button.disabled = true;
-    button.textContent = 'Sending…';
+    setMessage('');
+
+    if (!passwordInput.value) {
+      setMessage('Type your password, or use the emailed link below.');
+      return;
+    }
+
+    signinBtn.disabled = true;
+    signinBtn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch('/api/community/auth-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value, password: passwordInput.value }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        window.location.href = data.needsProfile
+          ? '/collective/portal/?welcome=1'
+          : '/collective/portal/';
+        return;
+      }
+      setMessage(data.error || 'Sign-in failed. Please try again.');
+    } catch {
+      setMessage('Could not reach the server. Please try again.');
+    } finally {
+      signinBtn.disabled = false;
+      signinBtn.textContent = 'Sign in';
+    }
+  });
+
+  // Magic link — also the "forgot password" path.
+  linkBtn.addEventListener('click', async () => {
+    setMessage('');
+    if (!emailInput.reportValidity()) return;
+
+    linkBtn.disabled = true;
+    linkBtn.textContent = 'Sending…';
 
     try {
       const res = await fetch('/api/community/auth-request', {
@@ -55,19 +113,15 @@ import PageLayout from '../../layouts/PageLayout.astro';
       const data = await res.json();
 
       if (res.ok) {
-        message.textContent = data.message || 'Check your email for a sign-in link.';
-        message.className = 'login-message login-message--ok';
-        form.reset();
+        setMessage(data.message || 'Check your email for a sign-in link.', true);
       } else {
-        message.textContent = data.error || 'Something went wrong. Please try again.';
-        message.className = 'login-message login-message--error';
+        setMessage(data.error || 'Something went wrong. Please try again.');
       }
     } catch {
-      message.textContent = 'Could not reach the server. Please try again.';
-      message.className = 'login-message login-message--error';
+      setMessage('Could not reach the server. Please try again.');
     } finally {
-      button.disabled = false;
-      button.textContent = 'Email me a sign-in link';
+      linkBtn.disabled = false;
+      linkBtn.textContent = 'Email me a sign-in link';
     }
   });
 </script>
@@ -122,6 +176,34 @@ import PageLayout from '../../layouts/PageLayout.astro';
   button:disabled {
     opacity: 0.6;
     cursor: default;
+  }
+
+  .label-hint {
+    color: var(--color-text-light);
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  .login-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .login-divider::before,
+  .login-divider::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-purple);
+    border: 1px solid var(--color-purple);
   }
 
   .login-hint {

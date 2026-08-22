@@ -7,7 +7,12 @@
 //        (safety net for a payment that didn't register)
 
 import { requireAdminStrict } from "../../lib/auth.js";
-import { generateId, normalizeEmail, isValidEmail } from "../../lib/community-auth.js";
+import {
+  generateId,
+  normalizeEmail,
+  isValidEmail,
+  createLoginToken,
+} from "../../lib/community-auth.js";
 import { ensureSubscriber } from "../../lib/community-list.js";
 import { ensureHandle } from "../../lib/community-mentions.js";
 
@@ -41,8 +46,15 @@ export async function onRequestPut(context) {
   const { env, request } = context;
   const { id, action } = await request.json();
 
-  if (!id || !["suspend", "reactivate", "make_admin", "make_member"].includes(action)) {
+  if (
+    !id ||
+    !["suspend", "reactivate", "make_admin", "make_member", "send_login_link"].includes(action)
+  ) {
     return Response.json({ error: "id and a valid action are required" }, { status: 400 });
+  }
+
+  if (action === "send_login_link") {
+    return sendLoginLink(context, id);
   }
 
   if (action === "suspend") {
@@ -105,6 +117,62 @@ export async function onRequestPost(context) {
   }
 
   return Response.json({ ok: true, created: true });
+}
+
+// Email a member a fresh one-time sign-in link, on an admin's say-so.
+// Handy when someone is stuck — no password set, magic-link email lost.
+async function sendLoginLink(context, id) {
+  const { env } = context;
+
+  const member = await env.SITE_DB.prepare(
+    "SELECT id, email, name, status FROM community_members WHERE id = ?"
+  ).bind(id).first();
+
+  if (!member) {
+    return Response.json({ error: "No such member" }, { status: 404 });
+  }
+  if (member.status !== "active") {
+    return Response.json({ error: "That member is suspended" }, { status: 400 });
+  }
+  if (!env.RESEND_API_KEY) {
+    return Response.json({ error: "Email is not configured" }, { status: 503 });
+  }
+
+  const { token, expiresMinutes } = await createLoginToken(env, member.email, "admin");
+  const link = `https://montessoriforadolescents.com/collective/verify/?token=${encodeURIComponent(token)}`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
+      to: [member.email],
+      subject: "Your sign-in link for the Collective",
+      html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
+          <p>Hello${member.name ? ` ${escapeHtml(member.name)}` : ""} — here's a fresh sign-in link:</p>
+          <p style="margin:28px 0;">
+            <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
+          </p>
+          <p style="color:#6b5b7d;font-size:14px;">This link works once and expires in ${expiresMinutes} minutes.
+          You can always request another at https://montessoriforadolescents.com/collective/login/</p>
+        </div>`,
+    }),
+  });
+
+  if (!res.ok) {
+    return Response.json({ error: "The email could not be sent" }, { status: 502 });
+  }
+
+  return Response.json({ ok: true, sent: true });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[c]);
 }
 
 // Resolve a report once you've dealt with it.

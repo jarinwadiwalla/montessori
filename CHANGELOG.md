@@ -15,6 +15,13 @@
   member can't skip naming themselves and get re-prompted on every login.
 
 ### Added
+- Optional passwords for Collective members: set or change one from the
+  profile editor, sign in with it at `/collective/login/` (PBKDF2-hashed,
+  never required — the magic link keeps working and doubles as the
+  forgot-password path). Sessions extended from 30 to 180 days so members
+  stay signed in on a device until they sign out.
+- Admins can email any member a fresh one-time sign-in link
+  (`send_login_link` action on the member admin API).
 - Test environment at `test.montessoriforadolescents.com`: a "Sign in" pill
   appears in the navigation on the test subdomain (and localhost) only, and
   the whole test host is served with `X-Robots-Tag: noindex, nofollow`.

@@ -58,6 +58,21 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       <input id="profile-avatar" type="file" accept="image/*" />
       <img class="avatar-preview" id="avatar-preview" alt="" hidden />
 
+      <label for="profile-password" id="profile-password-label">
+        Password <span>(optional)</span>
+      </label>
+      <input
+        id="profile-password"
+        type="password"
+        autocomplete="new-password"
+        maxlength="200"
+        placeholder="At least 8 characters"
+      />
+      <p class="setup-note" id="profile-password-note">
+        With a password you can sign in directly, without waiting for an emailed
+        link. Skip it and the email link keeps working as always.
+      </p>
+
       <div class="setup-actions">
         <button id="profile-save">Save and continue</button>
         <button id="profile-cancel" type="button" class="ghost" hidden>Cancel</button>
@@ -105,6 +120,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   type Member = { id: string; name: string; avatar_url: string; bio?: string; role?: string };
 
   let me: Member | null = null;
+  let hasPassword = false;
   let page = 1;
   let pendingAttachments: any[] = [];
   // Handles that actually belong to someone. Until this loads, nothing is
@@ -200,6 +216,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
 
     me = data.member;
+    hasPassword = !!data.hasPassword;
     $('loading').hidden = true;
 
     if (data.lapsed) {
@@ -281,6 +298,15 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       preview.src = me.avatar_url;
       preview.hidden = false;
     }
+
+    const pwInput = document.getElementById('profile-password') as HTMLInputElement;
+    pwInput.value = '';
+    pwInput.placeholder = hasPassword
+      ? 'Leave blank to keep your current password'
+      : 'At least 8 characters';
+    $('profile-password-note').textContent = hasPassword
+      ? 'You have a password. Type a new one to change it, or leave this blank.'
+      : 'With a password you can sign in directly, without waiting for an emailed link. Skip it and the email link keeps working as always.';
   }
 
   function showPortal() {
@@ -355,6 +381,22 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     if (!ok) {
       error.textContent = data.error || 'Could not save your profile.';
       return;
+    }
+
+    // The password rides along with the profile save, but only when the
+    // member typed one — an empty field means "no change".
+    const pwInput = document.getElementById('profile-password') as HTMLInputElement;
+    if (pwInput.value) {
+      const pw = await api('/api/community/password', {
+        method: 'PUT',
+        body: JSON.stringify({ password: pwInput.value }),
+      });
+      if (!pw.ok) {
+        error.textContent = pw.data.error || 'Your profile was saved, but that password could not be set.';
+        return;
+      }
+      hasPassword = true;
+      pwInput.value = '';
     }
 
     me = data.member;
