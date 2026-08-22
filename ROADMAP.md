@@ -20,12 +20,15 @@ CHANGELOG.md with the version they shipped in.
 - [ ] Hand-add a few test members (comped, via admin-members API or /guru).
 
 ## Phase 2 — auth changes
-- [ ] Password on first login: member sets a password during profile setup;
-      stays logged in after browser restarts (long-lived session).
-- [ ] "Forgot password" flow (reuses the magic-link machinery).
-- [ ] Admin option in /guru to send a one-time login link to any member.
-- [ ] **Bug:** profile setup re-prompts on every login even when a profile
-      exists — fix so it only shows when name is missing or member clicks Edit.
+- [x] Passwords (2026-08-23): optional, set/changed in the profile editor,
+      password sign-in on the login page. PBKDF2-hashed. Sessions extended
+      to 180 days. Verified end-to-end on the test subdomain.
+- [x] "Forgot password" = the magic-link button on the login page.
+- [x] Admin one-time login link: `send_login_link` API action exists;
+      the /guru button for it lands with the Phase 3 portal-admin tab.
+- [x] **Bug:** profile re-prompt (2026-08-23) — original cause fixed
+      pre-handoff (728a855); closed the remaining Cancel escape hatch for
+      first-time members.
 
 ## Phase 3 — /guru admin additions
 - [ ] **Donors tab**: show amount donated per person (pull from Stripe; store
