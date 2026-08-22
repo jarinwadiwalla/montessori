@@ -2,8 +2,6 @@
   // Must match the real Cloudflare Pages project name, or wrangler CLI
   // commands (secrets, deploys) fail with "Project does not exist".
   "name": "montessori",
-  // Jarin's account — pinned so wrangler works for members of several accounts.
-  "account_id": "ba2ee5bd302f29c68f32f923ca5f0599",
   "compatibility_date": "2026-04-11",
   "pages_build_output_dir": "./dist",
   "d1_databases": [

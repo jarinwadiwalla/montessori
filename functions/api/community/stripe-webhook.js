@@ -68,8 +68,13 @@ async function handleCheckout(context, event) {
   // This webhook receives every checkout on the whole Stripe account —
   // webinar recordings, guides, donations, all of it. Only a purchase of
   // the Collective product itself may grant membership.
-  const productId = env.STRIPE_COLLECTIVE_PRODUCT_ID;
-  if (!productId) {
+  // Comma-separated: the monthly and annual plans are separate Stripe
+  // products, and either one is a Collective purchase.
+  const productIds = (env.STRIPE_COLLECTIVE_PRODUCT_ID || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!productIds.length) {
     await notifyAdmin(
       context,
       `A checkout completed but <code>STRIPE_COLLECTIVE_PRODUCT_ID</code> is not
@@ -88,7 +93,7 @@ async function handleCheckout(context, event) {
     // retry the event and we can decide correctly then.
     return new Response("Could not fetch line items", { status: 500 });
   }
-  const isCollective = items.some((i) => i.price?.product === productId);
+  const isCollective = items.some((i) => productIds.includes(i.price?.product));
   if (!isCollective) {
     return Response.json({ received: true, skipped: "not a Collective purchase" });
   }
