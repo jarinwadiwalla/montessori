@@ -93,6 +93,22 @@ function groupIsActive(children: { href: string }[]): boolean {
         </li>
       )
     )}
+    <!-- Test-environment sign-in pill: hidden everywhere, revealed by the
+         script below on the test subdomain (and localhost) only. Lets us
+         exercise the portal before the Collective opens publicly. -->
+    <li id="nav-test-signin" hidden>
+      <a
+        href="/collective/login/"
+        class:list={[
+          'nav-link',
+          'nav-link--cta',
+          'js-collective-link',
+          { 'is-active': isActive('/collective/') },
+        ]}
+      >
+        Sign in
+      </a>
+    </li>
     {SHOW_COLLECTIVE && (
       <li>
         <a
@@ -142,6 +158,17 @@ function groupIsActive(children: { href: string }[]): boolean {
     if (e.key === 'Escape') closeAll();
   });
 
+  // --- Test-environment sign-in pill --------------------------
+  // The test subdomain behaves as if the Collective were open: a Sign in
+  // pill appears top right. Production keeps hiding it until launch.
+  const isTestHost =
+    window.location.hostname === 'test.montessoriforadolescents.com' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1';
+  if (isTestHost) {
+    document.getElementById('nav-test-signin')?.removeAttribute('hidden');
+  }
+
   // --- Collective link ----------------------------------------
   // Members already signed in should land in the portal rather than on the
   // sales page. The session cookie is HttpOnly, so we have to ask the server.
@@ -149,7 +176,9 @@ function groupIsActive(children: { href: string }[]): boolean {
   // Progressive enhancement: the link already works as /collective/, and this
   // only upgrades it. If the request is slow or fails, nothing breaks.
   // Two of these now: the item inside "Connect" and the standalone pill.
-  const collectiveLinks = document.querySelectorAll<HTMLAnchorElement>('.js-collective-link');
+  const collectiveLinks = [
+    ...document.querySelectorAll<HTMLAnchorElement>('.js-collective-link'),
+  ].filter((el) => !el.closest('li')?.hidden);
 
   if (collectiveLinks.length && !window.location.pathname.startsWith('/collective/')) {
     fetch('/api/community/me')

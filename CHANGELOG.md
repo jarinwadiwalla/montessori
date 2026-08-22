@@ -10,6 +10,10 @@
   nothing and emails the admin.
 
 ### Added
+- Test environment at `test.montessoriforadolescents.com`: a "Sign in" pill
+  appears in the navigation on the test subdomain (and localhost) only, and
+  the whole test host is served with `X-Robots-Tag: noindex, nofollow`.
+  Production keeps the Collective hidden until launch.
 - `ROADMAP.md` — the working list for the Collective rollout.
 
 ## [1.0.0] - 2026-04-11

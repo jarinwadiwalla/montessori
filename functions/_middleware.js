@@ -14,5 +14,13 @@ export async function onRequest(context) {
   for (const [key, value] of Object.entries(CORS_HEADERS)) {
     newResponse.headers.set(key, value);
   }
+
+  // The test subdomain mirrors the whole site; keep every page of it out
+  // of search engines.
+  const host = new URL(context.request.url).hostname;
+  if (host === "test.montessoriforadolescents.com") {
+    newResponse.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+
   return newResponse;
 }
