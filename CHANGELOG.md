@@ -3,6 +3,10 @@
 ## [1.1.0] - 2026-08-23
 
 ### Fixed
+- The `STRIPE_SECRET_KEY` stored in Cloudflare was not a valid Stripe
+  secret key, so every server-side Stripe API call had been failing
+  silently. Replaced with the real key; the payments sync and webhook
+  subscription lookups now work.
 - Stripe webhook now verifies the purchased product before granting Collective
   membership. Previously any checkout on the account (webinar, guide, donation)
   enrolled the buyer as a member. Requires the new

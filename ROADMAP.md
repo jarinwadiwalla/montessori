@@ -31,11 +31,16 @@ CHANGELOG.md with the version they shipped in.
       first-time members.
 
 ## Phase 3 — /guru admin additions
-- [ ] **Donors tab**: show amount donated per person (pull from Stripe; store
-      payments in D1 so amounts survive and can be summed).
-- [ ] **Subscriptions section**: who pays $5/mo or $50/yr, status, MRR.
-- [ ] **Portal admin inside /guru**: invite (comped) members, suspend/remove,
-      see who joined and from where (country), see churn.
+- [x] **Donors tab** (2026-08-23): per-donor totals in Guru → Payments,
+      backed by a D1 `payments` mirror (webhook-fed + Stripe sync button).
+- [x] **Subscriptions section** (2026-08-23): MRR + monthly/annual counts
+      in the Payments stat row; per-member plan in the Collective tab.
+- [x] **Portal admin inside /guru** (2026-08-23): Collective tab — invite
+      comped members, suspend/reactivate, send login links, location and
+      last-seen per member, resolve reports.
+- [x] Fixed an invalid `STRIPE_SECRET_KEY` in Cloudflare (was an `mk_`
+      value, not a real `sk_live_` key) — server-side Stripe calls had been
+      failing silently since the start.
 
 ## Phase 4 — portal features (Circle-inspired)
 - [ ] Left-hand sidebar spaces: Start Here, Say Hello, Events & Announcements
