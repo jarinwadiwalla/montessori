@@ -9,6 +9,11 @@
   `STRIPE_COLLECTIVE_PRODUCT_ID` secret; until it is set the webhook grants
   nothing and emails the admin.
 
+### Fixed
+- First-time profile setup no longer offers a Cancel escape (and no longer
+  pre-fills the name field with the server's "Member" placeholder), so a new
+  member can't skip naming themselves and get re-prompted on every login.
+
 ### Added
 - Test environment at `test.montessoriforadolescents.com`: a "Sign in" pill
   appears in the navigation on the test subdomain (and localhost) only, and

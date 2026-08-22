@@ -214,7 +214,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     sessionStorage.removeItem('apc_edit_profile');
 
     if (data.needsProfile || wantsEdit) {
-      showProfileSetup();
+      showProfileSetup(data.needsProfile);
     } else {
       showPortal();
       await loadHandles();
@@ -253,7 +253,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
   });
 
-  function showProfileSetup() {
+  function showProfileSetup(isFirstSetup = false) {
     $('profile-setup').hidden = false;
     $('portal-main').hidden = true;
 
@@ -266,9 +266,12 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     // Someone who already has a name is editing, not setting up, so give
     // them a way out without saving. A brand-new member needs a name, so
-    // they don't get one.
-    $('profile-cancel').hidden = !me?.name;
-    (document.getElementById('profile-name') as HTMLInputElement).value = me?.name || '';
+    // they don't get one. (me.name can't be used for this test — the server
+    // substitutes "Member" for a blank name, so it is never falsy.)
+    $('profile-cancel').hidden = isFirstSetup;
+    (document.getElementById('profile-name') as HTMLInputElement).value = isFirstSetup
+      ? ''
+      : me?.name || '';
     (document.getElementById('profile-bio') as HTMLTextAreaElement).value = me?.bio || '';
     (document.getElementById('profile-location') as HTMLInputElement).value = me?.location || '';
     (document.getElementById('profile-exchange') as HTMLInputElement).checked =
