@@ -19,6 +19,17 @@
   member can't skip naming themselves and get re-prompted on every login.
 
 ### Added
+- Circle-style portal layout: left sidebar with spaces (Start here,
+  Say hello, admin-only Announcements), Events, Resources, Webinar,
+  Members and Alerts. The feed is the landing view; posts carry a space
+  chip on the home feed.
+- Country on member profiles (ISO dropdown); flag shown beside names in
+  the feed, comments and directory.
+- Members' Resources page (from the content collection, with the paid
+  guide included free) and Webinar page (recordings embedded).
+- Removed per-post/comment Report buttons in favour of messaging the
+  team directly; fixed [hidden] being overridden by display rules, the
+  true cause of the profile editor appearing on every sign-in.
 - Guru **Payments** tab: donation totals per donor, Collective MRR and
   member counts, and a full payment history — backed by a new `payments`
   mirror table in D1, fed live by the Stripe webhook and backfillable with

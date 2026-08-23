@@ -18,7 +18,7 @@ export async function onRequestGet(context) {
   }
 
   const { results } = await env.SITE_DB.prepare(
-    `SELECT c.*, m.name AS author_name, m.avatar_url AS author_avatar
+    `SELECT c.*, m.name AS author_name, m.avatar_url AS author_avatar, m.country AS author_country
      FROM community_comments c
      JOIN community_members m ON m.id = c.member_id
      WHERE c.post_id = ? AND c.status = 'visible'
@@ -36,6 +36,7 @@ export async function onRequestGet(context) {
         id: c.member_id,
         name: c.author_name || "Member",
         avatar_url: c.author_avatar || "",
+        country: c.author_country || "",
       },
       can_delete: c.member_id === member.id || member.role === "admin",
     })),

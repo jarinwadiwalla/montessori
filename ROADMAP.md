@@ -52,9 +52,10 @@ CHANGELOG.md with the version they shipped in.
       membership.
 - [x] Country on profiles (2026-08-23): ISO dropdown; flag beside names in
       the feed and directory.
-- [ ] Subtle in-app notifications: alert only on @mentions; list of people
-      messaging you / admin announcements. (Alerts page exists; refine UX.)
-- [ ] Replace the report button with "message the admin" for issues.
+- [x] Subtle notifications: the Alerts page already did exactly this —
+      @mention-only, in-app badge, shows who. Kept as is.
+- [x] Report buttons removed from posts/comments (2026-08-23); Start here
+      tells members to message the team. Backend + Guru reports list kept.
 
 ## Later (marked, not scoped)
 - [ ] **Pen pal exchange programme** — details to come.
