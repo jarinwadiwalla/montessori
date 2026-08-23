@@ -12,6 +12,7 @@ import { notifyMentions } from "../../lib/community-mentions.js";
 const PAGE_SIZE = 20;
 const MAX_BODY = 5000;
 const MAX_ATTACHMENTS = 6;
+const SPACES = ["general", "say-hello", "announcements"];
 
 export async function onRequestGet(context) {
   const { member, response } = await requireMember(context);
@@ -21,16 +22,20 @@ export async function onRequestGet(context) {
   const url = new URL(request.url);
   const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
   const offset = (page - 1) * PAGE_SIZE;
+  // No space parameter = the home feed, which shows every space.
+  const space = url.searchParams.get("space") || "";
+  const filtered = SPACES.includes(space);
 
   const { results: posts } = await env.SITE_DB.prepare(
-    `SELECT p.*, m.name AS author_name, m.avatar_url AS author_avatar, m.id AS author_id
+    `SELECT p.*, m.name AS author_name, m.avatar_url AS author_avatar,
+            m.id AS author_id, m.country AS author_country
      FROM community_posts p
      JOIN community_members m ON m.id = p.member_id
-     WHERE p.status = 'visible'
+     WHERE p.status = 'visible' ${filtered ? "AND p.space = ?" : ""}
      ORDER BY p.created_at DESC
      LIMIT ? OFFSET ?`
   )
-    .bind(PAGE_SIZE + 1, offset)
+    .bind(...(filtered ? [space] : []), PAGE_SIZE + 1, offset)
     .all();
 
   const hasMore = posts.length > PAGE_SIZE;
@@ -63,10 +68,12 @@ export async function onRequestGet(context) {
       body: p.body,
       created_at: p.created_at,
       comment_count: p.comment_count || 0,
+      space: p.space || "general",
       author: {
         id: p.author_id,
         name: p.author_name || "Member",
         avatar_url: p.author_avatar || "",
+        country: p.author_country || "",
       },
       attachments: attachmentsByPost[p.id] || [],
       can_delete: p.member_id === member.id || member.role === "admin",
@@ -91,6 +98,15 @@ export async function onRequestPost(context) {
 
   const body = String(payload.body || "").trim();
   const attachments = Array.isArray(payload.attachments) ? payload.attachments : [];
+  const space = SPACES.includes(payload.space) ? payload.space : "general";
+
+  // Announcements come from the team, not the floor.
+  if (space === "announcements" && member.role !== "admin") {
+    return Response.json(
+      { error: "Only admins can post announcements." },
+      { status: 403 }
+    );
+  }
 
   if (!body && attachments.length === 0) {
     return Response.json(
@@ -159,10 +175,10 @@ export async function onRequestPost(context) {
   const now = new Date().toISOString();
 
   await env.SITE_DB.prepare(
-    `INSERT INTO community_posts (id, member_id, body, status, comment_count, created_at, updated_at)
-     VALUES (?, ?, ?, 'visible', 0, ?, ?)`
+    `INSERT INTO community_posts (id, member_id, body, status, comment_count, space, created_at, updated_at)
+     VALUES (?, ?, ?, 'visible', 0, ?, ?, ?)`
   )
-    .bind(id, member.id, body, now, now)
+    .bind(id, member.id, body, space, now, now)
     .run();
 
   for (const a of prepared) {

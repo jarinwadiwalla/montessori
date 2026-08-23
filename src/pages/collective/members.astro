@@ -124,7 +124,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
       const who = el('div', 'm-who');
       const nameRow = el('div', 'm-name-row');
-      nameRow.appendChild(el('span', 'm-name', m.name));
+      const flag = /^[A-Z]{2}$/.test(m.country || '')
+        ? ' ' + String.fromCodePoint(...[...m.country].map((c) => 0x1f1a5 + c.charCodeAt(0)))
+        : '';
+      nameRow.appendChild(el('span', 'm-name', m.name + flag));
       if (m.role === 'admin') nameRow.appendChild(el('span', 'm-badge', 'Organiser'));
       if (m.is_you) nameRow.appendChild(el('span', 'm-badge m-badge--you', 'You'));
       who.appendChild(nameRow);

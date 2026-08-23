@@ -1,0 +1,113 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Start Here"
+  description="Welcome to the Montessori Adolescent Collective."
+  heroTitle="Start here"
+  heroSubtitle="Welcome — here's how to get the most out of the Collective."
+  noindex
+>
+  <div class="container start-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="start-here" />
+
+      <div class="start-content">
+        <h2>Welcome to the Collective</h2>
+        <p>
+          The Montessori Adolescent Collective is a shared room for people doing
+          third-plane work — guides, teachers, administrators and parents from
+          adolescent environments around the world. It's a small community on
+          purpose: real names, real work, real questions.
+        </p>
+
+        <h3>Three things to do first</h3>
+        <ol>
+          <li>
+            <strong><a href="/collective/portal/?space=say-hello">Say hello</a></strong>
+            — introduce yourself: who you are, where you work, what brought you
+            to the third plane. Your country's flag shows by your name so
+            everyone can see how far the room stretches.
+          </li>
+          <li>
+            <strong><a href="/collective/events/">RSVP to the next gathering</a></strong>
+            — we meet online regularly, and everything has a timezone note.
+          </li>
+          <li>
+            <strong><a href="/collective/members/">Browse the member directory</a></strong>
+            — and if you're open to school exchanges or pen pal programmes for
+            your adolescents, tick the badge on your profile so others can find
+            you.
+          </li>
+        </ol>
+
+        <h3>How the room works</h3>
+        <ul>
+          <li>The <a href="/collective/portal/">Feed</a> is the main board — share work, ask questions, attach images and PDFs.</li>
+          <li>Type <strong>@name</strong> to notify someone. Mentions are the only thing that triggers an <a href="/collective/alerts/">alert</a> — no email floods, ever.</li>
+          <li>The <a href="/collective/resources/">Resources</a> shelf and the <a href="/collective/webinar/">webinar</a> are yours as a member.</li>
+          <li>Something amiss, or need a hand? Message the team — mention <strong>@jarinwadiwalla</strong> in a post, or <a href="/contact/">contact us</a> directly.</li>
+        </ul>
+
+        <p>
+          Please read the <a href="/collective/guidelines/">community guidelines</a>
+          once — they're short, and they're the whole rulebook.
+        </p>
+      </div>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+    if (me.lapsed) {
+      window.location.href = '/collective/portal/';
+      return;
+    }
+    document.getElementById('loading')!.hidden = true;
+    document.getElementById('main')!.hidden = false;
+    document.getElementById('me-name')!.textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+  }
+  boot();
+
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await fetch('/api/community/logout', { method: 'POST' });
+    window.location.href = '/collective/';
+  });
+</script>
+
+<style>
+  .start-content {
+    max-width: 640px;
+  }
+
+  .start-content h2 {
+    margin-top: 0;
+  }
+
+  .start-content li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .start-content a {
+    color: var(--color-purple);
+  }
+
+  .loading {
+    color: var(--color-text-light);
+  }
+</style>

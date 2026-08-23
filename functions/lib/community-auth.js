@@ -286,6 +286,7 @@ export function publicMember(m) {
     avatar_url: m.avatar_url || "",
     bio: m.bio || "",
     location: m.location || "",
+    country: m.country || "",
     handle: m.handle || "",
     open_to_exchange: !!m.open_to_exchange,
     role: m.role,

@@ -1,35 +1,60 @@
 ---
-// Shared top bar for the signed-in areas of the Collective.
+// Left-hand sidebar for the signed-in areas of the Collective — the
+// Circle-style layout: spaces and pages down the left, content on the
+// right, no top tab bar. On phones it collapses to a horizontal strip.
+//
 // The member name/avatar are filled in by each page's script once
 // /api/community/me returns.
 interface Props {
-  active: 'board' | 'events' | 'members' | 'alerts';
+  active:
+    | 'board'
+    | 'start-here'
+    | 'say-hello'
+    | 'announcements'
+    | 'events'
+    | 'resources'
+    | 'webinar'
+    | 'members'
+    | 'alerts';
 }
 const { active } = Astro.props;
+
+const cls = (name: string) => (active === name ? 'is-active' : '');
 ---
 
-<header class="portal-bar">
+<aside class="portal-side">
   <div class="portal-me">
     <img class="me-avatar" id="me-avatar" alt="" hidden />
     <span id="me-name"></span>
   </div>
 
   <nav class="portal-nav" aria-label="Collective">
-    <a href="/collective/portal/" class={active === 'board' ? 'is-active' : ''}>Board</a>
-    <a href="/collective/events/" class={active === 'events' ? 'is-active' : ''}>Events</a>
-    <a href="/collective/members/" class={active === 'members' ? 'is-active' : ''}>Members</a>
-    <a
-      href="/collective/alerts/"
-      class:list={['alerts-link', { 'is-active': active === 'alerts' }]}
-    >
+    <a href="/collective/portal/" class={cls('board')}>Feed</a>
+
+    <p class="side-heading">The Collective</p>
+    <a href="/collective/start-here/" class={cls('start-here')}>Start here</a>
+    <a href="/collective/portal/?space=say-hello" class={cls('say-hello')} data-keep-space>Say hello</a>
+    <a href="/collective/portal/?space=announcements" class={cls('announcements')} data-keep-space>Announcements</a>
+    <a href="/collective/events/" class={cls('events')}>Events</a>
+
+    <p class="side-heading">Library</p>
+    <a href="/collective/resources/" class={cls('resources')}>Resources</a>
+    <a href="/collective/webinar/" class={cls('webinar')}>Webinar</a>
+
+    <p class="side-heading">People</p>
+    <a href="/collective/members/" class={cls('members')}>Members</a>
+    <a href="/collective/alerts/" class:list={['alerts-link', cls('alerts')]}>
       Alerts<span class="alert-count" id="alert-count" hidden></span>
     </a>
-    <a href="/collective/guidelines/">Guidelines</a>
-    <a href="/collective/portal/" data-edit-profile>Edit profile</a>
-    <button id="billing-btn" class="link-btn" type="button" hidden>Billing</button>
-    <button id="signout-btn" class="link-btn" type="button">Sign out</button>
+
+    <div class="side-footer">
+      <a href="/collective/guidelines/">Guidelines</a>
+      <a href="/collective/portal/" data-edit-profile>Edit profile</a>
+      <button id="billing-btn" class="link-btn" type="button" hidden>Billing</button>
+      <button id="signout-btn" class="link-btn" type="button">Sign out</button>
+    </div>
   </nav>
-</header>
+</aside>
 
 <script>
   // "Edit profile" used to be /collective/portal/?edit=1. A URL that opens
@@ -88,26 +113,63 @@ const { active } = Astro.props;
       }
     });
   }
+
+  // Highlight the space links when the board is filtered to their space.
+  // Astro renders this nav statically, so the query string has to be
+  // matched here rather than at build time.
+  const params = new URLSearchParams(window.location.search);
+  const activeSpace = params.get('space');
+  if (activeSpace && window.location.pathname.startsWith('/collective/portal')) {
+    document.querySelectorAll('.portal-nav a').forEach((a) => {
+      const href = a.getAttribute('href') || '';
+      a.classList.toggle('is-active', href.endsWith(`space=${activeSpace}`));
+    });
+  }
 </script>
 
-<style>
-  .portal-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-md);
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: var(--space-xl);
-    flex-wrap: wrap;
+<style is:global>
+  /* The sidebar's parent (whatever wrapper each page puts it in) becomes
+     a two-column grid: sidebar left, everything else right. */
+  :where(div, section):has(> .portal-side) {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: var(--space-2xl);
+    align-items: start;
   }
 
+  :where(div, section):has(> .portal-side) > :not(.portal-side) {
+    grid-column: 2;
+  }
+
+  .portal-side {
+    grid-column: 1;
+    grid-row: 1 / span 100;
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-md));
+  }
+
+  @media (max-width: 820px) {
+    :where(div, section):has(> .portal-side) {
+      display: block;
+    }
+    .portal-side {
+      position: static;
+      margin-bottom: var(--space-lg);
+    }
+  }
+</style>
+
+<style>
   .portal-me {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
     font-weight: 500;
     color: var(--color-purple);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-md);
+    overflow-wrap: anywhere;
   }
 
   .me-avatar {
@@ -115,30 +177,47 @@ const { active } = Astro.props;
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+    flex-shrink: 0;
   }
 
   .portal-nav {
     display: flex;
-    gap: var(--space-md);
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .side-heading {
+    margin: var(--space-md) 0 0.15rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-light);
   }
 
   .portal-nav a,
   .link-btn {
     background: none;
     border: none;
-    color: var(--color-text-light);
+    color: var(--color-text);
     font-family: var(--font-body);
     font-size: var(--text-sm);
     cursor: pointer;
     text-decoration: none;
-    padding: 0;
+    text-align: left;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-sm);
   }
 
   .portal-nav a:hover,
   .link-btn:hover {
     color: var(--color-purple);
+    background: rgba(63, 38, 91, 0.06);
+  }
+
+  .portal-nav a.is-active {
+    color: var(--color-purple);
+    font-weight: 600;
+    background: rgba(63, 38, 91, 0.08);
   }
 
   .alerts-link {
@@ -159,9 +238,39 @@ const { active } = Astro.props;
     font-weight: 600;
   }
 
-  .portal-nav a.is-active {
-    color: var(--color-purple);
-    font-weight: 500;
-    border-bottom: 2px solid var(--color-terracotta);
+  .side-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .side-footer a,
+  .side-footer .link-btn {
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 820px) {
+    .portal-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: var(--space-xs);
+    }
+    .side-heading {
+      display: none;
+    }
+    .side-footer {
+      flex-direction: row;
+      flex-wrap: wrap;
+      column-gap: var(--space-md);
+      margin-top: var(--space-xs);
+      border-top: none;
+      padding-top: 0;
+      width: 100%;
+    }
   }
 </style>

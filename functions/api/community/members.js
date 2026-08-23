@@ -14,7 +14,7 @@ export async function onRequestGet(context) {
   const exchangeOnly = url.searchParams.get("exchange") === "1";
   const q = (url.searchParams.get("q") || "").trim().toLowerCase().slice(0, 60);
 
-  let sql = `SELECT id, name, avatar_url, bio, location, handle, open_to_exchange, role, joined_at
+  let sql = `SELECT id, name, avatar_url, bio, location, country, handle, open_to_exchange, role, joined_at
              FROM community_members
              WHERE status = 'active' AND name != ''`;
   const binds = [];
@@ -37,6 +37,7 @@ export async function onRequestGet(context) {
       avatar_url: m.avatar_url || "",
       bio: m.bio || "",
       location: m.location || "",
+      country: m.country || "",
       handle: m.handle || "",
       open_to_exchange: !!m.open_to_exchange,
       role: m.role,

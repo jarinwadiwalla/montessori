@@ -12,7 +12,8 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.17.2",
-    "aws4fetch": "^1.0.20"
+    "aws4fetch": "^1.0.20",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "pdfmake": "^0.3.4",

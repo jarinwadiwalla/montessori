@@ -1,0 +1,137 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+
+// The library shelf: every resource the site offers, gathered in one
+// members' page. Entries with a real file get a Download button; the
+// rest link to their article. Add a markdown file to src/content/resources
+// and it appears here on the next deploy.
+const resources = (await getCollection('resources')).sort(
+  (a, b) => (a.data.title > b.data.title ? 1 : -1)
+);
+---
+
+<PageLayout
+  title="Resources"
+  description="Downloadable resources for Collective members."
+  heroTitle="Resources"
+  heroSubtitle="Guides and materials to take back to your environment."
+  noindex
+>
+  <div class="container resources-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="resources" />
+
+      <div class="resource-list">
+        {resources.map((r) => (
+          <article class="resource-card">
+            <h3>{r.data.title}</h3>
+            <p>{r.data.description}</p>
+            {r.data.downloadUrl?.startsWith('/') ? (
+              <a class="res-btn" href={r.data.downloadUrl} download>Download PDF</a>
+            ) : r.data.downloadUrl?.startsWith('http') ? (
+              <a class="res-btn" href={r.data.downloadUrl} target="_blank" rel="noopener">Get it</a>
+            ) : (
+              <span class="res-soon">Coming soon</span>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <p class="resources-note">
+        Looking for something that isn't here? Ask on the
+        <a href="/collective/portal/">board</a> — chances are someone has it.
+      </p>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+    if (me.lapsed) {
+      window.location.href = '/collective/portal/';
+      return;
+    }
+    document.getElementById('loading')!.hidden = true;
+    document.getElementById('main')!.hidden = false;
+    document.getElementById('me-name')!.textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+  }
+  boot();
+
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await fetch('/api/community/logout', { method: 'POST' });
+    window.location.href = '/collective/';
+  });
+</script>
+
+<style>
+  .resource-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .resource-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .resource-card h3 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-base);
+  }
+
+  .resource-card p {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    flex: 1;
+  }
+
+  .res-btn {
+    align-self: flex-start;
+    background: var(--color-purple);
+    color: var(--color-white);
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .res-soon {
+    align-self: flex-start;
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    font-style: italic;
+  }
+
+  .resources-note {
+    margin-top: var(--space-xl);
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
+  .resources-note a {
+    color: var(--color-purple);
+  }
+
+  .loading {
+    color: var(--color-text-light);
+  }
+</style>

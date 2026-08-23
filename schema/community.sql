@@ -33,7 +33,10 @@ CREATE TABLE IF NOT EXISTS community_members (
   cancel_at_period_end INTEGER DEFAULT 0,
 
   -- Optional password (PBKDF2, "v1$iter$salt$hash"). Empty = magic link only.
-  password_hash TEXT DEFAULT ''
+  password_hash TEXT DEFAULT '',
+
+  -- ISO 3166-1 alpha-2, chosen by the member; shown as a flag by their name.
+  country TEXT DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_members_email ON community_members(email);
 -- Partial, so the many members with no handle yet don't collide on ''.
@@ -75,6 +78,7 @@ CREATE TABLE IF NOT EXISTS community_posts (
   status TEXT NOT NULL DEFAULT 'visible',   -- visible | removed
   removed_reason TEXT DEFAULT '',
   comment_count INTEGER DEFAULT 0,
+  space TEXT NOT NULL DEFAULT 'general',    -- general | say-hello | announcements
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

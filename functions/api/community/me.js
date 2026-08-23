@@ -56,6 +56,8 @@ export async function onRequestPut(context) {
   const bio = String(payload.bio ?? member.bio ?? "").trim();
   const avatarUrl = String(payload.avatar_url ?? member.avatar_url ?? "").trim();
   const location = String(payload.location ?? member.location ?? "").trim();
+  const countryRaw = String(payload.country ?? member.country ?? "").trim().toUpperCase();
+  const country = /^[A-Z]{2}$/.test(countryRaw) ? countryRaw : "";
   const openToExchange =
     payload.open_to_exchange === undefined
       ? member.open_to_exchange
@@ -85,10 +87,10 @@ export async function onRequestPut(context) {
 
   await env.SITE_DB.prepare(
     `UPDATE community_members
-     SET name = ?, bio = ?, avatar_url = ?, location = ?, open_to_exchange = ?
+     SET name = ?, bio = ?, avatar_url = ?, location = ?, country = ?, open_to_exchange = ?
      WHERE id = ?`
   )
-    .bind(name, bio, avatarUrl, location, openToExchange, member.id)
+    .bind(name, bio, avatarUrl, location, country, openToExchange, member.id)
     .run();
 
   // Their @handle follows their display name.
