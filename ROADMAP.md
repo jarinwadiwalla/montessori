@@ -43,15 +43,15 @@ CHANGELOG.md with the version they shipped in.
       failing silently since the start.
 
 ## Phase 4 — portal features (Circle-inspired)
-- [ ] Left-hand sidebar spaces: Start Here, Say Hello, Events & Announcements
-      (feed remains the landing view after login). Per the Circle screenshot
-      (2026-08-23): left sidebar nav ONLY — no top bar tabs, no Trending
-      posts column.
-- [ ] Downloadable resources section (PDFs etc., served through the
-      authenticated media route).
-- [ ] Webinar section (the existing webinar recording, members-only).
-- [ ] Profile: photo + name + **country**; show a flag next to the name
-      everywhere the member appears.
+- [x] Left sidebar spaces (2026-08-23): Feed, Start here, Say hello,
+      Announcements (admin-post-only), Events, Resources, Webinar, Members,
+      Alerts. No top tab bar, no trending column, feed is the landing view.
+- [x] Resources page (2026-08-23): built from the content collection;
+      paid guide swapped for its file for members.
+- [x] Webinar page (2026-08-23): recordings embedded, included with
+      membership.
+- [x] Country on profiles (2026-08-23): ISO dropdown; flag beside names in
+      the feed and directory.
 - [ ] Subtle in-app notifications: alert only on @mentions; list of people
       messaging you / admin announcements. (Alerts page exists; refine UX.)
 - [ ] Replace the report button with "message the admin" for issues.

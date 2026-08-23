@@ -10,6 +10,18 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 const resources = (await getCollection('resources')).sort(
   (a, b) => (a.data.title > b.data.title ? 1 : -1)
 );
+
+// Anything sold on the public site is included with membership — swap the
+// purchase link for the file itself here.
+const memberOverrides: Record<string, string> = {
+  'third-plane-characteristics': '/downloads/MontessoriforAdolescents101.pdf',
+};
+const downloadFor = (r: (typeof resources)[number]) => {
+  if (r.data.downloadUrl?.startsWith('http') && r.slug in memberOverrides) {
+    return memberOverrides[r.slug];
+  }
+  return r.data.downloadUrl || '';
+};
 ---
 
 <PageLayout
@@ -30,10 +42,10 @@ const resources = (await getCollection('resources')).sort(
           <article class="resource-card">
             <h3>{r.data.title}</h3>
             <p>{r.data.description}</p>
-            {r.data.downloadUrl?.startsWith('/') ? (
-              <a class="res-btn" href={r.data.downloadUrl} download>Download PDF</a>
-            ) : r.data.downloadUrl?.startsWith('http') ? (
-              <a class="res-btn" href={r.data.downloadUrl} target="_blank" rel="noopener">Get it</a>
+            {downloadFor(r).startsWith('/') ? (
+              <a class="res-btn" href={downloadFor(r)} download>Download PDF</a>
+            ) : downloadFor(r).startsWith('http') ? (
+              <a class="res-btn" href={downloadFor(r)} target="_blank" rel="noopener">Get it</a>
             ) : (
               <span class="res-soon">Coming soon</span>
             )}
