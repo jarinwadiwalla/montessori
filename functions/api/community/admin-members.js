@@ -15,6 +15,7 @@ import {
 } from "../../lib/community-auth.js";
 import { ensureSubscriber } from "../../lib/community-list.js";
 import { ensureHandle } from "../../lib/community-mentions.js";
+import { getTemplate, renderTemplate, greetingName } from "../../lib/email-templates.js";
 
 export async function onRequestGet(context) {
   const authErr = requireAdminStrict(context);
@@ -143,6 +144,13 @@ async function sendLoginLink(context, id) {
   const { token, expiresMinutes } = await createLoginToken(env, member.email, "admin");
   const link = `https://montessoriforadolescents.com/collective/verify/?token=${encodeURIComponent(token)}`;
 
+  const tpl = renderTemplate(await getTemplate(env, "admin-login-link"), {
+    greeting_name: greetingName(member.name),
+    link,
+    expires_minutes: expiresMinutes,
+    site: "https://montessoriforadolescents.com",
+  });
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -152,15 +160,8 @@ async function sendLoginLink(context, id) {
     body: JSON.stringify({
       from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
       to: [member.email],
-      subject: "Your sign-in link for the Collective",
-      html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
-          <p>Hello${member.name ? ` ${escapeHtml(member.name)}` : ""} — here's a fresh sign-in link:</p>
-          <p style="margin:28px 0;">
-            <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
-          </p>
-          <p style="color:#6b5b7d;font-size:14px;">This link works once and expires in ${expiresMinutes} minutes.
-          You can always request another at https://montessoriforadolescents.com/collective/login/</p>
-        </div>`,
+      subject: tpl.subject,
+      html: tpl.html,
     }),
   });
 

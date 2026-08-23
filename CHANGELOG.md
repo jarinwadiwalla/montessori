@@ -19,6 +19,11 @@
   member can't skip naming themselves and get re-prompted on every login.
 
 ### Added
+- Guru → Newsletter → **System emails**: the transactional emails (Collective
+  welcome, sign-in links, suspended/non-member notices, newsletter welcome)
+  are now editable templates with placeholders, live preview and
+  restore-to-default. Stored in a new `email_templates` D1 table; the coded
+  defaults apply until edited.
 - Circle-style portal layout: left sidebar with spaces (Start here,
   Say hello, admin-only Announcements), Events, Resources, Webinar,
   Members and Alerts. The feed is the landing view; posts carry a space

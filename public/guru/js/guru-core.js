@@ -102,6 +102,7 @@ function setupSubTabs() {
       if (subName === "nl-campaigns") nlLoadCampaigns();
       if (subName === "nl-templates") nlLoadTemplatesList();
       if (subName === "nl-retries") nlLoadRetries();
+      if (subName === "nl-system") sysmailLoad();
     });
   });
 }

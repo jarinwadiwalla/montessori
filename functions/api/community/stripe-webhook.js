@@ -16,6 +16,7 @@ import { generateId, normalizeEmail, createLoginToken } from "../../lib/communit
 import { ensureSubscriber } from "../../lib/community-list.js";
 import { ensureHandle } from "../../lib/community-mentions.js";
 import { classifyPayment, recordPayment } from "../../lib/payments.js";
+import { getTemplate, renderTemplate, greetingName } from "../../lib/email-templates.js";
 
 const SITE = "https://montessoriforadolescents.com";
 const TOLERANCE_SECONDS = 300;
@@ -393,6 +394,21 @@ async function sendWelcome(context, email, name, plan) {
         ? "Your dues renew monthly, and you can change or cancel them any time from Billing inside the Collective."
         : "";
 
+  const tpl = renderTemplate(
+    await getTemplate(env, "member-welcome"),
+    {
+      greeting_name: greetingName(name),
+      link,
+      expires_minutes: expiresMinutes,
+      site: SITE,
+    },
+    {
+      dues_note: dues
+        ? `<p style="color:#6b5b7d;font-size:14px;">${dues}</p>`
+        : "",
+    }
+  );
+
   context.waitUntil(
     fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -403,21 +419,8 @@ async function sendWelcome(context, email, name, plan) {
       body: JSON.stringify({
         from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
         to: [email],
-        subject: "Welcome to the Montessori Adolescent Collective",
-        html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#3f265b;">
-            <p>Welcome${name ? ` ${escapeHtml(name)}` : ""} — you're in.</p>
-            <p>The Montessori Adolescent Collective is a collaborative online community
-            for all things third plane of development. Use the link below to sign in
-            and set up your profile.</p>
-            <p style="margin:28px 0;">
-              <a href="${link}" style="background:#3f265b;color:#ffffff;padding:14px 28px;border-radius:999px;text-decoration:none;display:inline-block;">Sign in to the Collective</a>
-            </p>
-            <p style="color:#6b5b7d;font-size:14px;">This link works once and expires in ${expiresMinutes} minutes.
-            You can always request a fresh one at ${SITE}/collective/login/ — there's no password to remember.</p>
-            ${dues ? `<p style="color:#6b5b7d;font-size:14px;">${dues}</p>` : ""}
-            <p style="color:#6b5b7d;font-size:14px;">Please take a moment to read our
-            <a href="${SITE}/collective/guidelines/">community guidelines</a> before posting.</p>
-          </div>`,
+        subject: tpl.subject,
+        html: tpl.html,
       }),
     }).catch(() => {})
   );

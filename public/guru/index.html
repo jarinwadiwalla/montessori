@@ -169,6 +169,7 @@
       <div class="sub-tab" data-sub="nl-templates">Templates</div>
       <div class="sub-tab" data-sub="nl-campaigns">Campaigns</div>
       <div class="sub-tab" data-sub="nl-retries">Retries <span class="badge" id="retry-badge" style="display:none;">0</span></div>
+      <div class="sub-tab" data-sub="nl-system">System emails</div>
     </div>
 
     <!-- Compose -->
@@ -299,6 +300,39 @@
           <button class="btn btn-primary btn-sm" onclick="nlRetryAll()">Retry All Pending</button>
         </div>
         <div id="retries-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+
+    <div class="sub-section" id="sub-nl-system">
+      <div class="card">
+        <h3 style="margin-top:0;">System emails</h3>
+        <p style="font-size:13px;color:var(--gray-500);margin-top:0;">
+          The automatic emails members and subscribers receive — sign-in links and welcomes.
+          Edit one and it takes effect immediately; "Restore default" brings back the built-in version.
+          Keep the <code>{{placeholders}}</code> — they're filled in when each email is sent.
+        </p>
+        <div id="sysmail-list"><p class="empty-state">Loading...</p></div>
+      </div>
+
+      <div class="card" id="sysmail-editor" style="display:none;">
+        <h3 style="margin-top:0;" id="sysmail-editor-title"></h3>
+        <p style="font-size:13px;color:var(--gray-500);" id="sysmail-editor-desc"></p>
+        <p style="font-size:12px;color:var(--gray-500);" id="sysmail-editor-vars"></p>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" id="sysmail-subject" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">HTML</label>
+          <textarea id="sysmail-html" class="form-input" rows="14" style="font-family:monospace;font-size:12px;"></textarea>
+        </div>
+        <div class="btn-group" style="margin-bottom:16px;">
+          <button class="btn btn-secondary" onclick="sysmailCloseEditor()">Close</button>
+          <button class="btn btn-secondary" onclick="sysmailPreview()">Preview</button>
+          <button class="btn btn-secondary" id="sysmail-restore-btn" onclick="sysmailRestore()">Restore default</button>
+          <button class="btn btn-primary" onclick="sysmailSave()">Save</button>
+        </div>
+        <iframe id="sysmail-preview" style="display:none;width:100%;height:420px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;"></iframe>
       </div>
     </div>
   </div>
@@ -531,6 +565,7 @@
 <script src="/guru/js/guru-notes.js"></script>
 <script src="/guru/js/guru-payments.js"></script>
 <script src="/guru/js/guru-collective.js"></script>
+<script src="/guru/js/guru-sysmail.js"></script>
 
 </body>
 </html>

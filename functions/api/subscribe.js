@@ -1,3 +1,4 @@
+import { getTemplate, renderTemplate } from "../lib/email-templates.js";
 async function hmacToken(email, secret) {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -62,7 +63,13 @@ export async function onRequestPost(context) {
     const unsubUrl = `https://montessoriforadolescents.com/api/unsubscribe?email=${encodeURIComponent(normalizedEmail)}&token=${unsubToken}`;
 
     const isResub = existing && existing.unsubscribed;
-    const subject = isResub ? "Welcome back!" : "Welcome to Montessori for Adolescents";
+    const tpl = renderTemplate(await getTemplate(env, "subscriber-welcome"), {
+      welcome_word: isResub ? "Welcome back" : "Welcome",
+      first_name: firstName,
+      unsub_url: unsubUrl,
+      site: "https://montessoriforadolescents.com",
+    });
+    const subject = isResub ? "Welcome back!" : tpl.subject;
 
     context.waitUntil(
       fetch("https://api.resend.com/emails", {
@@ -79,15 +86,7 @@ export async function onRequestPost(context) {
             "List-Unsubscribe": `<${unsubUrl}>`,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
           },
-          html: `<!DOCTYPE html><html><body style="font-family: Georgia, serif; color: #3E312A; background: #FAF7F2; padding: 40px 20px; margin: 0;">
-<div style="max-width: 560px; margin: 0 auto;">
-  <h1 style="color: #3E312A; font-size: 24px; margin-bottom: 16px;">${isResub ? "Welcome back" : "Welcome"}, ${firstName}!</h1>
-  <p style="line-height: 1.7; color: #5A4D42;">Thank you for subscribing to our newsletter. We'll share reflections, resources, and updates about bringing Montessori education to adolescents.</p>
-  <p style="line-height: 1.7; color: #5A4D42;">In the meantime, visit our <a href="https://montessoriforadolescents.com/blog/" style="color: #B8755D;">blog</a> for the latest posts.</p>
-  <p style="line-height: 1.7; color: #5A4D42;">Warmly,<br>The Montessori for Adolescents Team</p>
-  <hr style="border: none; border-top: 1px solid #E8E0D8; margin: 32px 0 16px;">
-  <p style="font-size: 12px; color: #9B8E82;"><a href="${unsubUrl}" style="color: #9B8E82;">Unsubscribe</a></p>
-</div></body></html>`,
+          html: tpl.html,
         }),
       }).catch(() => {})
     );
