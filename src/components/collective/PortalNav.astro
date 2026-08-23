@@ -128,6 +128,13 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
 </script>
 
 <style is:global>
+  /* The hidden attribute must always win. Without this, any element whose
+     class sets a display (flex, grid…) stays visible despite hidden="" —
+     which is exactly how the profile editor haunted every sign-in. */
+  [hidden] {
+    display: none !important;
+  }
+
   /* The sidebar's parent (whatever wrapper each page puts it in) becomes
      a two-column grid: sidebar left, everything else right. */
   :where(div, section):has(> .portal-side) {
