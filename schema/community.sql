@@ -36,7 +36,10 @@ CREATE TABLE IF NOT EXISTS community_members (
   password_hash TEXT DEFAULT '',
 
   -- ISO 3166-1 alpha-2, chosen by the member; shown as a flag by their name.
-  country TEXT DEFAULT ''
+  country TEXT DEFAULT '',
+
+  -- When they accepted the community guidelines (first sign-in gate).
+  guidelines_accepted_at TEXT DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_members_email ON community_members(email);
 -- Partial, so the many members with no handle yet don't collide on ''.

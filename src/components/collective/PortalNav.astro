@@ -44,7 +44,7 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     <p class="side-heading">People</p>
     <a href="/collective/members/" class={cls('members')}>Members</a>
     <a href="/collective/alerts/" class:list={['alerts-link', cls('alerts')]}>
-      Alerts<span class="alert-count" id="alert-count" hidden></span>
+      Notifications<span class="alert-count" id="alert-count" hidden></span>
     </a>
 
     <div class="side-footer">
@@ -139,9 +139,24 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
      a two-column grid: sidebar left, everything else right. */
   :where(div, section):has(> .portal-side) {
     display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
-    column-gap: var(--space-2xl);
+    grid-template-columns: 260px minmax(0, 1fr);
+    column-gap: var(--space-3xl);
     align-items: start;
+  }
+
+  /* Compact page heading used instead of the old full-width hero. */
+  .portal-page-head {
+    margin-bottom: var(--space-xl);
+  }
+
+  .portal-page-head h1 {
+    margin: 0 0 0.25rem;
+    font-size: var(--text-2xl);
+  }
+
+  .portal-page-head p {
+    margin: 0;
+    color: var(--color-text-light);
   }
 
   :where(div, section):has(> .portal-side) > :not(.portal-side) {
@@ -180,8 +195,8 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
   }
 
   .me-avatar {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -194,8 +209,8 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
   }
 
   .side-heading {
-    margin: var(--space-md) 0 0.15rem;
-    font-size: 0.68rem;
+    margin: var(--space-lg) 0 0.2rem;
+    font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-light);
@@ -207,12 +222,12 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     border: none;
     color: var(--color-text);
     font-family: var(--font-body);
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     cursor: pointer;
     text-decoration: none;
     text-align: left;
-    padding: 0.35rem 0.6rem;
-    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
   }
 
   .portal-nav a:hover,

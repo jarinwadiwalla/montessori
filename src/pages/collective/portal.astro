@@ -6,8 +6,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <PageLayout
   title="The Collective"
   description="The Montessori Adolescent Collective member portal."
-  heroTitle="The Collective"
-  heroSubtitle="A shared room for people doing this work."
   noindex
 >
   <div class="container portal" id="portal">
@@ -278,6 +276,12 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       return;
     }
 
+    // First sign-in gate: guidelines before anything else.
+    if (data.needsGuidelines) {
+      window.location.href = '/collective/guidelines/';
+      return;
+    }
+
     // Set by the "Edit profile" link immediately before navigating here.
     // Read once and cleared, so a refresh returns to the board and no URL
     // can reopen the editor.
@@ -324,7 +328,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
   });
 
+  let wasFirstSetup = false;
+
   function showProfileSetup(isFirstSetup = false) {
+    wasFirstSetup = isFirstSetup;
     $('profile-setup').hidden = false;
     $('portal-main').hidden = true;
 
@@ -478,6 +485,13 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     me = data.member;
     stagedAvatarUrl = null;
+
+    // A brand-new member has just finished setting up — welcome them in
+    // properly rather than dropping them into an empty feed.
+    if (wasFirstSetup) {
+      window.location.href = '/collective/start-here/';
+      return;
+    }
     showPortal();
     loadFeed(true);
   });
@@ -825,7 +839,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
 <style>
   .portal {
-    max-width: 680px;
+    max-width: 1100px;
   }
 
   .portal-loading,

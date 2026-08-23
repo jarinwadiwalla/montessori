@@ -6,8 +6,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <PageLayout
   title="Members"
   description="The Montessori Adolescent Collective member directory."
-  heroTitle="Members"
-  heroSubtitle="Who else is in the room."
   noindex
 >
   <div class="container directory">
@@ -15,6 +13,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     <div id="main" hidden>
       <PortalNav active="members" />
+
+      <header class="portal-page-head">
+        <h1>Members</h1>
+        <p>Who else is in the room.</p>
+      </header>
 
       <div class="dir-tools">
         <input
@@ -155,7 +158,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
 <style>
   .directory {
-    max-width: 860px;
+    max-width: 1160px;
   }
 
   .loading,

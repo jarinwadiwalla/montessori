@@ -5,7 +5,7 @@ import PageHero from '../components/shared/PageHero.astro';
 interface Props {
   title: string;
   description: string;
-  heroTitle: string;
+  heroTitle?: string;
   heroSubtitle?: string;
   heroEyebrow?: string;
   heroCta?: string;
@@ -20,16 +20,18 @@ const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroC
 ---
 
 <BaseLayout title={title} description={description} image={image} noindex={noindex}>
-  <PageHero
-    title={heroTitle}
-    subtitle={heroSubtitle}
-    eyebrow={heroEyebrow}
-    ctaLabel={heroCta}
-    ctaHref={heroCtaHref}
-    image={heroImage}
-    imagePosition={heroImagePosition}
-  />
-  <div class="page-content" id="content">
+  {heroTitle && (
+    <PageHero
+      title={heroTitle}
+      subtitle={heroSubtitle}
+      eyebrow={heroEyebrow}
+      ctaLabel={heroCta}
+      ctaHref={heroCtaHref}
+      image={heroImage}
+      imagePosition={heroImagePosition}
+    />
+  )}
+  <div class:list={['page-content', { 'page-content--flush': !heroTitle }]} id="content">
     <slot />
   </div>
 </BaseLayout>
@@ -37,5 +39,11 @@ const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroC
 <style>
   .page-content {
     padding-block: var(--space-3xl);
+  }
+
+  /* App-style pages (the Collective portal) skip the hero and sit close
+     to the header, so the room feels like an app, not a brochure. */
+  .page-content--flush {
+    padding-block: var(--space-lg) var(--space-3xl);
   }
 </style>

@@ -4,10 +4,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 ---
 
 <PageLayout
-  title="Alerts"
-  description="Your alerts in the Montessori Adolescent Collective."
-  heroTitle="Alerts"
-  heroSubtitle="When someone mentions you, it shows up here."
+  title="Notifications"
+  description="Your notifications in the Montessori Adolescent Collective."
   noindex
 >
   <div class="container alerts-page">
@@ -15,6 +13,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     <div id="main" hidden>
       <PortalNav active="alerts" />
+
+      <header class="portal-page-head">
+        <h1>Notifications</h1>
+        <p>When someone mentions you, it shows up here.</p>
+      </header>
 
       <div class="alerts-tools">
         <p class="alerts-count" id="count"></p>
@@ -169,7 +172,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
 <style>
   .alerts-page {
-    max-width: 680px;
+    max-width: 1040px;
   }
 
   .loading,

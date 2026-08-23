@@ -6,8 +6,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <PageLayout
   title="Events"
   description="Monthly gatherings, guest presentations and in-person retreats for the Montessori Adolescent Collective."
-  heroTitle="Events"
-  heroSubtitle="Gatherings, guest presentations, and retreats."
   noindex
 >
   <div class="container events-page">
@@ -15,6 +13,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     <div id="main" hidden>
       <PortalNav active="events" />
+
+      <header class="portal-page-head">
+        <h1>Events</h1>
+        <p>Gatherings, guest presentations, and retreats.</p>
+      </header>
 
       <!-- Organiser-only: add an event -->
       <section class="event-form" id="event-form" hidden>
@@ -177,8 +180,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     const { ok, data } = await api(`/api/community/events?when=${when}`);
     if (!ok) return;
 
-    canManage = data.can_manage;
-    $('event-form').hidden = !canManage;
+    // Events are created and edited from Guru → Collective now; this page
+    // only shows them. The form below stays permanently hidden (its wiring
+    // is kept so nothing here throws).
+    canManage = false;
+    $('event-form').hidden = true;
 
     const list = $('list');
     list.textContent = '';
@@ -344,7 +350,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
 <style>
   .events-page {
-    max-width: 760px;
+    max-width: 1100px;
   }
 
   .loading,

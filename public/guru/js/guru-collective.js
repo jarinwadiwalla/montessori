@@ -1,6 +1,7 @@
 /* ── Collective tab: member admin, invites, reports ── */
 
 async function colLoad() {
+  colLoadEvents();
   const data = await apiFetch("/api/community/admin-members");
   if (!data) return;
 
@@ -47,6 +48,72 @@ async function colLoad() {
       </div>
     `).join("");
   }
+}
+
+// ---- events -------------------------------------------------
+
+async function colLoadEvents() {
+  const data = await apiFetch("/api/community/events?when=upcoming");
+  if (!data) return;
+  const wrap = document.getElementById("col-events");
+  const events = data.events || [];
+  if (!events.length) {
+    wrap.innerHTML = '<p class="empty-state">No upcoming events.</p>';
+    return;
+  }
+  wrap.innerHTML = events.map((e) => `
+    <div class="campaign-item"${e.status === "cancelled" ? ' style="opacity:.55;"' : ""}>
+      <div>
+        <strong>${escapeHtml(e.title)}</strong>
+        ${e.status === "cancelled" ? '<span class="badge">cancelled</span>' : ""}
+        <div style="font-size:12px;color:var(--gray-500);">
+          ${new Date(e.starts_at).toLocaleString()} · ${escapeHtml(e.kind)} · ${e.rsvp_count} going${e.capacity ? ` / ${e.capacity}` : ""}
+        </div>
+      </div>
+      ${e.status === "cancelled" ? "" : `<button class="btn btn-danger btn-sm" onclick="colCancelEvent('${e.id}', '${escapeHtml(e.title)}')">Cancel event</button>`}
+    </div>
+  `).join("");
+}
+
+async function colAddEvent() {
+  const starts = document.getElementById("ev-starts").value;
+  const ends = document.getElementById("ev-ends").value;
+  const data = await apiFetch("/api/community/events", {
+    method: "POST",
+    body: JSON.stringify({
+      kind: document.getElementById("ev-kind").value,
+      title: document.getElementById("ev-title").value,
+      starts_at: starts ? new Date(starts).toISOString() : "",
+      ends_at: ends ? new Date(ends).toISOString() : "",
+      timezone_note: document.getElementById("ev-tz").value,
+      location: document.getElementById("ev-location").value,
+      link: document.getElementById("ev-link").value,
+      capacity: Number(document.getElementById("ev-capacity").value) || 0,
+      description: document.getElementById("ev-description").value,
+    }),
+  });
+  if (data) {
+    showToast("Event added.", "success");
+    ["ev-title", "ev-starts", "ev-ends", "ev-tz", "ev-location", "ev-link", "ev-description"].forEach(
+      (id) => (document.getElementById(id).value = "")
+    );
+    document.getElementById("ev-capacity").value = "0";
+    colLoadEvents();
+  }
+}
+
+function colCancelEvent(id, title) {
+  openModal(
+    "Cancel event",
+    `Cancel "${title}"? Members who RSVP'd will see it marked as cancelled.`,
+    async () => {
+      const data = await apiFetch("/api/community/events", {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+      });
+      if (data) { showToast("Event cancelled.", "success"); colLoadEvents(); }
+    }
+  );
 }
 
 async function colInvite() {

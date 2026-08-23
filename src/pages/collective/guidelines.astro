@@ -135,8 +135,47 @@ import PageLayout from '../../layouts/PageLayout.astro';
       <a href="/collective/" class="btn-primary">About the Collective</a>
       <a href="/collective/portal/" class="btn-secondary">Go to the Collective</a>
     </div>
+
+    <!-- Shown only to signed-in members who haven't accepted yet -->
+    <section class="accept-box" id="accept-box" hidden>
+      <h2>One thing before you come in</h2>
+      <p>
+        These guidelines are the whole rulebook. By continuing you're agreeing
+        to hold to them.
+      </p>
+      <button id="accept-btn" type="button">I've read them — I accept</button>
+      <p class="accept-error" id="accept-error" role="alert"></p>
+    </section>
   </div>
 </PageLayout>
+
+<script>
+  // The guidelines are public; the acceptance step only appears for a
+  // signed-in member who hasn't accepted yet.
+  (async () => {
+    try {
+      const me = await (await fetch('/api/community/me')).json();
+      if (!me.signedIn || !me.needsGuidelines) return;
+      const box = document.getElementById('accept-box')!;
+      box.hidden = false;
+
+      document.getElementById('accept-btn')!.addEventListener('click', async () => {
+        const btn = document.getElementById('accept-btn') as HTMLButtonElement;
+        btn.disabled = true;
+        const res = await fetch('/api/community/accept-guidelines', { method: 'POST' });
+        if (res.ok) {
+          window.location.href = me.needsProfile
+            ? '/collective/portal/?welcome=1'
+            : '/collective/start-here/';
+        } else {
+          btn.disabled = false;
+          document.getElementById('accept-error')!.textContent =
+            'That didn\'t save — please try again.';
+        }
+      });
+    } catch {}
+  })();
+</script>
 
 <style>
   .guidelines {
@@ -176,6 +215,41 @@ import PageLayout from '../../layouts/PageLayout.astro';
 
   .guideline li {
     margin-bottom: var(--space-xs);
+  }
+
+  .accept-box {
+    margin-top: var(--space-2xl);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    text-align: center;
+  }
+
+  .accept-box h2 {
+    margin-top: 0;
+  }
+
+  .accept-box button {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border: none;
+    padding: 0.95rem 1.75rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+
+  .accept-box button:disabled {
+    opacity: 0.6;
+  }
+
+  .accept-error {
+    color: var(--color-terracotta-dark);
+    font-size: var(--text-sm);
   }
 
   .closing {

@@ -522,6 +522,61 @@
     </div>
 
     <div class="card">
+      <h3 style="margin-top:0;">Events</h3>
+      <p style="font-size:13px;color:var(--gray-500);margin-top:0;">
+        What members see on the portal's Events page. Cancelling keeps the event visible as cancelled.
+      </p>
+      <div class="form-row">
+        <div class="form-group" style="max-width:180px;">
+          <label class="form-label">Type</label>
+          <select id="ev-kind" class="form-select">
+            <option value="gathering">Monthly gathering</option>
+            <option value="presentation">Guest presentation</option>
+            <option value="retreat">In-person retreat</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" id="ev-title" class="form-input" maxlength="140" placeholder="October gathering">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Starts</label>
+          <input type="datetime-local" id="ev-starts" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ends (optional)</label>
+          <input type="datetime-local" id="ev-ends" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time note</label>
+          <input type="text" id="ev-tz" class="form-input" maxlength="120" placeholder="9am SGT / 6pm PDT">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Where</label>
+          <input type="text" id="ev-location" class="form-input" maxlength="160" placeholder="Online, or a place">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link (https://…)</label>
+          <input type="url" id="ev-link" class="form-input" maxlength="500">
+        </div>
+        <div class="form-group" style="max-width:140px;">
+          <label class="form-label">Capacity (0 = none)</label>
+          <input type="number" id="ev-capacity" class="form-input" min="0" value="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="ev-description" class="form-input" rows="3" maxlength="3000"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="colAddEvent()">Add event</button>
+      <div id="col-events" style="margin-top:16px;"><p class="empty-state">Loading...</p></div>
+    </div>
+
+    <div class="card">
       <h3 style="margin-top:0;">Open reports</h3>
       <div id="col-reports"><p class="empty-state">Loading...</p></div>
     </div>

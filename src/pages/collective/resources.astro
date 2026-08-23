@@ -11,15 +11,14 @@ const resources = (await getCollection('resources')).sort(
   (a, b) => (a.data.title > b.data.title ? 1 : -1)
 );
 
-// Anything sold on the public site is included with membership — swap the
-// purchase link for the file itself here.
+// Per-resource overrides for members. '' forces "Coming soon" — used for
+// the 101 guide until its member edition is ready (the public entry links
+// to a Stripe purchase, which members should never be sent to).
 const memberOverrides: Record<string, string> = {
-  'third-plane-characteristics': '/downloads/MontessoriforAdolescents101.pdf',
+  'third-plane-characteristics': '',
 };
 const downloadFor = (r: (typeof resources)[number]) => {
-  if (r.data.downloadUrl?.startsWith('http') && r.slug in memberOverrides) {
-    return memberOverrides[r.slug];
-  }
+  if (r.slug in memberOverrides) return memberOverrides[r.slug];
   return r.data.downloadUrl || '';
 };
 ---
@@ -27,8 +26,6 @@ const downloadFor = (r: (typeof resources)[number]) => {
 <PageLayout
   title="Resources"
   description="Downloadable resources for Collective members."
-  heroTitle="Resources"
-  heroSubtitle="Guides and materials to take back to your environment."
   noindex
 >
   <div class="container resources-page">
@@ -37,15 +34,18 @@ const downloadFor = (r: (typeof resources)[number]) => {
     <div id="main" hidden>
       <PortalNav active="resources" />
 
+      <header class="portal-page-head">
+        <h1>Resources</h1>
+        <p>Guides and materials to take back to your environment.</p>
+      </header>
+
       <div class="resource-list">
         {resources.map((r) => (
           <article class="resource-card">
             <h3>{r.data.title}</h3>
             <p>{r.data.description}</p>
-            {downloadFor(r).startsWith('/') ? (
-              <a class="res-btn" href={downloadFor(r)} download>Download PDF</a>
-            ) : downloadFor(r).startsWith('http') ? (
-              <a class="res-btn" href={downloadFor(r)} target="_blank" rel="noopener">Get it</a>
+            {downloadFor(r) ? (
+              <a class="res-btn" href={downloadFor(r)} target="_blank" rel="noopener">Open PDF</a>
             ) : (
               <span class="res-soon">Coming soon</span>
             )}

@@ -61,6 +61,7 @@ export async function onRequestPost(context) {
       ok: true,
       member: publicMember(member),
       needsProfile: !member.name,
+      needsGuidelines: !member.guidelines_accepted_at,
     }),
     {
       status: 200,

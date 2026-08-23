@@ -82,9 +82,11 @@ import PageLayout from '../../layouts/PageLayout.astro';
       const data = await res.json();
 
       if (res.ok) {
-        window.location.href = data.needsProfile
-          ? '/collective/portal/?welcome=1'
-          : '/collective/portal/';
+        window.location.href = data.needsGuidelines
+          ? '/collective/guidelines/'
+          : data.needsProfile
+            ? '/collective/portal/?welcome=1'
+            : '/collective/start-here/';
         return;
       }
       setMessage(data.error || 'Sign-in failed. Please try again.');

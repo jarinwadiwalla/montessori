@@ -5,12 +5,40 @@
 // DELETE /api/community/events  — cancel (admins only)
 
 import { requireMember, generateId } from "../../lib/community-auth.js";
+import { requireAdminStrict } from "../../lib/auth.js";
 
 const KINDS = ["gathering", "presentation", "retreat"];
 
-export async function onRequestGet(context) {
+// Events are managed from Guru (X-Admin-Token) as well as by admin
+// members in the portal (session cookie). Either credential works.
+async function requireOrganiser(context) {
+  if (context.request.headers.get("X-Admin-Token")) {
+    const authErr = requireAdminStrict(context);
+    if (authErr) return { member: null, response: authErr };
+    return { member: { id: "guru-admin", role: "admin" }, response: null };
+  }
   const { member, response } = await requireMember(context);
-  if (response) return response;
+  if (response) return { member: null, response };
+  if (member.role !== "admin") {
+    return {
+      member: null,
+      response: Response.json({ error: "Only organisers can manage events." }, { status: 403 }),
+    };
+  }
+  return { member, response: null };
+}
+
+export async function onRequestGet(context) {
+  // Guru reads the list with the admin token and no member session.
+  let member = null;
+  if (context.request.headers.get("X-Admin-Token")) {
+    const authErr = requireAdminStrict(context);
+    if (authErr) return authErr;
+  } else {
+    const res = await requireMember(context);
+    if (res.response) return res.response;
+    member = res.member;
+  }
 
   const { env, request } = context;
   const when = new URL(request.url).searchParams.get("when") || "upcoming";
@@ -41,13 +69,15 @@ export async function onRequestGet(context) {
       .all();
     for (const r of rows) counts[r.event_id] = r.n;
 
-    const { results: myRows } = await env.SITE_DB.prepare(
-      `SELECT event_id FROM community_event_rsvps
-       WHERE member_id = ? AND event_id IN (${ph})`
-    )
-      .bind(member.id, ...ids)
-      .all();
-    mine = new Set(myRows.map((r) => r.event_id));
+    if (member) {
+      const { results: myRows } = await env.SITE_DB.prepare(
+        `SELECT event_id FROM community_event_rsvps
+         WHERE member_id = ? AND event_id IN (${ph})`
+      )
+        .bind(member.id, ...ids)
+        .all();
+      mine = new Set(myRows.map((r) => r.event_id));
+    }
   }
 
   return Response.json({
@@ -67,16 +97,13 @@ export async function onRequestGet(context) {
       rsvp_count: counts[e.id] || 0,
       going: mine.has(e.id),
     })),
-    can_manage: member.role === "admin",
+    can_manage: !member || member.role === "admin",
   });
 }
 
 export async function onRequestPost(context) {
-  const { member, response } = await requireMember(context);
+  const { member, response } = await requireOrganiser(context);
   if (response) return response;
-  if (member.role !== "admin") {
-    return Response.json({ error: "Only organisers can add events." }, { status: 403 });
-  }
 
   const { env, request } = context;
   const payload = await safeJson(request);
@@ -116,11 +143,8 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestPut(context) {
-  const { member, response } = await requireMember(context);
+  const { member, response } = await requireOrganiser(context);
   if (response) return response;
-  if (member.role !== "admin") {
-    return Response.json({ error: "Only organisers can edit events." }, { status: 403 });
-  }
 
   const { env, request } = context;
   const payload = await safeJson(request);
@@ -156,11 +180,8 @@ export async function onRequestPut(context) {
 }
 
 export async function onRequestDelete(context) {
-  const { member, response } = await requireMember(context);
+  const { member, response } = await requireOrganiser(context);
   if (response) return response;
-  if (member.role !== "admin") {
-    return Response.json({ error: "Only organisers can cancel events." }, { status: 403 });
-  }
 
   const { env, request } = context;
   const payload = await safeJson(request);

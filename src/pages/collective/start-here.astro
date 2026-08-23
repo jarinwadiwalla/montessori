@@ -6,8 +6,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <PageLayout
   title="Start Here"
   description="Welcome to the Montessori Adolescent Collective."
-  heroTitle="Start here"
-  heroSubtitle="Welcome — here's how to get the most out of the Collective."
   noindex
 >
   <div class="container start-page">
@@ -48,7 +46,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
         <h3>How the room works</h3>
         <ul>
           <li>The <a href="/collective/portal/">Feed</a> is the main board — share work, ask questions, attach images and PDFs.</li>
-          <li>Type <strong>@name</strong> to notify someone. Mentions are the only thing that triggers an <a href="/collective/alerts/">alert</a> — no email floods, ever.</li>
+          <li>Type <strong>@name</strong> to notify someone. Mentions are the only thing that triggers a <a href="/collective/alerts/">notification</a> — no email floods, ever.</li>
           <li>The <a href="/collective/resources/">Resources</a> shelf and the <a href="/collective/webinar/">webinar</a> are yours as a member.</li>
           <li>Something amiss, or need a hand? Message the team — mention <strong>@jarinwadiwalla</strong> in a post, or <a href="/contact/">contact us</a> directly.</li>
         </ul>
@@ -73,6 +71,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       window.location.href = '/collective/portal/';
       return;
     }
+    if (me.needsGuidelines) {
+      window.location.href = '/collective/guidelines/';
+      return;
+    }
     document.getElementById('loading')!.hidden = true;
     document.getElementById('main')!.hidden = false;
     document.getElementById('me-name')!.textContent = me.member.name || 'Member';
@@ -92,7 +94,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
 <style>
   .start-content {
-    max-width: 640px;
+    max-width: 680px;
   }
 
   .start-content h2 {

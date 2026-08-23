@@ -18,6 +18,19 @@
   pre-fills the name field with the server's "Member" placeholder), so a new
   member can't skip naming themselves and get re-prompted on every login.
 
+### Changed
+- Portal redesign round 2 (from live testing): the purple hero banner is
+  gone from all member pages — the sidebar and content now fill the screen
+  app-style, with a wider (260px) sidebar, larger nav type and compact
+  in-page headings. Sign-in lands on the Start here welcome screen.
+- First sign-in now asks each member to read and accept the community
+  guidelines; acceptance is stored per member (`guidelines_accepted_at`).
+- Event creation moved out of the members' Events page into Guru →
+  Collective (add, list upcoming, cancel); members just see events.
+- "Alerts" renamed to "Notifications" throughout the portal.
+- Resources open PDFs in a new tab instead of forcing a download; the
+  101 guide shows "Coming soon" for members instead of a purchase link.
+
 ### Added
 - Guru → Newsletter → **System emails**: the transactional emails (Collective
   welcome, sign-in links, suspended/non-member notices, newsletter welcome)
