@@ -12,13 +12,16 @@ const resources = (await getCollection('resources')).sort(
 );
 
 // Per-resource overrides for members. '' forces "Coming soon" — used for
-// the 101 guide until its member edition is ready (the public entry links
-// to a Stripe purchase, which members should never be sent to).
-const memberOverrides: Record<string, string> = {
-  'third-plane-characteristics': '',
-};
+// anything whose public entry points somewhere members shouldn't be sent,
+// such as a Stripe purchase link.
+//
+// Keyed on entry.id, not .slug: these are content-layer entries loaded by
+// glob(), which carry an id and no slug. Keying on .slug looked right but
+// matched nothing, so every override silently fell through to the public
+// downloadUrl.
+const memberOverrides: Record<string, string> = {};
 const downloadFor = (r: (typeof resources)[number]) => {
-  if (r.slug in memberOverrides) return memberOverrides[r.slug];
+  if (r.id in memberOverrides) return memberOverrides[r.id];
   return r.data.downloadUrl || '';
 };
 ---
