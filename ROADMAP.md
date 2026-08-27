@@ -57,6 +57,19 @@ CHANGELOG.md with the version they shipped in.
 - [x] Report buttons removed from posts/comments (2026-08-23); Start here
       tells members to message the team. Backend + Guru reports list kept.
 
+## Phase 5 — direct messages (2026-08-24)
+- [x] One-to-one private conversations, sidebar entry with unread badge,
+      Message button on member cards. `schema/messages.sql` applied to
+      production.
+- [x] Private by default — no admin endpoint reads messages. Mute (silent,
+      one-directional) and Report a conversation (the only thing that
+      surfaces a thread) both shipped.
+- [x] Email on a new conversation or when the recipient had caught up;
+      template `member-new-message`, editable in Guru.
+- [ ] **Not yet tested end to end by a human.** Needs two signed-in members
+      — Jarin plus the Bijan Test account. Check: send, reply, unread badge
+      clears, email arrives, mute stops delivery, report reaches Guru.
+
 ## Later (marked, not scoped)
 - [ ] **Pen pal exchange programme** — details to come.
 - [ ] **Courses** — sellable course support if one launches.

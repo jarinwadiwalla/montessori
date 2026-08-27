@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.2.0] - 2026-08-24
+
+### Added
+- **Direct messages** between members. One-to-one private conversations,
+  reachable from the sidebar and from a Message button on every member
+  card. Three new tables (`community_conversations`, `community_messages`,
+  `community_mutes` — see `schema/messages.sql`, already applied to
+  production). Members can mute someone, which silently stops them
+  messaging you, or report a conversation, which is the only thing that
+  surfaces a thread to the team. No admin endpoint can read messages.
+  Email notification on a new conversation, or when the recipient had
+  already caught up — a back-and-forth doesn't email every line. The
+  template (`member-new-message`) is editable in Guru → System emails.
+- Unread message badge in the sidebar; the count rides along on
+  `/api/community/me` so it costs no extra request.
+
+### Changed
+- Community guidelines rewritten with Jarin's wording: posting photos stay
+  inside the Collective, advice only when asked for, share what's
+  Montessori-based or cite the source, platform feedback. Student privacy
+  and photos are now separate sections.
+
+### Fixed
+- "How concerns are handled" in the guidelines told members to use a Report
+  button on posts and comments. Those were removed in 1.1.0, so the page
+  pointed at something that no longer existed.
+- The 101 guide's Stripe payment link is deactivated; the entry now shows
+  "Coming soon" everywhere rather than linking to a dead checkout.
+- The members' resources override never fired: it was keyed on `entry.slug`,
+  but content-layer entries loaded by `glob()` carry an `id` and no `slug`,
+  so every override silently fell through to the public `downloadUrl`.
+  Members were being sent to the purchase link the override existed to
+  prevent.
+
 ## [1.1.0] - 2026-08-23
 
 ### Fixed
