@@ -70,9 +70,79 @@ async function colLoadEvents() {
           ${new Date(e.starts_at).toLocaleString()} · ${escapeHtml(e.kind)} · ${e.rsvp_count} going${e.capacity ? ` / ${e.capacity}` : ""}
         </div>
       </div>
-      ${e.status === "cancelled" ? "" : `<button class="btn btn-danger btn-sm" onclick="colCancelEvent('${e.id}', '${escapeHtml(e.title)}')">Cancel event</button>`}
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="colShowRsvps('${e.id}')">Who's coming</button>
+        ${e.status === "cancelled" ? "" : `<button class="btn btn-danger btn-sm" onclick="colCancelEvent('${e.id}', '${escapeHtml(e.title)}')">Cancel event</button>`}
+      </div>
     </div>
+    <div id="rsvps-${e.id}" style="display:none;"></div>
   `).join("");
+}
+
+// Who has RSVP'd, with their emails, so a joining link can be sent out.
+// Members' emails are shown nowhere else; this is admin-only by design.
+async function colShowRsvps(eventId) {
+  const box = document.getElementById(`rsvps-${eventId}`);
+  if (!box) return;
+
+  if (box.style.display === "block") {
+    box.style.display = "none";
+    return;
+  }
+
+  box.style.display = "block";
+  box.innerHTML = '<p class="empty-state">Loading…</p>';
+
+  const data = await apiFetch(
+    `/api/community/admin-event-rsvps?event_id=${encodeURIComponent(eventId)}`
+  );
+  if (!data) return;
+
+  if (!data.count) {
+    box.innerHTML = '<p class="empty-state">Nobody has RSVP\'d yet.</p>';
+    return;
+  }
+
+  const rows = data.going
+    .map(
+      (g) => `<tr>
+        <td>${escapeHtml(g.name)}</td>
+        <td>${escapeHtml(g.email)}</td>
+        <td style="color:var(--gray-500);">${new Date(g.rsvped_at).toLocaleDateString()}</td>
+      </tr>`
+    )
+    .join("");
+
+  box.innerHTML = `
+    <div class="card" style="margin:8px 0 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;">
+        <strong>${data.count} coming</strong>
+        <button class="btn btn-secondary btn-sm" onclick="colCopyRsvpEmails('${eventId}')">Copy all emails</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>RSVP'd</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <textarea id="rsvp-emails-${eventId}" readonly rows="2"
+        class="form-input" style="margin-top:8px;font-size:12px;"
+      >${escapeHtml(data.emails)}</textarea>
+      <p style="font-size:12px;color:var(--gray-500);margin-top:6px;">
+        Paste these into the <strong>Bcc</strong> field so members can't see each other's addresses.
+      </p>
+    </div>
+  `;
+}
+
+function colCopyRsvpEmails(eventId) {
+  const field = document.getElementById(`rsvp-emails-${eventId}`);
+  if (!field) return;
+  field.select();
+  navigator.clipboard
+    .writeText(field.value)
+    .then(() => showToast("Emails copied", "success"))
+    .catch(() => showToast("Select the box and copy manually", "error"));
 }
 
 async function colAddEvent() {
