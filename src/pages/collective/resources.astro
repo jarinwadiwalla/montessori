@@ -200,7 +200,9 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
       tile.setAttribute('type', 'button');
 
       // Title first, then the folder, then the count beneath it.
-      tile.appendChild(el('span', 'tile-name', f.name));
+      const tileName = el('span', 'tile-name', f.name);
+      tileName.title = f.name;   // clamped to two lines, so clipped too
+      tile.appendChild(tileName);
       tile.appendChild(icon(FOLDER_PATH, 'folder-icon'));
       const n = f.documents.length;
       tile.appendChild(
@@ -270,10 +272,15 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     const name = el('div', 'col-name');
     name.appendChild(el('span', `kind-chip kind-chip--${d.kind}`, KIND_LABEL[d.kind] || 'FILE'));
     const label = el('span', 'file-name', d.title);
+    // The column clips long names with an ellipsis, so carry the whole
+    // thing in a tooltip — otherwise there's no way to read it at all.
+    label.title = d.title;
     name.appendChild(label);
     row.appendChild(name);
 
-    row.appendChild(el('span', 'col-owner', d.uploader_name));
+    const owner = el('span', 'col-owner', d.uploader_name);
+    owner.title = d.uploader_name;   // also clipped when a name runs long
+    row.appendChild(owner);
     row.appendChild(el('span', 'col-date', shortDate(d.created_at)));
     row.appendChild(el('span', 'col-size', fileSize(d.size)));
 
