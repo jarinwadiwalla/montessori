@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.4.0] - 2026-08-27
+
+### Removed
+- **Webinar recordings are no longer included with membership.** The
+  members' `/collective/webinar/` page is deleted, not just unlinked — it
+  embedded the same recording sold publicly for $45, so leaving the page
+  reachable by URL would have kept giving it away to anyone who had
+  bookmarked it. Sidebar entry and the Start here mention removed with it.
+  The public sale pages are untouched.
+- The curated "From the Collective" section on the members' Resources
+  page, along with its content-collection query and styles.
+
+### Fixed
+- Styles never reached any element built at runtime. Astro scopes a
+  component's CSS by stamping `data-astro-cid` onto elements it compiles
+  from the template; rows, tiles, chips and buttons are created with
+  `createElement`, so they never carried it and every scoped rule missed.
+  The Resources table rendered as unstyled text. `messages.astro` had the
+  same defect throughout and would have looked the same on first use.
+  Both now use `:global()` anchored to a template element, matching the
+  pattern already in `members.astro`.
+
+### Changed
+- Sidebar: "Resources" is now "Shared Resources"; the Webinar entry is gone.
+- Resources page subtitle: "A shared resource library for the Collective
+  to upload to."
+- Folder tiles are smaller with the name above the icon and the count
+  below; the title always occupies two lines so icons and counts align
+  across a row.
+- Two more seeded folders: Math Seminars, Literature Seminars.
+
 ## [1.3.0] - 2026-08-24
 
 ### Added
