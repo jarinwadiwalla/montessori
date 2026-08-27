@@ -15,7 +15,6 @@ interface Props {
     | 'resources'
     | 'webinar'
     | 'members'
-    | 'messages'
     | 'alerts';
 }
 const { active } = Astro.props;
@@ -43,9 +42,12 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     <a href="/collective/webinar/" class={cls('webinar')}>Webinar</a>
 
     <p class="side-heading">People</p>
-    <a href="/collective/members/" class={cls('members')}>Members</a>
-    <a href="/collective/messages/" class:list={['alerts-link', cls('messages')]}>
-      Messages<span class="alert-count" id="message-count" hidden></span>
+    <!-- Direct messages live inside Members rather than as a destination of
+         their own: the board is the point of this place, and a Messages tab
+         in the main nav quietly competes with it. The badge still rides here
+         so an unread message can't go unnoticed. -->
+    <a href="/collective/members/" class:list={['alerts-link', cls('members')]}>
+      Members<span class="alert-count" id="message-count" hidden></span>
     </a>
     <a href="/collective/alerts/" class:list={['alerts-link', cls('alerts')]}>
       Notifications<span class="alert-count" id="alert-count" hidden></span>

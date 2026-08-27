@@ -12,9 +12,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     <p class="loading" id="loading">Loading…</p>
 
     <div id="main" hidden>
-      <PortalNav active="messages" />
+      <PortalNav active="members" />
 
       <header class="portal-page-head">
+        <p class="msg-crumb"><a href="/collective/members/">← Members</a></p>
         <h1>Messages</h1>
         <p>Private conversations between you and another member.</p>
       </header>
@@ -78,7 +79,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <script>
   const $ = (id: string) => document.getElementById(id)!;
 
-  let meId = '';
   let currentConversation = '';
   let currentWith = '';
 
@@ -237,7 +237,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       return;
     }
 
-    meId = me.member.id;
     $('loading').hidden = true;
     $('main').hidden = false;
     $('me-name').textContent = me.member.name || 'Member';
@@ -592,4 +591,16 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     .thread-back { display: block; }
     .thread-body { max-height: none; }
   }
+
+  .msg-crumb {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-sm);
+  }
+
+  .msg-crumb a {
+    color: var(--color-text-light);
+    text-decoration: none;
+  }
+
+  .msg-crumb a:hover { color: var(--color-terracotta-dark); }
 </style>

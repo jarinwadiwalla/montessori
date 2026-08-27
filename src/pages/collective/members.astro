@@ -14,9 +14,14 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     <div id="main" hidden>
       <PortalNav active="members" />
 
-      <header class="portal-page-head">
-        <h1>Members</h1>
-        <p>Who else is in the room.</p>
+      <header class="portal-page-head dir-head">
+        <div>
+          <h1>Members</h1>
+          <p>Who else is in the room.</p>
+        </div>
+        <a class="dir-messages" href="/collective/messages/">
+          Your conversations<span class="dir-msg-count" id="dir-msg-count" hidden></span>
+        </a>
       </header>
 
       <div class="dir-tools">
@@ -84,6 +89,13 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     $('loading').hidden = true;
     $('main').hidden = false;
     $('me-name').textContent = me.member.name || 'Member';
+
+    // Unread direct messages, shown on the link into the conversations page.
+    const dirCount = document.getElementById('dir-msg-count');
+    if (dirCount && me.unreadMessages > 0) {
+      dirCount.textContent = String(me.unreadMessages > 99 ? '99+' : me.unreadMessages);
+      dirCount.hidden = false;
+    }
     const av = document.getElementById('me-avatar') as HTMLImageElement;
     if (me.member.avatar_url) {
       av.src = me.member.avatar_url;
@@ -329,5 +341,40 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .member-grid :global(.m-message:hover) {
     border-color: var(--color-terracotta);
     color: var(--color-terracotta-dark);
+  }
+
+  .dir-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .dir-messages {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .dir-messages:hover {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .dir-msg-count {
+    background: var(--color-terracotta);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 0 0.4rem;
+    font-size: 11px;
+    line-height: 1.5;
   }
 </style>
