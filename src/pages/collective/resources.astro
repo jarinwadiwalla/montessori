@@ -51,19 +51,40 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
         </section>
       )}
 
-      <section class="res-section">
-        <div class="folders-head">
-          <h2 class="res-heading">Shared folders</h2>
-          <button class="res-action res-action--primary" id="new-folder" type="button">New folder</button>
+      <section class="res-section drive">
+        <!-- Toolbar: breadcrumb on the left, actions on the right. The
+             breadcrumb is what tells you whether you're looking at the
+             shelves or inside one of them. -->
+        <div class="drive-bar">
+          <nav class="crumbs" id="crumbs" aria-label="Folder path"></nav>
+          <div class="drive-actions" id="drive-actions"></div>
         </div>
-        <p class="folders-note">
-          Anything you upload here is visible to every member, and to nobody
-          else. Please only share what's yours to share — see the
-          <a href="/collective/guidelines/">guidelines</a>.
-        </p>
 
         <p class="res-error" id="folders-error" role="alert" hidden></p>
-        <div id="folders"></div>
+
+        <!-- Grid of folders -->
+        <div class="folder-grid" id="folder-grid"></div>
+
+        <!-- Inside one folder -->
+        <div class="file-table" id="file-table" hidden>
+          <div class="file-head">
+            <span class="col-name">Name</span>
+            <span class="col-owner">Uploaded by</span>
+            <span class="col-date">Date</span>
+            <span class="col-size">Size</span>
+            <span class="col-act"></span>
+          </div>
+          <div id="file-rows"></div>
+          <p class="drive-empty" id="folder-empty" hidden>
+            Nothing in here yet. Use <strong>Upload</strong> to add the first document.
+          </p>
+        </div>
+
+        <p class="drive-note">
+          Anything you upload is visible to every member, and to nobody else.
+          Please only share what's yours to share — see the
+          <a href="/collective/guidelines/">guidelines</a>.
+        </p>
       </section>
 
       <p class="resources-note">
@@ -73,21 +94,21 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     </div>
   </div>
 
-  <!-- Hidden input reused by every folder's upload button -->
   <input type="file" id="file-input" accept={ACCEPT} hidden />
 </PageLayout>
 
 <script>
   const $ = (id: string) => document.getElementById(id)!;
 
-  let uploadTargetFolder = '';
+  let folders: any[] = [];
+  let openFolderId = '';   // '' means the folder grid
 
   const KIND_LABEL: Record<string, string> = {
     pdf: 'PDF',
-    image: 'Image',
-    doc: 'Word',
-    slides: 'PowerPoint',
-    sheet: 'Excel',
+    image: 'IMG',
+    doc: 'DOC',
+    slides: 'PPT',
+    sheet: 'XLS',
   };
 
   function el(tag: string, cls?: string, text?: string) {
@@ -97,15 +118,30 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     return n;
   }
 
+  function icon(paths: string, cls: string) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('class', cls);
+    svg.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', paths);
+    svg.appendChild(p);
+    return svg;
+  }
+
+  const FOLDER_PATH =
+    'M4 5h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z';
+
   function fileSize(bytes: number) {
-    if (!bytes) return '';
+    if (!bytes) return '—';
     if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
   }
 
-  function whenUploaded(iso: string) {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  function shortDate(iso: string) {
+    return new Date(iso).toLocaleDateString(undefined, {
+      day: 'numeric', month: 'short', year: 'numeric',
+    });
   }
 
   async function api(path: string, options: RequestInit = {}) {
@@ -124,122 +160,170 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     box.hidden = !msg;
   }
 
-  // --- rendering ------------------------------------------------
+  const current = () => folders.find((f) => f.id === openFolderId);
 
-  async function loadFolders() {
-    const { ok, data } = await api('/api/community/folders');
-    if (!ok) {
-      showError(data.error || 'The folders could not be loaded.');
+  // --- chrome ---------------------------------------------------
+
+  function renderBar() {
+    const crumbs = $('crumbs');
+    const actions = $('drive-actions');
+    crumbs.textContent = '';
+    actions.textContent = '';
+
+    const root = el('button', 'crumb', 'Shared folders');
+    root.setAttribute('type', 'button');
+
+    if (!openFolderId) {
+      root.classList.add('is-current');
+      crumbs.appendChild(root);
+
+      const add = el('button', 'res-action res-action--primary', 'New folder');
+      add.setAttribute('type', 'button');
+      add.addEventListener('click', newFolder);
+      actions.appendChild(add);
       return;
     }
 
-    const wrap = $('folders');
-    wrap.textContent = '';
+    root.addEventListener('click', () => openGrid());
+    crumbs.appendChild(root);
+    crumbs.appendChild(el('span', 'crumb-sep', '/'));
 
-    for (const f of data.folders) {
-      wrap.appendChild(renderFolder(f));
-    }
-  }
+    const f = current();
+    crumbs.appendChild(el('span', 'crumb is-current', f?.name || 'Folder'));
 
-  function renderFolder(f: any) {
-    const box = el('section', 'folder');
-
-    const head = el('div', 'folder-head');
-    const title = el('h3', 'folder-name', f.name);
-    head.appendChild(title);
-
-    const count = f.documents.length;
-    head.appendChild(
-      el('span', 'folder-count', count === 1 ? '1 document' : `${count} documents`)
-    );
-
-    const actions = el('div', 'folder-actions');
-
-    const upload = el('button', 'res-action', 'Upload');
+    const upload = el('button', 'res-action res-action--primary', 'Upload');
     upload.setAttribute('type', 'button');
-    upload.addEventListener('click', () => {
-      uploadTargetFolder = f.id;
-      ($('file-input') as HTMLInputElement).click();
-    });
+    upload.addEventListener('click', () => ($('file-input') as HTMLInputElement).click());
     actions.appendChild(upload);
 
-    if (f.can_edit) {
+    if (f?.can_edit) {
       const rename = el('button', 'res-action', 'Rename');
       rename.setAttribute('type', 'button');
       rename.addEventListener('click', () => renameFolder(f));
       actions.appendChild(rename);
 
-      const del = el('button', 'res-action res-action--quiet', 'Delete');
+      const del = el('button', 'res-action res-action--quiet', 'Delete folder');
       del.setAttribute('type', 'button');
       del.addEventListener('click', () => deleteFolder(f));
       actions.appendChild(del);
     }
-
-    head.appendChild(actions);
-    box.appendChild(head);
-
-    if (!count) {
-      box.appendChild(el('p', 'folder-empty', 'Nothing in here yet.'));
-      return box;
-    }
-
-    const list = el('ul', 'doc-list');
-    for (const d of f.documents) list.appendChild(renderDoc(d));
-    box.appendChild(list);
-
-    return box;
   }
 
-  function renderDoc(d: any) {
-    const row = el('li', 'doc-row');
+  // --- grid of folders ------------------------------------------
 
-    const main = el('div', 'doc-main');
-    main.appendChild(el('span', `doc-kind doc-kind--${d.kind}`, KIND_LABEL[d.kind] || 'File'));
+  function openGrid() {
+    openFolderId = '';
+    $('folder-grid').hidden = false;
+    $('file-table').hidden = true;
+    renderBar();
+    renderGrid();
+  }
 
-    const text = el('div', 'doc-text');
-    text.appendChild(el('span', 'doc-title', d.title));
-    // Who uploaded it and when — the point of a shared shelf is knowing
-    // whose work you're looking at.
-    text.appendChild(
-      el(
-        'span',
-        'doc-meta',
-        [d.uploader_name, whenUploaded(d.created_at), fileSize(d.size)]
-          .filter(Boolean)
-          .join(' · ')
-      )
-    );
-    main.appendChild(text);
-    row.appendChild(main);
+  function renderGrid() {
+    const grid = $('folder-grid');
+    grid.textContent = '';
 
-    const actions = el('div', 'doc-actions');
+    for (const f of folders) {
+      const tile = el('button', 'folder-tile');
+      tile.setAttribute('type', 'button');
+
+      tile.appendChild(icon(FOLDER_PATH, 'folder-icon'));
+
+      const text = el('span', 'tile-text');
+      text.appendChild(el('span', 'tile-name', f.name));
+      const n = f.documents.length;
+      text.appendChild(
+        el('span', 'tile-count', n === 1 ? '1 document' : `${n} documents`)
+      );
+      tile.appendChild(text);
+
+      tile.addEventListener('click', () => openFolder(f.id));
+      grid.appendChild(tile);
+    }
+  }
+
+  // --- inside a folder ------------------------------------------
+
+  function openFolder(id: string) {
+    openFolderId = id;
+    $('folder-grid').hidden = true;
+    $('file-table').hidden = false;
+    renderBar();
+    renderFiles();
+  }
+
+  function renderFiles() {
+    const f = current();
+    const rows = $('file-rows');
+    rows.textContent = '';
+
+    const docs = f?.documents || [];
+    $('folder-empty').hidden = docs.length > 0;
+
+    for (const d of docs) rows.appendChild(renderRow(d));
+  }
+
+  function renderRow(d: any) {
+    const row = el('div', 'file-row');
+
+    // Name cell: type chip + title
+    const name = el('div', 'col-name');
+    name.appendChild(el('span', `kind-chip kind-chip--${d.kind}`, KIND_LABEL[d.kind] || 'FILE'));
+    const label = el('span', 'file-name', d.title);
+    name.appendChild(label);
+    row.appendChild(name);
+
+    row.appendChild(el('span', 'col-owner', d.uploader_name));
+    row.appendChild(el('span', 'col-date', shortDate(d.created_at)));
+    row.appendChild(el('span', 'col-size', fileSize(d.size)));
+
+    const act = el('div', 'col-act');
 
     if (d.previewable) {
       const preview = el('button', 'res-action', 'Preview');
       preview.setAttribute('type', 'button');
-      // A separate window, so the library stays open behind it.
       preview.addEventListener('click', () => {
         window.open(d.url, '_blank', 'noopener,width=1000,height=800');
       });
-      actions.appendChild(preview);
+      act.appendChild(preview);
+      // Double-clicking the row opens it too, the way a file manager does.
+      row.addEventListener('dblclick', () => {
+        window.open(d.url, '_blank', 'noopener,width=1000,height=800');
+      });
     }
 
     const download = el('a', 'res-action', 'Download') as HTMLAnchorElement;
     download.href = `${d.url}?download=1`;
-    actions.appendChild(download);
+    act.appendChild(download);
 
     if (d.can_delete) {
       const del = el('button', 'res-action res-action--quiet', 'Delete');
       del.setAttribute('type', 'button');
       del.addEventListener('click', () => deleteDoc(d));
-      actions.appendChild(del);
+      act.appendChild(del);
     }
 
-    row.appendChild(actions);
+    row.appendChild(act);
     return row;
   }
 
-  // --- actions --------------------------------------------------
+  // --- data + actions -------------------------------------------
+
+  async function loadFolders(keepOpen = true) {
+    const { ok, data } = await api('/api/community/folders');
+    if (!ok) {
+      showError(data.error || 'The folders could not be loaded.');
+      return;
+    }
+    folders = data.folders;
+
+    // If the folder we were inside has gone, fall back to the grid.
+    if (keepOpen && openFolderId && current()) {
+      openFolder(openFolderId);
+    } else {
+      openGrid();
+    }
+  }
 
   async function newFolder() {
     const name = window.prompt('Name the folder');
@@ -273,7 +357,8 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     });
     if (!ok) return showError(data.error || 'That folder could not be deleted.');
     showError('');
-    loadFolders();
+    openFolderId = '';
+    loadFolders(false);
   }
 
   async function deleteDoc(d: any) {
@@ -290,13 +375,13 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   async function handleFile(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file || !uploadTargetFolder) return;
+    if (!file || !openFolderId) return;
 
     showError(`Uploading ${file.name}…`);
 
     const form = new FormData();
     form.append('file', file);
-    form.append('folder_id', uploadTargetFolder);
+    form.append('folder_id', openFolderId);
 
     let data: any = {};
     let ok = false;
@@ -310,8 +395,6 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     }
 
     input.value = '';
-    uploadTargetFolder = '';
-
     if (!ok) return showError(data.error || 'That upload did not work.');
     showError('');
     loadFolders();
@@ -344,19 +427,16 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
       window.location.href = '/collective/';
     });
 
-    $('new-folder').addEventListener('click', newFolder);
     $('file-input').addEventListener('change', handleFile);
 
-    loadFolders();
+    loadFolders(false);
   }
 
   boot();
 </script>
 
 <style>
-  .resources-page {
-    max-width: 1040px;
-  }
+  .resources-page { max-width: 1040px; }
 
   .loading {
     text-align: center;
@@ -364,9 +444,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     padding: var(--space-2xl) 0;
   }
 
-  .res-section {
-    margin-bottom: var(--space-2xl);
-  }
+  .res-section { margin-bottom: var(--space-2xl); }
 
   .res-heading {
     font-family: var(--font-heading);
@@ -419,69 +497,44 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   .res-btn:hover { background: var(--color-cream); }
 
-  /* --- folders --- */
+  /* --- drive: toolbar --- */
 
-  .folders-head {
+  .drive-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
     flex-wrap: wrap;
-  }
-
-  .folders-head .res-heading { margin-bottom: 0; }
-
-  .folders-note {
-    margin: var(--space-sm) 0 var(--space-lg);
-    font-size: var(--text-sm);
-    color: var(--color-text-light);
-    line-height: var(--leading-relaxed);
-  }
-
-  .res-error {
-    margin: 0 0 var(--space-md);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-lg);
-    background: var(--color-cream);
-    color: var(--color-terracotta-dark);
-    font-size: var(--text-sm);
-  }
-
-  .folder {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-white);
     margin-bottom: var(--space-md);
-    overflow: hidden;
   }
 
-  .folder-head {
+  .crumbs {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--color-border);
-    flex-wrap: wrap;
+    gap: 0.4rem;
+    min-width: 0;
   }
 
-  .folder-name {
-    margin: 0;
-    font-size: var(--text-base);
-    color: var(--color-text);
-  }
-
-  .folder-count {
-    font-size: var(--text-xs);
+  .crumb {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
     color: var(--color-text-light);
-    flex: 1;
+    cursor: pointer;
   }
 
-  .folder-actions,
-  .doc-actions {
-    display: flex;
-    gap: var(--space-xs);
-    flex-wrap: wrap;
+  button.crumb:hover { color: var(--color-terracotta-dark); }
+
+  .crumb.is-current {
+    color: var(--color-earth-dark);
+    cursor: default;
   }
+
+  .crumb-sep { color: var(--color-cream-dark); font-size: var(--text-xl); }
+
+  .drive-actions { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 
   .res-action {
     background: none;
@@ -511,77 +564,171 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     color: var(--color-earth);
   }
 
-  .folder-empty {
-    margin: 0;
-    padding: var(--space-lg);
+  .res-error {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-cream);
+    color: var(--color-terracotta-dark);
     font-size: var(--text-sm);
-    color: var(--color-text-light);
   }
 
-  .doc-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+  /* --- drive: folder tiles --- */
 
-  .doc-row {
-    display: flex;
-    align-items: center;
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
     gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--color-border);
-    flex-wrap: wrap;
   }
 
-  .doc-row:last-child { border-bottom: none; }
-
-  .doc-main {
+  .folder-tile {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    flex: 1;
-    min-width: 0;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
   }
 
-  .doc-kind {
+  .folder-tile:hover {
+    background: var(--color-cream);
+    border-color: var(--color-terracotta);
+  }
+
+  .folder-icon {
+    width: 30px;
+    height: 30px;
     flex-shrink: 0;
-    border-radius: var(--radius-sm, 4px);
-    padding: 0.15rem 0.45rem;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    background: var(--color-cream-dark);
-    color: var(--color-earth);
+    fill: var(--color-terracotta);
   }
 
-  .doc-kind--pdf { background: var(--color-terracotta); color: var(--color-white); }
-  .doc-kind--image { background: var(--color-sage-light); color: var(--color-earth-dark); }
-
-  .doc-text {
+  .tile-text {
     display: flex;
     flex-direction: column;
     min-width: 0;
   }
 
-  .doc-title {
+  .tile-name {
     font-size: var(--text-sm);
     color: var(--color-text);
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .doc-meta {
+  .tile-count {
     font-size: var(--text-xs);
     color: var(--color-text-light);
   }
 
-  .resources-note {
+  /* --- drive: file table --- */
+
+  .file-table {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    overflow: hidden;
+  }
+
+  .file-head,
+  .file-row {
+    display: grid;
+    /* The action column is a fixed width, not auto: with auto, a row
+       holding three buttons sizes its column wider than a row holding
+       one, and every column to its left shifts. Columns must line up
+       down the table. */
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) 110px 80px 232px;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
+  }
+
+  .file-head {
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+  }
+
+  .file-row {
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .file-row:last-child { border-bottom: none; }
+  .file-row:hover { background: var(--color-cream); }
+
+  .col-name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .col-owner,
+  .col-date,
+  .col-size {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .col-act { display: flex; gap: var(--space-xs); justify-content: flex-end; }
+
+  .kind-chip {
+    flex-shrink: 0;
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    background: var(--color-cream-dark);
+    color: var(--color-earth);
+  }
+
+  .kind-chip--pdf { background: var(--color-terracotta); color: var(--color-white); }
+  .kind-chip--image { background: var(--color-sage-light); color: var(--color-earth-dark); }
+  .kind-chip--doc { background: var(--color-earth-light); color: var(--color-white); }
+  .kind-chip--slides { background: var(--color-terracotta-light); color: var(--color-earth-dark); }
+  .kind-chip--sheet { background: var(--color-sage); color: var(--color-white); }
+
+  .drive-empty {
+    margin: 0;
+    padding: var(--space-2xl) var(--space-lg);
+    text-align: center;
     font-size: var(--text-sm);
     color: var(--color-text-light);
   }
 
-  @media (max-width: 640px) {
-    .doc-row { align-items: flex-start; }
-    .doc-actions { width: 100%; }
+  .drive-note,
+  .resources-note {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+  }
+
+  .drive-note { margin-top: var(--space-md); }
+
+  /* Columns that stop earning their space on a narrow screen. */
+  @media (max-width: 760px) {
+    .file-head { display: none; }
+
+    .file-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xs);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .col-date, .col-size { display: none; }
+    .col-act { justify-content: flex-start; }
   }
 </style>
