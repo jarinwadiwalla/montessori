@@ -1,7 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /guru/
-Disallow: /collective/preview/
 Disallow: /collective/portal/
 Disallow: /collective/login/
 Disallow: /collective/verify/
