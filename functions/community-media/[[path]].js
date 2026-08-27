@@ -31,6 +31,17 @@ export async function onRequestGet(context) {
   object.writeHttpMetadata(headers);
   headers.set("etag", object.httpEtag);
   headers.set("Cache-Control", "private, max-age=3600");
+
+  // ?download=1 forces a save rather than letting the browser decide.
+  // Office documents can't be displayed anyway, and a PDF the member
+  // asked to download shouldn't open in a viewer instead.
+  const url = new URL(context.request.url);
+  if (url.searchParams.get("download") === "1") {
+    const name = (object.customMetadata?.originalName || "download")
+      .replace(/[^a-zA-Z0-9._ -]/g, "")
+      .slice(0, 120);
+    headers.set("Content-Disposition", `attachment; filename="${name}"`);
+  }
   // Never let an uploaded file execute in our origin's context.
   headers.set("Content-Security-Policy", "default-src 'none'; object-src 'none'; sandbox");
   headers.set("X-Content-Type-Options", "nosniff");

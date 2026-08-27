@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.3.0] - 2026-08-24
+
+### Added
+- **Shared document folders** on the members' Resources page. Any member can
+  create a folder and upload into it; each document shows who uploaded it,
+  when, and how big it is. Four folders are seeded and marked `is_system`
+  so members can't rename or remove them: Montessori Readings, Individual
+  Literature Reviews, Adolescent Brain Development, Sexual Education Lessons.
+  Two new tables (`community_folders`, `community_documents` — see
+  `schema/resource-folders.sql`, already applied to production).
+- PDFs, images, Word, PowerPoint and Excel accepted, up to 25MB. PDFs and
+  images open in a separate preview window; office formats can't be
+  displayed by a browser, so they're labelled by type and offer Download
+  only. Every file is magic-byte checked against the type it claims to be.
+- `/community-media/...?download=1` sets `Content-Disposition: attachment`
+  with the original filename, so Download saves rather than opening.
+
+### Changed
+- Resources with no file no longer appear on the members' page. The shelf
+  used to show "Coming soon" placeholders, advertising things members
+  couldn't open. Note this leaves only one curated entry — seven of the
+  eight resource entries have no file. **The public /resources/ page still
+  shows six "Coming soon" cards; left alone deliberately, pending a
+  decision.**
+
+### Permissions
+- Folders: created by anyone; renamed or deleted by their creator or an
+  organiser. Deleting refuses while a folder still has documents in it,
+  rather than cascading through other people's work.
+- Documents: removed by the uploader or an organiser.
+
 ## [1.2.0] - 2026-08-24
 
 ### Added

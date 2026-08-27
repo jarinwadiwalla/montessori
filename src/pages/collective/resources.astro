@@ -3,32 +3,26 @@ import { getCollection } from 'astro:content';
 import PageLayout from '../../layouts/PageLayout.astro';
 import PortalNav from '../../components/collective/PortalNav.astro';
 
-// The library shelf: every resource the site offers, gathered in one
-// members' page. Entries with a real file get a Download button; the
-// rest link to their article. Add a markdown file to src/content/resources
-// and it appears here on the next deploy.
-const resources = (await getCollection('resources')).sort(
-  (a, b) => (a.data.title > b.data.title ? 1 : -1)
-);
-
-// Per-resource overrides for members. '' forces "Coming soon" — used for
-// anything whose public entry points somewhere members shouldn't be sent,
-// such as a Stripe purchase link.
+// The curated shelf: resources the site itself publishes.
 //
-// Keyed on entry.id, not .slug: these are content-layer entries loaded by
-// glob(), which carry an id and no slug. Keying on .slug looked right but
-// matched nothing, so every override silently fell through to the public
-// downloadUrl.
-const memberOverrides: Record<string, string> = {};
-const downloadFor = (r: (typeof resources)[number]) => {
-  if (r.id in memberOverrides) return memberOverrides[r.id];
-  return r.data.downloadUrl || '';
-};
+// Only entries that actually have a file are shown. There used to be
+// "Coming soon" placeholders here for entries without one, which meant the
+// shelf advertised things members couldn't open. An entry appears the day
+// it has a downloadUrl and not before.
+const resources = (await getCollection('resources'))
+  .filter((r) => {
+    const url = r.data.downloadUrl || '';
+    return url.startsWith('/') || url.startsWith('http');
+  })
+  .sort((a, b) => (a.data.title > b.data.title ? 1 : -1));
+
+// Must stay in step with TYPES in functions/lib/community-files.js.
+const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls';
 ---
 
 <PageLayout
   title="Resources"
-  description="Downloadable resources for Collective members."
+  description="Documents and materials shared by Collective members."
   noindex
 >
   <div class="container resources-page">
@@ -39,22 +33,38 @@ const downloadFor = (r: (typeof resources)[number]) => {
 
       <header class="portal-page-head">
         <h1>Resources</h1>
-        <p>Guides and materials to take back to your environment.</p>
+        <p>Guides from us, and a shared library the whole Collective fills.</p>
       </header>
 
-      <div class="resource-list">
-        {resources.map((r) => (
-          <article class="resource-card">
-            <h3>{r.data.title}</h3>
-            <p>{r.data.description}</p>
-            {downloadFor(r) ? (
-              <a class="res-btn" href={downloadFor(r)} target="_blank" rel="noopener">Open PDF</a>
-            ) : (
-              <span class="res-soon">Coming soon</span>
-            )}
-          </article>
-        ))}
-      </div>
+      {resources.length > 0 && (
+        <section class="res-section">
+          <h2 class="res-heading">From the Collective</h2>
+          <div class="resource-list">
+            {resources.map((r) => (
+              <article class="resource-card">
+                <h3>{r.data.title}</h3>
+                <p>{r.data.description}</p>
+                <a class="res-btn" href={r.data.downloadUrl} target="_blank" rel="noopener">Open</a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="res-section">
+        <div class="folders-head">
+          <h2 class="res-heading">Shared folders</h2>
+          <button class="res-action res-action--primary" id="new-folder" type="button">New folder</button>
+        </div>
+        <p class="folders-note">
+          Anything you upload here is visible to every member, and to nobody
+          else. Please only share what's yours to share — see the
+          <a href="/collective/guidelines/">guidelines</a>.
+        </p>
+
+        <p class="res-error" id="folders-error" role="alert" hidden></p>
+        <div id="folders"></div>
+      </section>
 
       <p class="resources-note">
         Looking for something that isn't here? Ask on the
@@ -62,9 +72,253 @@ const downloadFor = (r: (typeof resources)[number]) => {
       </p>
     </div>
   </div>
+
+  <!-- Hidden input reused by every folder's upload button -->
+  <input type="file" id="file-input" accept={ACCEPT} hidden />
 </PageLayout>
 
 <script>
+  const $ = (id: string) => document.getElementById(id)!;
+
+  let uploadTargetFolder = '';
+
+  const KIND_LABEL: Record<string, string> = {
+    pdf: 'PDF',
+    image: 'Image',
+    doc: 'Word',
+    slides: 'PowerPoint',
+    sheet: 'Excel',
+  };
+
+  function el(tag: string, cls?: string, text?: string) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text; // never innerHTML
+    return n;
+  }
+
+  function fileSize(bytes: number) {
+    if (!bytes) return '';
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  function whenUploaded(iso: string) {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  async function api(path: string, options: RequestInit = {}) {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    let data: any = {};
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, data };
+  }
+
+  function showError(msg: string) {
+    const box = $('folders-error');
+    box.textContent = msg;
+    box.hidden = !msg;
+  }
+
+  // --- rendering ------------------------------------------------
+
+  async function loadFolders() {
+    const { ok, data } = await api('/api/community/folders');
+    if (!ok) {
+      showError(data.error || 'The folders could not be loaded.');
+      return;
+    }
+
+    const wrap = $('folders');
+    wrap.textContent = '';
+
+    for (const f of data.folders) {
+      wrap.appendChild(renderFolder(f));
+    }
+  }
+
+  function renderFolder(f: any) {
+    const box = el('section', 'folder');
+
+    const head = el('div', 'folder-head');
+    const title = el('h3', 'folder-name', f.name);
+    head.appendChild(title);
+
+    const count = f.documents.length;
+    head.appendChild(
+      el('span', 'folder-count', count === 1 ? '1 document' : `${count} documents`)
+    );
+
+    const actions = el('div', 'folder-actions');
+
+    const upload = el('button', 'res-action', 'Upload');
+    upload.setAttribute('type', 'button');
+    upload.addEventListener('click', () => {
+      uploadTargetFolder = f.id;
+      ($('file-input') as HTMLInputElement).click();
+    });
+    actions.appendChild(upload);
+
+    if (f.can_edit) {
+      const rename = el('button', 'res-action', 'Rename');
+      rename.setAttribute('type', 'button');
+      rename.addEventListener('click', () => renameFolder(f));
+      actions.appendChild(rename);
+
+      const del = el('button', 'res-action res-action--quiet', 'Delete');
+      del.setAttribute('type', 'button');
+      del.addEventListener('click', () => deleteFolder(f));
+      actions.appendChild(del);
+    }
+
+    head.appendChild(actions);
+    box.appendChild(head);
+
+    if (!count) {
+      box.appendChild(el('p', 'folder-empty', 'Nothing in here yet.'));
+      return box;
+    }
+
+    const list = el('ul', 'doc-list');
+    for (const d of f.documents) list.appendChild(renderDoc(d));
+    box.appendChild(list);
+
+    return box;
+  }
+
+  function renderDoc(d: any) {
+    const row = el('li', 'doc-row');
+
+    const main = el('div', 'doc-main');
+    main.appendChild(el('span', `doc-kind doc-kind--${d.kind}`, KIND_LABEL[d.kind] || 'File'));
+
+    const text = el('div', 'doc-text');
+    text.appendChild(el('span', 'doc-title', d.title));
+    // Who uploaded it and when — the point of a shared shelf is knowing
+    // whose work you're looking at.
+    text.appendChild(
+      el(
+        'span',
+        'doc-meta',
+        [d.uploader_name, whenUploaded(d.created_at), fileSize(d.size)]
+          .filter(Boolean)
+          .join(' · ')
+      )
+    );
+    main.appendChild(text);
+    row.appendChild(main);
+
+    const actions = el('div', 'doc-actions');
+
+    if (d.previewable) {
+      const preview = el('button', 'res-action', 'Preview');
+      preview.setAttribute('type', 'button');
+      // A separate window, so the library stays open behind it.
+      preview.addEventListener('click', () => {
+        window.open(d.url, '_blank', 'noopener,width=1000,height=800');
+      });
+      actions.appendChild(preview);
+    }
+
+    const download = el('a', 'res-action', 'Download') as HTMLAnchorElement;
+    download.href = `${d.url}?download=1`;
+    actions.appendChild(download);
+
+    if (d.can_delete) {
+      const del = el('button', 'res-action res-action--quiet', 'Delete');
+      del.setAttribute('type', 'button');
+      del.addEventListener('click', () => deleteDoc(d));
+      actions.appendChild(del);
+    }
+
+    row.appendChild(actions);
+    return row;
+  }
+
+  // --- actions --------------------------------------------------
+
+  async function newFolder() {
+    const name = window.prompt('Name the folder');
+    if (!name) return;
+    const { ok, data } = await api('/api/community/folders', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+    if (!ok) return showError(data.error || 'That folder could not be created.');
+    showError('');
+    loadFolders();
+  }
+
+  async function renameFolder(f: any) {
+    const name = window.prompt('Rename the folder', f.name);
+    if (!name || name === f.name) return;
+    const { ok, data } = await api('/api/community/folders', {
+      method: 'PUT',
+      body: JSON.stringify({ id: f.id, name }),
+    });
+    if (!ok) return showError(data.error || 'That folder could not be renamed.');
+    showError('');
+    loadFolders();
+  }
+
+  async function deleteFolder(f: any) {
+    if (!window.confirm(`Delete the folder "${f.name}"?`)) return;
+    const { ok, data } = await api('/api/community/folders', {
+      method: 'DELETE',
+      body: JSON.stringify({ id: f.id }),
+    });
+    if (!ok) return showError(data.error || 'That folder could not be deleted.');
+    showError('');
+    loadFolders();
+  }
+
+  async function deleteDoc(d: any) {
+    if (!window.confirm(`Remove "${d.title}"? This cannot be undone.`)) return;
+    const { ok, data } = await api('/api/community/documents', {
+      method: 'DELETE',
+      body: JSON.stringify({ id: d.id }),
+    });
+    if (!ok) return showError(data.error || 'That document could not be removed.');
+    showError('');
+    loadFolders();
+  }
+
+  async function handleFile(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !uploadTargetFolder) return;
+
+    showError(`Uploading ${file.name}…`);
+
+    const form = new FormData();
+    form.append('file', file);
+    form.append('folder_id', uploadTargetFolder);
+
+    let data: any = {};
+    let ok = false;
+    try {
+      // No Content-Type header: the browser sets the multipart boundary.
+      const res = await fetch('/api/community/documents', { method: 'POST', body: form });
+      ok = res.ok;
+      try { data = await res.json(); } catch {}
+    } catch {
+      /* handled below */
+    }
+
+    input.value = '';
+    uploadTargetFolder = '';
+
+    if (!ok) return showError(data.error || 'That upload did not work.');
+    showError('');
+    loadFolders();
+  }
+
+  // --- boot -----------------------------------------------------
+
   async function boot() {
     const me = await (await fetch('/api/community/me')).json();
     if (!me.signedIn) {
@@ -75,78 +329,259 @@ const downloadFor = (r: (typeof resources)[number]) => {
       window.location.href = '/collective/portal/';
       return;
     }
-    document.getElementById('loading')!.hidden = true;
-    document.getElementById('main')!.hidden = false;
-    document.getElementById('me-name')!.textContent = me.member.name || 'Member';
+
+    $('loading').hidden = true;
+    $('main').hidden = false;
+    $('me-name').textContent = me.member.name || 'Member';
     const av = document.getElementById('me-avatar') as HTMLImageElement;
     if (me.member.avatar_url) {
       av.src = me.member.avatar_url;
       av.hidden = false;
     }
-  }
-  boot();
 
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await fetch('/api/community/logout', { method: 'POST' });
-    window.location.href = '/collective/';
-  });
+    $('signout-btn').addEventListener('click', async () => {
+      await fetch('/api/community/logout', { method: 'POST' });
+      window.location.href = '/collective/';
+    });
+
+    $('new-folder').addEventListener('click', newFolder);
+    $('file-input').addEventListener('change', handleFile);
+
+    loadFolders();
+  }
+
+  boot();
 </script>
 
 <style>
+  .resources-page {
+    max-width: 1040px;
+  }
+
+  .loading {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) 0;
+  }
+
+  .res-section {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .res-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-md);
+  }
+
+  /* --- curated shelf --- */
+
   .resource-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-lg);
+    gap: var(--space-md);
   }
 
   .resource-card {
-    background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
+    background: var(--color-white);
     padding: var(--space-lg);
     display: flex;
     flex-direction: column;
+    gap: var(--space-sm);
   }
 
   .resource-card h3 {
-    margin: 0 0 var(--space-sm);
+    margin: 0;
     font-size: var(--text-base);
+    color: var(--color-text);
   }
 
   .resource-card p {
-    color: var(--color-text-light);
+    margin: 0;
     font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
     flex: 1;
   }
 
   .res-btn {
     align-self: flex-start;
-    background: var(--color-purple);
-    color: var(--color-white);
-    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--color-terracotta);
+    color: var(--color-terracotta-dark);
     border-radius: 999px;
+    padding: 0.4rem 1rem;
     font-size: var(--text-sm);
     text-decoration: none;
   }
 
-  .res-soon {
-    align-self: flex-start;
-    color: var(--color-text-light);
+  .res-btn:hover { background: var(--color-cream); }
+
+  /* --- folders --- */
+
+  .folders-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .folders-head .res-heading { margin-bottom: 0; }
+
+  .folders-note {
+    margin: var(--space-sm) 0 var(--space-lg);
     font-size: var(--text-sm);
-    font-style: italic;
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+  }
+
+  .res-error {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-cream);
+    color: var(--color-terracotta-dark);
+    font-size: var(--text-sm);
+  }
+
+  .folder {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    margin-bottom: var(--space-md);
+    overflow: hidden;
+  }
+
+  .folder-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+
+  .folder-name {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  .folder-count {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    flex: 1;
+  }
+
+  .folder-actions,
+  .doc-actions {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .res-action {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-family: inherit;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .res-action:hover {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .res-action--primary {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .res-action--quiet:hover {
+    border-color: var(--color-earth-light);
+    color: var(--color-earth);
+  }
+
+  .folder-empty {
+    margin: 0;
+    padding: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .doc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .doc-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+
+  .doc-row:last-child { border-bottom: none; }
+
+  .doc-main {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .doc-kind {
+    flex-shrink: 0;
+    border-radius: var(--radius-sm, 4px);
+    padding: 0.15rem 0.45rem;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--color-cream-dark);
+    color: var(--color-earth);
+  }
+
+  .doc-kind--pdf { background: var(--color-terracotta); color: var(--color-white); }
+  .doc-kind--image { background: var(--color-sage-light); color: var(--color-earth-dark); }
+
+  .doc-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .doc-title {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .doc-meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
   }
 
   .resources-note {
-    margin-top: var(--space-xl);
-    color: var(--color-text-light);
     font-size: var(--text-sm);
-  }
-
-  .resources-note a {
-    color: var(--color-purple);
-  }
-
-  .loading {
     color: var(--color-text-light);
+  }
+
+  @media (max-width: 640px) {
+    .doc-row { align-items: flex-start; }
+    .doc-actions { width: 100%; }
   }
 </style>
