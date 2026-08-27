@@ -20,8 +20,23 @@ export async function onRequestPost(context) {
   const targetId = String(payload.target_id || "");
   const reason = String(payload.reason || "").trim().slice(0, 1000);
 
-  if (!["post", "comment"].includes(targetType) || !targetId) {
+  if (!["post", "comment", "conversation"].includes(targetType) || !targetId) {
     return Response.json({ error: "Invalid report." }, { status: 400 });
+  }
+
+  // Reporting a private conversation is the only thing that surfaces one to
+  // the team, so check the reporter is actually in it. Otherwise anyone who
+  // guessed an id could pull a thread they have nothing to do with into view.
+  if (targetType === "conversation") {
+    const inIt = await env.SITE_DB.prepare(
+      `SELECT 1 AS n FROM community_conversations
+       WHERE id = ? AND (member_a = ? OR member_b = ?)`
+    )
+      .bind(targetId, member.id, member.id)
+      .first();
+    if (!inIt) {
+      return Response.json({ error: "Invalid report." }, { status: 400 });
+    }
   }
 
   // One open report per member per item.

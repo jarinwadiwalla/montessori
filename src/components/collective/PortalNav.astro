@@ -15,6 +15,7 @@ interface Props {
     | 'resources'
     | 'webinar'
     | 'members'
+    | 'messages'
     | 'alerts';
 }
 const { active } = Astro.props;
@@ -43,6 +44,9 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
 
     <p class="side-heading">People</p>
     <a href="/collective/members/" class={cls('members')}>Members</a>
+    <a href="/collective/messages/" class:list={['alerts-link', cls('messages')]}>
+      Messages<span class="alert-count" id="message-count" hidden></span>
+    </a>
     <a href="/collective/alerts/" class:list={['alerts-link', cls('alerts')]}>
       Notifications<span class="alert-count" id="alert-count" hidden></span>
     </a>
@@ -71,8 +75,8 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
 
   // Unread alert badge. The count rides along on /api/community/me, which
   // this component already calls, so it costs no extra request.
-  function showAlertCount(n: number) {
-    const badge = document.getElementById('alert-count');
+  function showCount(id: string, n: number) {
+    const badge = document.getElementById(id);
     if (!badge) return;
     if (n > 0) {
       badge.textContent = String(n > 99 ? '99+' : n);
@@ -90,7 +94,8 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
   fetch('/api/community/me')
     .then((r) => r.json())
     .then((me) => {
-      showAlertCount(me?.unread || 0);
+      showCount('alert-count', me?.unread || 0);
+      showCount('message-count', me?.unreadMessages || 0);
       if (billingBtn && me?.membership?.has_billing) billingBtn.hidden = false;
     })
     .catch(() => {});

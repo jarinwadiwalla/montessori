@@ -145,6 +145,13 @@ import PortalNav from '../../components/collective/PortalNav.astro';
         card.appendChild(el('span', 'm-exchange', 'Open to exchange & pen pal'));
       }
 
+      // No point offering to message yourself.
+      if (!m.is_you) {
+        const msg = el('a', 'm-message', 'Message') as HTMLAnchorElement;
+        msg.href = `/collective/messages/?with=${encodeURIComponent(m.id)}`;
+        card.appendChild(msg);
+      }
+
       grid.appendChild(card);
     }
 
@@ -306,5 +313,21 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
   .dir-note a {
     color: var(--color-purple);
+  }
+
+  .member-grid :global(.m-message) {
+    align-self: flex-start;
+    margin-top: var(--space-sm);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    text-decoration: none;
+  }
+
+  .member-grid :global(.m-message:hover) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
   }
 </style>

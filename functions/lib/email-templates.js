@@ -48,6 +48,22 @@ export const EMAIL_TEMPLATES = {
     </div>`,
   },
 
+  "member-new-message": {
+    label: "Collective — new direct message",
+    description:
+      "Sent when a member receives a direct message. Only sent for a new conversation, or when they had already read everything before it — a back-and-forth doesn't email every line.",
+    vars: ["greeting_name", "sender_name", "excerpt", "link", "site"],
+    subject: "{{sender_name}} sent you a message",
+    html: `${WRAP_OPEN}
+      <p>Hello{{greeting_name}},</p>
+      <p><strong>{{sender_name}}</strong> sent you a message in the Collective:</p>
+      <p style="border-left:3px solid #d0905b;padding-left:14px;color:#5c4a3a;">{{excerpt}}</p>
+      <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Read and reply</a></p>
+      <p ${MUTED}>Replies happen in the Collective, not by email — this address
+      isn't monitored for conversations between members.</p>
+    </div>`,
+  },
+
   "member-login-suspended": {
     label: "Collective — sign-in refused (membership paused)",
     description:

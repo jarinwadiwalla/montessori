@@ -1,0 +1,595 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Messages"
+  description="Your direct messages in the Montessori Adolescent Collective."
+  noindex
+>
+  <div class="container messages-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="messages" />
+
+      <header class="portal-page-head">
+        <h1>Messages</h1>
+        <p>Private conversations between you and another member.</p>
+      </header>
+
+      <div class="msg-layout">
+        <!-- Conversation list -->
+        <aside class="msg-list" id="conv-pane">
+          <div id="conv-list"></div>
+          <p class="msg-empty" id="conv-empty" hidden>
+            No conversations yet. Open someone's profile in
+            <a href="/collective/members/">Members</a> and say hello.
+          </p>
+        </aside>
+
+        <!-- Thread -->
+        <section class="msg-thread" id="thread-pane">
+          <p class="msg-placeholder" id="placeholder">
+            Choose a conversation, or start one from
+            <a href="/collective/members/">Members</a>.
+          </p>
+
+          <div id="thread" hidden>
+            <header class="thread-head">
+              <button class="thread-back" id="back-btn" type="button" aria-label="Back to conversations">←</button>
+              <img class="thread-avatar" id="thread-avatar" alt="" hidden />
+              <div class="thread-who">
+                <p class="thread-name" id="thread-name"></p>
+                <p class="thread-meta" id="thread-meta"></p>
+              </div>
+              <div class="thread-actions">
+                <button class="thread-action" id="mute-btn" type="button"></button>
+                <button class="thread-action" id="report-btn" type="button">Report</button>
+              </div>
+            </header>
+
+            <p class="thread-muted-note" id="muted-note" hidden>
+              You've muted this person. They can't send you new messages, and
+              they haven't been told.
+            </p>
+
+            <div class="thread-body" id="thread-body"></div>
+
+            <form class="thread-compose" id="compose">
+              <label class="sr-only" for="compose-body">Your message</label>
+              <textarea
+                id="compose-body"
+                rows="2"
+                maxlength="5000"
+                placeholder="Write a message…"
+                required></textarea>
+              <button type="submit" id="send-btn">Send</button>
+            </form>
+            <p class="thread-error" id="thread-error" role="alert"></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+
+  let meId = '';
+  let currentConversation = '';
+  let currentWith = '';
+
+  function el(tag: string, cls?: string, text?: string) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text; // never innerHTML
+    return n;
+  }
+
+  function timeAgo(iso: string) {
+    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString();
+  }
+
+  async function api(path: string, options: RequestInit = {}) {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    let data: any = {};
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, data };
+  }
+
+  // --- conversation list ---------------------------------------
+
+  async function loadConversations() {
+    const { ok, data } = await api('/api/community/messages');
+    if (!ok) return;
+
+    const list = $('conv-list');
+    list.textContent = '';
+
+    for (const c of data.conversations) {
+      const row = el('button', 'conv-row');
+      row.setAttribute('type', 'button');
+      if (c.id === currentConversation) row.classList.add('is-active');
+      if (c.unread) row.classList.add('is-unread');
+
+      if (c.with?.avatar_url) {
+        const img = el('img', 'conv-avatar') as HTMLImageElement;
+        img.src = c.with.avatar_url;
+        img.alt = '';
+        row.appendChild(img);
+      } else {
+        row.appendChild(el('span', 'conv-avatar conv-avatar--blank'));
+      }
+
+      const body = el('span', 'conv-text');
+      body.appendChild(el('span', 'conv-name', c.with?.name || 'Member'));
+      body.appendChild(
+        el('span', 'conv-excerpt', (c.last_was_mine ? 'You: ' : '') + c.last_excerpt)
+      );
+      row.appendChild(body);
+      row.appendChild(el('span', 'conv-time', timeAgo(c.last_message_at)));
+
+      row.addEventListener('click', () => openThread({ conversationId: c.id }));
+      list.appendChild(row);
+    }
+
+    $('conv-empty').hidden = data.conversations.length > 0;
+    syncBadge(data.conversations.filter((c: any) => c.unread).length);
+  }
+
+  function syncBadge(n: number) {
+    const badge = document.getElementById('message-count');
+    if (!badge) return;
+    if (n > 0) {
+      badge.textContent = String(n > 99 ? '99+' : n);
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+  }
+
+  // --- one thread ----------------------------------------------
+
+  async function openThread({ conversationId, withMember }: { conversationId?: string; withMember?: string }) {
+    const q = conversationId
+      ? `conversation=${encodeURIComponent(conversationId)}`
+      : `with=${encodeURIComponent(withMember || '')}`;
+    const { ok, data } = await api(`/api/community/messages?${q}`);
+    if (!ok) {
+      $('thread-error').textContent = data.error || 'That conversation could not be opened.';
+      return;
+    }
+
+    currentConversation = data.conversation_id || '';
+    currentWith = data.with.id;
+
+    $('placeholder').hidden = true;
+    $('thread').hidden = false;
+    $('thread-name').textContent = data.with.name;
+    $('thread-meta').textContent = [data.with.location, data.with.bio].filter(Boolean).join(' · ');
+
+    const av = $('thread-avatar') as HTMLImageElement;
+    if (data.with.avatar_url) {
+      av.src = data.with.avatar_url;
+      av.hidden = false;
+    } else {
+      av.hidden = true;
+    }
+
+    setMuted(data.muted);
+    renderMessages(data.messages);
+
+    // On phones the two panes stack; showing a thread hides the list.
+    document.querySelector('.msg-layout')?.classList.add('is-threading');
+  }
+
+  function setMuted(muted: boolean) {
+    $('mute-btn').textContent = muted ? 'Unmute' : 'Mute';
+    $('muted-note').hidden = !muted;
+  }
+
+  function renderMessages(messages: any[]) {
+    const body = $('thread-body');
+    body.textContent = '';
+
+    if (!messages.length) {
+      body.appendChild(
+        el('p', 'thread-empty', 'No messages yet — say the first thing.')
+      );
+      return;
+    }
+
+    for (const m of messages) {
+      const row = el('div', `bubble-row ${m.mine ? 'is-mine' : ''}`);
+      const bubble = el('div', 'bubble');
+      // textContent, so a message can never inject markup.
+      bubble.appendChild(el('p', 'bubble-body', m.body));
+      bubble.appendChild(el('span', 'bubble-time', timeAgo(m.created_at)));
+      row.appendChild(bubble);
+      body.appendChild(row);
+    }
+    body.scrollTop = body.scrollHeight;
+  }
+
+  // --- boot ----------------------------------------------------
+
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+    if (me.lapsed) {
+      window.location.href = '/collective/portal/';
+      return;
+    }
+
+    meId = me.member.id;
+    $('loading').hidden = true;
+    $('main').hidden = false;
+    $('me-name').textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+
+    $('signout-btn').addEventListener('click', async () => {
+      await fetch('/api/community/logout', { method: 'POST' });
+      window.location.href = '/collective/';
+    });
+
+    $('back-btn').addEventListener('click', () => {
+      document.querySelector('.msg-layout')?.classList.remove('is-threading');
+    });
+
+    $('compose').addEventListener('submit', send);
+    $('mute-btn').addEventListener('click', toggleMute);
+    $('report-btn').addEventListener('click', report);
+
+    await loadConversations();
+
+    // Arriving from a member's profile: /collective/messages/?with=<id>
+    const withParam = new URLSearchParams(window.location.search).get('with');
+    if (withParam) {
+      await openThread({ withMember: withParam });
+      // Drop the parameter so a refresh doesn't reopen it forever.
+      history.replaceState({}, '', '/collective/messages/');
+    }
+  }
+
+  async function send(e: Event) {
+    e.preventDefault();
+    const input = $('compose-body') as HTMLTextAreaElement;
+    const btn = $('send-btn') as HTMLButtonElement;
+    const body = input.value.trim();
+    if (!body) return;
+
+    btn.disabled = true;
+    $('thread-error').textContent = '';
+
+    const { ok, data } = await api('/api/community/messages', {
+      method: 'POST',
+      body: JSON.stringify({ to: currentWith, body }),
+    });
+
+    btn.disabled = false;
+
+    if (!ok) {
+      $('thread-error').textContent = data.error || "That didn't send — please try again.";
+      return;
+    }
+
+    input.value = '';
+    currentConversation = data.conversation_id || currentConversation;
+    await openThread({ conversationId: currentConversation });
+    await loadConversations();
+  }
+
+  async function toggleMute() {
+    const muting = $('mute-btn').textContent === 'Mute';
+    const { ok } = await api('/api/community/messages', {
+      method: 'PUT',
+      body: JSON.stringify({ action: muting ? 'mute' : 'unmute', member_id: currentWith }),
+    });
+    if (ok) setMuted(muting);
+  }
+
+  async function report() {
+    if (!currentConversation) return;
+    const reason = window.prompt(
+      'What would you like us to know? This sends the conversation to the team so a person can look at it.'
+    );
+    if (reason === null) return;
+
+    const { ok } = await api('/api/community/report', {
+      method: 'POST',
+      body: JSON.stringify({
+        target_type: 'conversation',
+        target_id: currentConversation,
+        reason,
+      }),
+    });
+    $('thread-error').textContent = ok
+      ? 'Thank you — a person will look at this.'
+      : "That didn't send — please try again.";
+  }
+
+  boot();
+</script>
+
+<style>
+  .messages-page {
+    max-width: 1180px;
+  }
+
+  .loading,
+  .msg-empty,
+  .msg-placeholder {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) var(--space-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  .msg-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  /* --- conversation list --- */
+
+  .msg-list {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    overflow: hidden;
+  }
+
+  .conv-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-md);
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .conv-row:last-child { border-bottom: none; }
+  .conv-row:hover { background: var(--color-cream); }
+  .conv-row.is-active { background: var(--color-cream); }
+
+  .conv-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .conv-avatar--blank { background: var(--color-cream-dark); }
+
+  .conv-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .conv-name {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .conv-row.is-unread .conv-name { font-weight: 600; }
+
+  .conv-excerpt,
+  .conv-time {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .conv-time { flex-shrink: 0; }
+
+  /* --- thread --- */
+
+  .msg-thread {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    min-height: 460px;
+  }
+
+  .thread-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .thread-back {
+    display: none;
+    background: none;
+    border: none;
+    font-size: var(--text-lg);
+    cursor: pointer;
+    color: var(--color-text);
+  }
+
+  .thread-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .thread-who { flex: 1; min-width: 0; }
+
+  .thread-name {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .thread-meta {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .thread-actions {
+    display: flex;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+  }
+
+  .thread-action {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-family: inherit;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+
+  .thread-action:hover { border-color: var(--color-terracotta); color: var(--color-terracotta-dark); }
+
+  .thread-muted-note,
+  .thread-error {
+    margin: 0;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--color-terracotta-dark);
+  }
+
+  .thread-body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 52vh;
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .thread-empty {
+    color: var(--color-text-light);
+    text-align: center;
+    padding: var(--space-xl) 0;
+  }
+
+  .bubble-row { display: flex; }
+  .bubble-row.is-mine { justify-content: flex-end; }
+
+  .bubble {
+    max-width: min(78%, 46ch);
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-cream);
+  }
+
+  .bubble-row.is-mine .bubble {
+    background: var(--color-purple);
+  }
+
+  .bubble-body {
+    margin: 0 0 0.2rem;
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .bubble-time {
+    font-size: 11px;
+    color: var(--color-text-light);
+  }
+
+  .bubble-row.is-mine .bubble-body { color: var(--color-white); }
+  .bubble-row.is-mine .bubble-time { color: rgba(255, 255, 255, 0.7); }
+
+  .thread-compose {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .thread-compose textarea {
+    flex: 1;
+    resize: vertical;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .thread-compose button {
+    align-self: flex-end;
+    background: var(--color-purple);
+    color: var(--color-white);
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.4rem;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .thread-compose button:disabled { opacity: 0.6; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* On phones the panes stack: the list, or the thread, never both. */
+  @media (max-width: 760px) {
+    .msg-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .msg-layout.is-threading .msg-list { display: none; }
+    .msg-layout:not(.is-threading) .msg-thread { display: none; }
+    .thread-back { display: block; }
+    .thread-body { max-height: none; }
+  }
+</style>

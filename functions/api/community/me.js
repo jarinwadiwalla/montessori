@@ -2,6 +2,7 @@
 // PUT  /api/community/me — update my profile (name, avatar, bio)
 
 import { ensureHandle } from "../../lib/community-mentions.js";
+import { unreadCount as unreadMessageCount } from "../../lib/community-messages.js";
 import {
   getMember,
   requireMember,
@@ -21,6 +22,8 @@ export async function onRequestGet(context) {
     .bind(member.id)
     .first();
 
+  const unreadMessages = await unreadMessageCount(context.env, member.id);
+
   return Response.json({
     signedIn: true,
     member: { ...publicMember(member), email: member.email },
@@ -28,6 +31,7 @@ export async function onRequestGet(context) {
     needsGuidelines: !member.guidelines_accepted_at,
     hasPassword: !!member.password_hash,
     unread: unread?.n || 0,
+    unreadMessages,
     lapsed: membershipLapsed(member),
     membership: {
       // Empty plan means comped — no dues, nothing to manage.
