@@ -17,6 +17,15 @@
   `/api/community/me` so it costs no extra request.
 
 ### Changed
+- Direct messages moved out of the main sidebar into Members ("Your
+  conversations" at the top of the directory, plus the Message button on
+  each card). The board is the point of the place; a Messages tab in the
+  main nav competed with it. The unread badge moved onto the Members link
+  rather than disappearing.
+- Sign-in now lands a returning member on the **board**, not Start here.
+  Start here remains the orientation screen shown once, right after
+  first-time profile setup — it was previously opening on every sign-in
+  forever.
 - Community guidelines rewritten with Jarin's wording: posting photos stay
   inside the Collective, advice only when asked for, share what's
   Montessori-based or cite the source, platform feedback. Student privacy

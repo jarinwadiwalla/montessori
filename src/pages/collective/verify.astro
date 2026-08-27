@@ -44,12 +44,15 @@ import PageLayout from '../../layouts/PageLayout.astro';
         // Clear the token from the address bar before leaving the page.
         window.history.replaceState({}, '', '/collective/verify/');
         status.textContent = 'Signed in. Taking you to the Collective…';
-        // Guidelines first, then profile, then the welcome room.
+        // Guidelines first, then profile, then the board.
         window.location.href = data.needsGuidelines
           ? '/collective/guidelines/'
           : data.needsProfile
             ? '/collective/portal/?welcome=1'
-            : '/collective/start-here/';
+            // Returning member: the board is the point of this place, so
+            // that's what opens. Start here is orientation — it's shown
+            // once, after profile setup, not on every sign-in forever.
+            : '/collective/portal/';
       } else {
         status.textContent = data.error || 'That sign-in link did not work.';
         actions.hidden = false;
