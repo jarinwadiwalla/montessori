@@ -23,7 +23,7 @@ export async function onRequestGet(context) {
 
   const [folders, documents] = await Promise.all([
     env.SITE_DB.prepare(
-      "SELECT * FROM community_folders ORDER BY is_system DESC, name ASC"
+      "SELECT * FROM community_folders ORDER BY sort_order ASC, name ASC"
     ).all(),
     env.SITE_DB.prepare(
       `SELECT d.*, m.name AS uploader_name
@@ -91,11 +91,18 @@ export async function onRequestPost(context) {
 
   const now = new Date().toISOString();
   const id = generateId("fold_");
+
+  // Land at the end of the shelf rather than the front.
+  const last = await env.SITE_DB.prepare(
+    "SELECT MAX(sort_order) AS n FROM community_folders"
+  ).first();
+
   await env.SITE_DB.prepare(
-    `INSERT INTO community_folders (id, name, created_by, is_system, created_at, updated_at)
-     VALUES (?, ?, ?, 0, ?, ?)`
+    `INSERT INTO community_folders
+       (id, name, created_by, is_system, created_at, updated_at, sort_order)
+     VALUES (?, ?, ?, 0, ?, ?, ?)`
   )
-    .bind(id, name, member.id, now, now)
+    .bind(id, name, member.id, now, now, (last?.n || 0) + 10)
     .run();
 
   return Response.json({ ok: true, id, name });
@@ -108,6 +115,10 @@ export async function onRequestPut(context) {
   const { env } = context;
   const payload = await readJson(context);
   if (!payload) return badRequest();
+
+  if (payload.action === "move") {
+    return moveFolder(context, member, payload);
+  }
 
   const id = String(payload.id || "");
   const name = cleanName(payload.name);
@@ -194,6 +205,60 @@ export async function onRequestDelete(context) {
     .run();
 
   return Response.json({ ok: true });
+}
+
+/**
+ * Shift one folder one place earlier or later.
+ *
+ * Ordering the shared shelf is an organiser's job: if any member could
+ * rearrange it, one person's grouping would keep undoing another's.
+ *
+ * Implemented as a swap with the adjacent folder rather than a rewrite of
+ * every row, so two organisers tidying at once can't leave the list with
+ * duplicate positions.
+ */
+async function moveFolder(context, member, payload) {
+  const { env } = context;
+
+  if (member.role !== "admin") {
+    return Response.json(
+      { error: "Only an organiser can rearrange the folders." },
+      { status: 403 }
+    );
+  }
+
+  const id = String(payload.id || "");
+  const direction = payload.direction === "up" ? "up" : "down";
+  if (!id) return badRequest();
+
+  const { results } = await env.SITE_DB.prepare(
+    "SELECT id, sort_order, name FROM community_folders ORDER BY sort_order ASC, name ASC"
+  ).all();
+
+  const folders = results || [];
+  const index = folders.findIndex((f) => f.id === id);
+  if (index === -1) return Response.json({ error: "Not found." }, { status: 404 });
+
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  // Already at the end it is being moved toward — nothing to do.
+  if (swapWith < 0 || swapWith >= folders.length) {
+    return Response.json({ ok: true, moved: false });
+  }
+
+  const a = folders[index];
+  const b = folders[swapWith];
+
+  // Positions can be equal if rows were seeded together; fall back to the
+  // list index so the swap still separates them.
+  const aOrder = a.sort_order === b.sort_order ? index * 10 : a.sort_order;
+  const bOrder = a.sort_order === b.sort_order ? swapWith * 10 : b.sort_order;
+
+  await env.SITE_DB.batch([
+    env.SITE_DB.prepare("UPDATE community_folders SET sort_order = ? WHERE id = ?").bind(bOrder, a.id),
+    env.SITE_DB.prepare("UPDATE community_folders SET sort_order = ? WHERE id = ?").bind(aOrder, b.id),
+  ]);
+
+  return Response.json({ ok: true, moved: true });
 }
 
 // --- helpers ---------------------------------------------------

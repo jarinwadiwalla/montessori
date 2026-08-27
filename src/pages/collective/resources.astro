@@ -73,6 +73,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   let folders: any[] = [];
   let openFolderId = '';   // '' means the folder grid
+  let isAdmin = false;
 
   const KIND_LABEL: Record<string, string> = {
     pdf: 'PDF',
@@ -207,7 +208,37 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
       );
 
       tile.addEventListener('click', () => openFolder(f.id));
-      grid.appendChild(tile);
+
+      if (!isAdmin) {
+        grid.appendChild(tile);
+        continue;
+      }
+
+      // Organisers get arrows to group related subjects together. They sit
+      // outside the tile button so clicking one doesn't also open the
+      // folder, and are hidden at the ends where they'd do nothing.
+      const cell = el('div', 'tile-cell');
+      cell.appendChild(tile);
+
+      const nudge = el('div', 'tile-nudge');
+      const i = folders.indexOf(f);
+
+      const left = el('button', 'nudge-btn', '\u2039');
+      left.setAttribute('type', 'button');
+      left.setAttribute('aria-label', `Move ${f.name} earlier`);
+      left.disabled = i === 0;
+      left.addEventListener('click', (e) => { e.stopPropagation(); moveFolder(f.id, 'up'); });
+
+      const right = el('button', 'nudge-btn', '\u203a');
+      right.setAttribute('type', 'button');
+      right.setAttribute('aria-label', `Move ${f.name} later`);
+      right.disabled = i === folders.length - 1;
+      right.addEventListener('click', (e) => { e.stopPropagation(); moveFolder(f.id, 'down'); });
+
+      nudge.appendChild(left);
+      nudge.appendChild(right);
+      cell.appendChild(nudge);
+      grid.appendChild(cell);
     }
   }
 
@@ -285,6 +316,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
       return;
     }
     folders = data.folders;
+    isAdmin = !!data.is_admin;
 
     // If the folder we were inside has gone, fall back to the grid.
     if (keepOpen && openFolderId && current()) {
@@ -292,6 +324,16 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     } else {
       openGrid();
     }
+  }
+
+  async function moveFolder(id: string, direction: 'up' | 'down') {
+    const { ok, data } = await api('/api/community/folders', {
+      method: 'PUT',
+      body: JSON.stringify({ action: 'move', id, direction }),
+    });
+    if (!ok) return showError(data.error || 'That folder could not be moved.');
+    showError('');
+    loadFolders();
   }
 
   async function newFolder() {
@@ -682,5 +724,55 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     .drive :global(.file-name) { white-space: normal; }
     .drive :global(.col-date), .drive :global(.col-size) { display: none; }
     .drive :global(.col-act) { justify-content: flex-start; margin-top: 0.2rem; }
+  }
+
+  .drive :global(.tile-cell) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .drive :global(.tile-cell .folder-tile) { flex: 1; }
+
+  .drive :global(.tile-nudge) {
+    display: flex;
+    justify-content: center;
+    gap: 0.3rem;
+    /* Out of the way until the row is hovered, so the shelf stays calm
+       for the organiser who is only reading it. */
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .drive :global(.tile-cell:hover .tile-nudge),
+  .drive :global(.tile-nudge:focus-within) { opacity: 1; }
+
+  .drive :global(.nudge-btn) {
+    width: 26px;
+    height: 20px;
+    padding: 0;
+    line-height: 1;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+
+  .drive :global(.nudge-btn:hover:not(:disabled)) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .drive :global(.nudge-btn:disabled) {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  /* Touch has no hover, so the arrows are simply always visible. */
+  @media (hover: none) {
+    .drive :global(.tile-nudge) { opacity: 1; }
   }
 </style>

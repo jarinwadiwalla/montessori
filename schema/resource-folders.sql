@@ -55,3 +55,9 @@ VALUES
   ('fold_math_seminars', 'Math Seminars', '', 1, datetime('now'), datetime('now')),
   ('fold_literature_seminars', 'Literature Seminars', '', 1, datetime('now'), datetime('now'))
 ON CONFLICT(id) DO UPDATE SET name = excluded.name, is_system = 1;
+
+-- Ordering ---------------------------------------------------
+-- Added 2026-08-27. Folders are arranged by hand so related subjects can
+-- sit together, rather than being stuck in alphabetical order. Lower
+-- sort_order comes first; ties fall back to name.
+ALTER TABLE community_folders ADD COLUMN sort_order INTEGER DEFAULT 0;
