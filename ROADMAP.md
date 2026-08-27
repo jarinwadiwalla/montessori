@@ -70,6 +70,85 @@ CHANGELOG.md with the version they shipped in.
       — Jarin plus the Bijan Test account. Check: send, reply, unread badge
       clears, email arrives, mute stops delivery, report reaches Guru.
 
+## For Bijan to review (added 2026-08-27)
+
+Everything below is either untested by a human, or a decision that isn't
+mine to make. Grouped by what it needs.
+
+### Needs a human test — nothing here has been exercised end to end
+Claude can't hold a member session, so all of this is verified only as far
+as "builds, deploys, endpoints refuse when signed out". Two accounts are
+needed (Jarin + the Bijan Test member).
+
+- [ ] **Direct messages.** Send, reply, unread badge appears then clears,
+      notification email actually arrives, mute silently stops delivery,
+      Report reaches Guru. Reached from Members → "Your conversations",
+      not the main sidebar.
+- [ ] **Document folders.** Upload a PDF, a Word file and an image;
+      rename a folder; delete a document; reorder folders with the arrows.
+- [ ] **PDF preview specifically.** Member media is served with a sandbox
+      CSP and `nosniff` — correct for security, but it can interfere with
+      a browser's built-in PDF viewer. If Preview opens blank, that's the
+      cause and the headers need a narrow exception for this one case.
+- [ ] **Word/Excel/PowerPoint download** — these can't preview, so they
+      offer Download only. Confirm the file opens cleanly after saving.
+
+### Bugs found and fixed this session — worth a second pair of eyes
+- **Scoped CSS never reached script-built elements.** Astro stamps
+  `data-astro-cid` on elements it compiles from the template; anything
+  made with `createElement` doesn't get it, so scoped rules miss entirely.
+  The Resources table rendered as raw unstyled text. `messages.astro` had
+  the same defect throughout. Both fixed with `:global()` anchored to a
+  template element, matching the pattern already in `members.astro`.
+- **`.form-error` in `portal.astro`** had the same problem: the reply
+  composer builds one at runtime, so the error under a failed comment
+  reply rendered unstyled. Fixed the same way.
+- Audited every portal page for further instances — `portal`, `events`,
+  `alerts`, `members`, `resources`, `messages` all now clean. Worth
+  knowing the pattern: **any class you create in JS needs `:global()`.**
+- **The members' resources override was keyed on `entry.slug`**, but
+  content-layer entries loaded by `glob()` carry an `id` and no `slug`,
+  so it silently never fired. Worth grepping for other `.slug` uses on
+  content entries.
+
+### Decisions for Jarin and Bijan, not for Claude
+- [ ] **The Collective banner** is built and sitting unmerged on branch
+      `collective-hero` — a logo-led chocolate/terracotta hero. It clashes
+      with the deliberate "app, not brochure" call to drop heroes from the
+      portal pages. Options discussed: door pages only (login, verify,
+      welcome, guidelines), drop it, or reinstate everywhere.
+- [ ] **The guidelines no longer list prohibited conduct.** "What isn't
+      allowed" was removed at Jarin's request, along with the photo
+      family-permission paragraph. Since the guidelines are the acceptance
+      gate new members must tick, there is now nothing written that a
+      removal decision would rest on, and no mention of family consent
+      anywhere. Deliberate — flagged so it isn't a surprise later.
+- [ ] **The Collective hero photo shows three identifiable young people**
+      and `/collective/` is public and indexed. Confirm family permission
+      covers public web use, or swap the photo back.
+- [ ] **Webinar recordings are no longer free to members** (page deleted
+      2026-08-27). Two loose ends: the old page can persist in Cloudflare's
+      edge cache for up to 7 days (`s-maxage=604800`) — purge if that
+      matters; and the recording is an **unlisted, not private** YouTube
+      video, so anyone who already opened that page can still watch it.
+      Setting it to Private is the only real fix.
+
+### Still open from before
+- [ ] Verify the webhook replay in Stripe (Phase 0) — replay the
+      2026-08-20 event, confirm it is now skipped.
+- [ ] Test domain is crawlable: `test.montessoriforadolescents.com` serves
+      `Allow: /`, has no `noindex`, and its sitemap responds 200. That is
+      the whole site duplicated on a second domain. Phase 1 item, still open.
+- [ ] The room is empty and there is no launch audience: 1 post, 0
+      comments, 0 waitlist signups, ~10 mailable non-donor subscribers.
+      This is the actual launch blocker, not the code.
+
+### Launch switches, when the above is settled
+`OPEN` in `src/pages/collective/index.astro`, and `SHOW_COLLECTIVE` in
+`src/components/global/Navigation.astro`. Both currently false. Delete
+`src/pages/collective/preview.astro` at the same time — `/collective/`
+will be showing the same page.
+
 ## Later (marked, not scoped)
 - [ ] **Pen pal exchange programme** — details to come.
 - [ ] **Courses** — sellable course support if one launches.

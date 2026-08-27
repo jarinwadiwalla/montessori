@@ -965,7 +965,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     align-self: flex-start;
   }
 
-  .form-error {
+  /* Also matched globally: the reply composer builds a .form-error at
+     runtime, and a scope-locked selector would never reach it. */
+  .form-error,
+  .portal :global(.form-error) {
     color: var(--color-terracotta-dark);
     font-size: var(--text-sm);
     margin-top: var(--space-xs);

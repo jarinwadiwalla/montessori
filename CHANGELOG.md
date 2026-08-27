@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.1] - 2026-08-27
+
+### Added
+- Organisers can rearrange the shared folders with arrows on each tile, so
+  related subjects group together instead of sitting in alphabetical order.
+  New `sort_order` column; new folders land at the end. Organiser-only —
+  otherwise one member's grouping would undo another's.
+
+### Fixed
+- `.form-error` in `portal.astro` was scope-locked while the reply
+  composer builds one at runtime, so the error under a failed comment
+  reply rendered unstyled. Same defect as the Resources table.
+- Audited every portal page for the same class of bug; the rest are clean.
+
 ## [1.4.0] - 2026-08-27
 
 ### Removed
