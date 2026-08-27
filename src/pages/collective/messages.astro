@@ -360,7 +360,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     overflow: hidden;
   }
 
-  .conv-row {
+  .msg-layout :global(.conv-row){
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -374,11 +374,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     font-family: inherit;
   }
 
-  .conv-row:last-child { border-bottom: none; }
-  .conv-row:hover { background: var(--color-cream); }
-  .conv-row.is-active { background: var(--color-cream); }
+  .msg-layout :global(.conv-row:last-child){ border-bottom: none; }
+  .msg-layout :global(.conv-row:hover){ background: var(--color-cream); }
+  .msg-layout :global(.conv-row.is-active){ background: var(--color-cream); }
 
-  .conv-avatar {
+  .msg-layout :global(.conv-avatar){
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -386,24 +386,24 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     flex-shrink: 0;
   }
 
-  .conv-avatar--blank { background: var(--color-cream-dark); }
+  .msg-layout :global(.conv-avatar--blank){ background: var(--color-cream-dark); }
 
-  .conv-text {
+  .msg-layout :global(.conv-text){
     display: flex;
     flex-direction: column;
     min-width: 0;
     flex: 1;
   }
 
-  .conv-name {
+  .msg-layout :global(.conv-name){
     font-size: var(--text-sm);
     color: var(--color-text);
   }
 
-  .conv-row.is-unread .conv-name { font-weight: 600; }
+  .msg-layout :global(.conv-row.is-unread .conv-name){ font-weight: 600; }
 
-  .conv-excerpt,
-  .conv-time {
+  .msg-layout :global(.conv-excerpt),
+  .msg-layout :global(.conv-time){
     font-size: var(--text-xs);
     color: var(--color-text-light);
     white-space: nowrap;
@@ -411,7 +411,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     text-overflow: ellipsis;
   }
 
-  .conv-time { flex-shrink: 0; }
+  .msg-layout :global(.conv-time){ flex-shrink: 0; }
 
   /* --- thread --- */
 
@@ -503,27 +503,27 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     gap: var(--space-sm);
   }
 
-  .thread-empty {
+  .msg-layout :global(.thread-empty){
     color: var(--color-text-light);
     text-align: center;
     padding: var(--space-xl) 0;
   }
 
-  .bubble-row { display: flex; }
-  .bubble-row.is-mine { justify-content: flex-end; }
+  .msg-layout :global(.bubble-row){ display: flex; }
+  .msg-layout :global(.bubble-row.is-mine){ justify-content: flex-end; }
 
-  .bubble {
+  .msg-layout :global(.bubble){
     max-width: min(78%, 46ch);
     padding: 0.6rem 0.85rem;
     border-radius: var(--radius-lg);
     background: var(--color-cream);
   }
 
-  .bubble-row.is-mine .bubble {
+  .msg-layout :global(.bubble-row.is-mine .bubble){
     background: var(--color-purple);
   }
 
-  .bubble-body {
+  .msg-layout :global(.bubble-body){
     margin: 0 0 0.2rem;
     font-size: var(--text-sm);
     line-height: var(--leading-relaxed);
@@ -532,13 +532,13 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     overflow-wrap: anywhere;
   }
 
-  .bubble-time {
+  .msg-layout :global(.bubble-time){
     font-size: 11px;
     color: var(--color-text-light);
   }
 
-  .bubble-row.is-mine .bubble-body { color: var(--color-white); }
-  .bubble-row.is-mine .bubble-time { color: rgba(255, 255, 255, 0.7); }
+  .msg-layout :global(.bubble-row.is-mine .bubble-body){ color: var(--color-white); }
+  .msg-layout :global(.bubble-row.is-mine .bubble-time){ color: rgba(255, 255, 255, 0.7); }
 
   .thread-compose {
     display: flex;

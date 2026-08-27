@@ -51,5 +51,7 @@ VALUES
   ('fold_montessori_readings', 'Montessori Readings', '', 1, datetime('now'), datetime('now')),
   ('fold_literature_reviews', 'Individual Literature Reviews', '', 1, datetime('now'), datetime('now')),
   ('fold_brain_development', 'Adolescent Brain Development', '', 1, datetime('now'), datetime('now')),
-  ('fold_sexual_education', 'Sexual Education Lessons', '', 1, datetime('now'), datetime('now'))
+  ('fold_sexual_education', 'Sexual Education Lessons', '', 1, datetime('now'), datetime('now')),
+  ('fold_math_seminars', 'Math Seminars', '', 1, datetime('now'), datetime('now')),
+  ('fold_literature_seminars', 'Literature Seminars', '', 1, datetime('now'), datetime('now'))
 ON CONFLICT(id) DO UPDATE SET name = excluded.name, is_system = 1;

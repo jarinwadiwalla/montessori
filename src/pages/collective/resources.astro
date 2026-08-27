@@ -1,20 +1,6 @@
 ---
-import { getCollection } from 'astro:content';
 import PageLayout from '../../layouts/PageLayout.astro';
 import PortalNav from '../../components/collective/PortalNav.astro';
-
-// The curated shelf: resources the site itself publishes.
-//
-// Only entries that actually have a file are shown. There used to be
-// "Coming soon" placeholders here for entries without one, which meant the
-// shelf advertised things members couldn't open. An entry appears the day
-// it has a downloadUrl and not before.
-const resources = (await getCollection('resources'))
-  .filter((r) => {
-    const url = r.data.downloadUrl || '';
-    return url.startsWith('/') || url.startsWith('http');
-  })
-  .sort((a, b) => (a.data.title > b.data.title ? 1 : -1));
 
 // Must stay in step with TYPES in functions/lib/community-files.js.
 const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls';
@@ -33,23 +19,8 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
       <header class="portal-page-head">
         <h1>Resources</h1>
-        <p>Guides from us, and a shared library the whole Collective fills.</p>
+        <p>A shared resource library for the Collective to upload to.</p>
       </header>
-
-      {resources.length > 0 && (
-        <section class="res-section">
-          <h2 class="res-heading">From the Collective</h2>
-          <div class="resource-list">
-            {resources.map((r) => (
-              <article class="resource-card">
-                <h3>{r.data.title}</h3>
-                <p>{r.data.description}</p>
-                <a class="res-btn" href={r.data.downloadUrl} target="_blank" rel="noopener">Open</a>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
 
       <section class="res-section drive">
         <!-- Toolbar: breadcrumb on the left, actions on the right. The
@@ -434,6 +405,13 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 </script>
 
 <style>
+  /* Astro scopes styles by stamping data-astro-cid onto elements in the
+     template. Everything below the toolbar — tiles, rows, buttons — is
+     built by script, so it never receives that attribute and a plain
+     scoped selector would match nothing. Anything script-created is
+     therefore written as `.drive :global(...)`: still confined to this
+     section, but matching elements the compiler never saw. */
+
   .resources-page { max-width: 1040px; }
 
   .loading {
@@ -444,58 +422,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   .res-section { margin-bottom: var(--space-2xl); }
 
-  .res-heading {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    color: var(--color-earth-dark);
-    margin: 0 0 var(--space-md);
-  }
-
-  /* --- curated shelf --- */
-
-  .resource-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-md);
-  }
-
-  .resource-card {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-white);
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-
-  .resource-card h3 {
-    margin: 0;
-    font-size: var(--text-base);
-    color: var(--color-text);
-  }
-
-  .resource-card p {
-    margin: 0;
-    font-size: var(--text-sm);
-    color: var(--color-text-light);
-    line-height: var(--leading-relaxed);
-    flex: 1;
-  }
-
-  .res-btn {
-    align-self: flex-start;
-    border: 1px solid var(--color-terracotta);
-    color: var(--color-terracotta-dark);
-    border-radius: 999px;
-    padding: 0.4rem 1rem;
-    font-size: var(--text-sm);
-    text-decoration: none;
-  }
-
-  .res-btn:hover { background: var(--color-cream); }
-
-  /* --- drive: toolbar --- */
+  /* --- toolbar --- */
 
   .drive-bar {
     display: flex;
@@ -508,12 +435,12 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   .crumbs {
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    align-items: baseline;
+    gap: 0.45rem;
     min-width: 0;
   }
 
-  .crumb {
+  .drive :global(.crumb) {
     background: none;
     border: none;
     padding: 0;
@@ -523,41 +450,48 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     cursor: pointer;
   }
 
-  button.crumb:hover { color: var(--color-terracotta-dark); }
+  .drive :global(button.crumb:hover) { color: var(--color-terracotta-dark); }
 
-  .crumb.is-current {
+  .drive :global(.crumb.is-current) {
     color: var(--color-earth-dark);
     cursor: default;
   }
 
-  .crumb-sep { color: var(--color-cream-dark); font-size: var(--text-xl); }
+  .drive :global(.crumb-sep) {
+    color: var(--color-cream-dark);
+    font-size: var(--text-lg);
+  }
 
   .drive-actions { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 
-  .res-action {
+  .drive :global(.res-action) {
+    display: inline-block;
     background: none;
     border: 1px solid var(--color-border);
     border-radius: 999px;
-    padding: 0.3rem 0.8rem;
-    font-family: inherit;
+    padding: 0.32rem 0.85rem;
+    font-family: var(--font-body);
     font-size: var(--text-xs);
+    line-height: 1.5;
     color: var(--color-text-light);
     text-decoration: none;
     cursor: pointer;
     white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s, background-color 0.15s;
   }
 
-  .res-action:hover {
+  .drive :global(.res-action:hover) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+    background: var(--color-white);
+  }
+
+  .drive :global(.res-action--primary) {
     border-color: var(--color-terracotta);
     color: var(--color-terracotta-dark);
   }
 
-  .res-action--primary {
-    border-color: var(--color-terracotta);
-    color: var(--color-terracotta-dark);
-  }
-
-  .res-action--quiet:hover {
+  .drive :global(.res-action--quiet:hover) {
     border-color: var(--color-earth-light);
     color: var(--color-earth);
   }
@@ -571,7 +505,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     font-size: var(--text-sm);
   }
 
-  /* --- drive: folder tiles --- */
+  /* --- folder tiles --- */
 
   .folder-grid {
     display: grid;
@@ -579,40 +513,39 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     gap: var(--space-sm);
   }
 
-  .folder-tile {
+  .drive :global(.folder-tile) {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.3rem;
-    padding: var(--space-sm);
+    padding: var(--space-md) var(--space-sm);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-white);
-    font-family: inherit;
+    font-family: var(--font-body);
     text-align: center;
     cursor: pointer;
     transition: border-color 0.15s, background-color 0.15s;
   }
 
-  .folder-tile:hover {
+  .drive :global(.folder-tile:hover) {
     background: var(--color-cream);
     border-color: var(--color-terracotta);
   }
 
-  .folder-icon {
+  .drive :global(.folder-icon) {
     width: 22px;
     height: 22px;
     flex-shrink: 0;
     fill: var(--color-terracotta);
   }
 
-  .tile-name {
+  .drive :global(.tile-name) {
     font-size: var(--text-xs);
     line-height: 1.3;
     color: var(--color-text);
-    /* Always two lines tall, clipped at two. Reserving the space means the
-       folder icon and count sit on the same line across the whole row —
-       otherwise a one-line name lifts them 16px above their neighbours. */
+    /* Always two lines tall, clipped at two, so the icon and count sit on
+       the same line right across the row. */
     min-height: 2.6em;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -620,12 +553,12 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     overflow: hidden;
   }
 
-  .tile-count {
+  .drive :global(.tile-count) {
     font-size: 11px;
     color: var(--color-text-light);
   }
 
-  /* --- drive: file table --- */
+  /* --- file table --- */
 
   .file-table {
     border: 1px solid var(--color-border);
@@ -635,47 +568,54 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   }
 
   .file-head,
-  .file-row {
+  .drive :global(.file-row) {
     display: grid;
     /* The action column is a fixed width, not auto: with auto, a row
        holding three buttons sizes its column wider than a row holding
-       one, and every column to its left shifts. Columns must line up
-       down the table. */
-    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) 110px 80px 232px;
+       one, and every column to its left shifts. */
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) 118px 84px 232px;
     align-items: center;
     gap: var(--space-md);
-    padding: var(--space-sm) var(--space-lg);
+    padding: 0.7rem var(--space-lg);
   }
 
   .file-head {
     border-bottom: 1px solid var(--color-border);
-    font-size: var(--text-xs);
+    background: var(--color-cream);
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.09em;
     color: var(--color-text-light);
   }
 
-  .file-row {
+  .drive :global(.file-row) {
     border-bottom: 1px solid var(--color-border);
     font-size: var(--text-sm);
     color: var(--color-text);
+    transition: background-color 0.12s;
   }
 
-  .file-row:last-child { border-bottom: none; }
-  .file-row:hover { background: var(--color-cream); }
+  .drive :global(.file-row:last-child) { border-bottom: none; }
+  .drive :global(.file-row:hover) { background: var(--color-cream); }
 
-  .col-name {
+  .col-name,
+  .drive :global(.col-name) {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 0.6rem;
     min-width: 0;
   }
 
-  .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .drive :global(.file-name) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-earth-dark);
+  }
 
-  .col-owner,
-  .col-date,
-  .col-size {
+  .drive :global(.col-owner),
+  .drive :global(.col-date),
+  .drive :global(.col-size) {
     font-size: var(--text-xs);
     color: var(--color-text-light);
     overflow: hidden;
@@ -683,23 +623,32 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     white-space: nowrap;
   }
 
-  .col-act { display: flex; gap: var(--space-xs); justify-content: flex-end; }
+  .drive :global(.col-act) {
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: flex-end;
+  }
 
-  .kind-chip {
+  .drive :global(.kind-chip) {
     flex-shrink: 0;
+    /* Fixed width so the file names all begin at the same x, whatever
+       the file type. */
+    width: 38px;
+    text-align: center;
     border-radius: 4px;
-    padding: 0.15rem 0.4rem;
-    font-size: 10px;
-    letter-spacing: 0.06em;
+    padding: 0.2rem 0;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     background: var(--color-cream-dark);
     color: var(--color-earth);
   }
 
-  .kind-chip--pdf { background: var(--color-terracotta); color: var(--color-white); }
-  .kind-chip--image { background: var(--color-sage-light); color: var(--color-earth-dark); }
-  .kind-chip--doc { background: var(--color-earth-light); color: var(--color-white); }
-  .kind-chip--slides { background: var(--color-terracotta-light); color: var(--color-earth-dark); }
-  .kind-chip--sheet { background: var(--color-sage); color: var(--color-white); }
+  .drive :global(.kind-chip--pdf) { background: var(--color-terracotta); color: var(--color-white); }
+  .drive :global(.kind-chip--image) { background: var(--color-sage-light); color: var(--color-earth-dark); }
+  .drive :global(.kind-chip--doc) { background: var(--color-earth-light); color: var(--color-white); }
+  .drive :global(.kind-chip--slides) { background: var(--color-terracotta-light); color: var(--color-earth-dark); }
+  .drive :global(.kind-chip--sheet) { background: var(--color-sage); color: var(--color-white); }
 
   .drive-empty {
     margin: 0;
@@ -718,17 +667,20 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   .drive-note { margin-top: var(--space-md); }
 
-  /* Columns that stop earning their space on a narrow screen. */
+  /* On a phone the row becomes a stacked card: name, then the details on
+     one line, then the buttons. A five-column table at that width is
+     unreadable however the columns are sized. */
   @media (max-width: 760px) {
     .file-head { display: none; }
 
-    .file-row {
+    .drive :global(.file-row) {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-xs);
+      gap: 0.35rem;
       padding: var(--space-md) var(--space-lg);
     }
 
-    .col-date, .col-size { display: none; }
-    .col-act { justify-content: flex-start; }
+    .drive :global(.file-name) { white-space: normal; }
+    .drive :global(.col-date), .drive :global(.col-size) { display: none; }
+    .drive :global(.col-act) { justify-content: flex-start; margin-top: 0.2rem; }
   }
 </style>
