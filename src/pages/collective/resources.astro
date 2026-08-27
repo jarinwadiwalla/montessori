@@ -19,7 +19,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
       <header class="portal-page-head">
         <h1>Resources</h1>
-        <p>A shared resource library for the Collective to upload to.</p>
+        <p>A shared resource library for the Collective to upload to. Keep titles of documents short and descriptive.</p>
       </header>
 
       <section class="res-section drive">
@@ -40,9 +40,6 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
         <div class="file-table" id="file-table" hidden>
           <div class="file-head">
             <span class="col-name">Name</span>
-            <span class="col-owner">Uploaded by</span>
-            <span class="col-date">Date</span>
-            <span class="col-size">Size</span>
             <span class="col-act"></span>
           </div>
           <div id="file-rows"></div>
@@ -266,25 +263,37 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   }
 
   function renderRow(d: any) {
+    // A wrapper holds the row and its detail line, so the detail can drop
+    // beneath without breaking the row's grid.
+    const item = el('div', 'file-item');
     const row = el('div', 'file-row');
 
-    // Name cell: type chip + title
+    // Name: type chip + the full title. It wraps rather than clipping —
+    // the columns that used to compete for this space are in Info now.
     const name = el('div', 'col-name');
     name.appendChild(el('span', `kind-chip kind-chip--${d.kind}`, KIND_LABEL[d.kind] || 'FILE'));
-    const label = el('span', 'file-name', d.title);
-    // The column clips long names with an ellipsis, so carry the whole
-    // thing in a tooltip — otherwise there's no way to read it at all.
-    label.title = d.title;
-    name.appendChild(label);
+    name.appendChild(el('span', 'file-name', d.title));
     row.appendChild(name);
 
-    const owner = el('span', 'col-owner', d.uploader_name);
-    owner.title = d.uploader_name;   // also clipped when a name runs long
-    row.appendChild(owner);
-    row.appendChild(el('span', 'col-date', shortDate(d.created_at)));
-    row.appendChild(el('span', 'col-size', fileSize(d.size)));
-
     const act = el('div', 'col-act');
+
+    // Info: who put it there and when, revealed on demand.
+    const detail = el('div', 'file-detail');
+    detail.hidden = true;
+    detail.appendChild(
+      el('span', '', `Uploaded by ${d.uploader_name} · ${shortDate(d.created_at)} · ${fileSize(d.size)}`)
+    );
+
+    const info = el('button', 'res-action', 'Info');
+    info.setAttribute('type', 'button');
+    info.setAttribute('aria-expanded', 'false');
+    info.addEventListener('click', () => {
+      const showing = detail.hidden;
+      detail.hidden = !showing;
+      info.setAttribute('aria-expanded', String(showing));
+      info.classList.toggle('is-on', showing);
+    });
+    act.appendChild(info);
 
     if (d.previewable) {
       const preview = el('button', 'res-action', 'Preview');
@@ -311,7 +320,9 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     }
 
     row.appendChild(act);
-    return row;
+    item.appendChild(row);
+    item.appendChild(detail);
+    return item;
   }
 
   // --- data + actions -------------------------------------------
@@ -620,9 +631,9 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   .drive :global(.file-row) {
     display: grid;
     /* The action column is a fixed width, not auto: with auto, a row
-       holding three buttons sizes its column wider than a row holding
-       one, and every column to its left shifts. */
-    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) 118px 84px 232px;
+       holding four buttons sizes its column wider than a row holding
+       two, and the name column beside it shifts with every row. */
+    grid-template-columns: minmax(0, 1fr) 288px;
     align-items: center;
     gap: var(--space-md);
     padding: 0.7rem var(--space-lg);
@@ -637,40 +648,51 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     color: var(--color-text-light);
   }
 
-  .drive :global(.file-row) {
+  .drive :global(.file-item) {
     border-bottom: 1px solid var(--color-border);
+  }
+
+  .drive :global(.file-item:last-child) { border-bottom: none; }
+
+  .drive :global(.file-row) {
     font-size: var(--text-sm);
     color: var(--color-text);
     transition: background-color 0.12s;
   }
 
-  .drive :global(.file-row:last-child) { border-bottom: none; }
-  .drive :global(.file-row:hover) { background: var(--color-cream); }
+  .drive :global(.file-item:hover) { background: var(--color-cream); }
+
+  /* Who uploaded it and when, shown by the Info button. */
+  .drive :global(.file-detail) {
+    padding: 0 var(--space-lg) 0.7rem calc(var(--space-lg) + 38px + 0.6rem);
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .drive :global(.res-action.is-on) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+    background: var(--color-cream-dark);
+  }
 
   .col-name,
   .drive :global(.col-name) {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.6rem;
     min-width: 0;
   }
 
+  .drive :global(.kind-chip) { margin-top: 0.1rem; }
+
   .drive :global(.file-name) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    /* Wraps rather than clipping — the whole point of moving the
+       uploader and date behind Info was to give the title this room. */
+    overflow-wrap: anywhere;
+    line-height: 1.4;
     color: var(--color-earth-dark);
   }
 
-  .drive :global(.col-owner),
-  .drive :global(.col-date),
-  .drive :global(.col-size) {
-    font-size: var(--text-xs);
-    color: var(--color-text-light);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   .drive :global(.col-act) {
     display: flex;
@@ -728,8 +750,6 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
       padding: var(--space-md) var(--space-lg);
     }
 
-    .drive :global(.file-name) { white-space: normal; }
-    .drive :global(.col-date), .drive :global(.col-size) { display: none; }
     .drive :global(.col-act) { justify-content: flex-start; margin-top: 0.2rem; }
   }
 
