@@ -238,7 +238,7 @@ async function colSendLink(id) {
 // The full welcome, not just a link. For anyone added before the welcome
 // was wired into the invite step, or who lost the original.
 async function colResendWelcome(id, who) {
-  if (!confirm(`Send the welcome email to ${who} again?\n\nIt explains what the Collective is, that their membership is free, and carries a fresh sign-in link valid for 20 minutes.`)) return;
+  if (!confirm(`Send the welcome email to ${who} again?\n\nIt explains what the Collective is, that their membership is free, and carries a fresh sign-in link valid for 24 hours.`)) return;
   const data = await apiFetch("/api/community/admin-members", {
     method: "PUT",
     body: JSON.stringify({ id, action: "resend_welcome" }),

@@ -66,13 +66,13 @@ export async function onRequestPost(context) {
     .first();
 
   if (member && member.status === "active") {
-    const { token, expiresMinutes } = await createLoginToken(env, email, ip);
+    const { token, expiresIn } = await createLoginToken(env, email, ip);
     const link = `${SITE}/collective/verify/?token=${encodeURIComponent(token)}`;
 
     const tpl = renderTemplate(await getTemplate(env, "member-login-link"), {
       greeting_name: greetingName(member.name),
       link,
-      expires_minutes: expiresMinutes,
+      expires_in: expiresIn,
     });
     context.waitUntil(sendEmail(env, email, tpl.subject, tpl.html));
   } else if (member && member.status === "suspended") {

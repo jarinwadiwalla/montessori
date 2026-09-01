@@ -10,7 +10,7 @@ var SYSMAIL_SAMPLE = {
   welcome_word: "Welcome",
   link: "https://montessoriforadolescents.com/collective/verify/?token=example",
   unsub_url: "https://montessoriforadolescents.com/api/unsubscribe?email=example",
-  expires_minutes: "20",
+  expires_in: "24 hours",
   site: "https://montessoriforadolescents.com",
   dues_note: '<p style="color:#6b5b7d;font-size:14px;">Your dues renew monthly.</p>',
 };

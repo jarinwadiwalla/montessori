@@ -18,7 +18,7 @@ export const EMAIL_TEMPLATES = {
     label: "Collective — welcome (after payment)",
     description:
       "Sent when someone joins the Collective through Stripe. Contains their first sign-in link.",
-    vars: ["greeting_name", "link", "expires_minutes", "dues_note", "site"],
+    vars: ["greeting_name", "link", "expires_in", "dues_note", "site"],
     subject: "Welcome to the Montessori Adolescent Collective",
     html: `${WRAP_OPEN}
       <p>Welcome{{greeting_name}} — you're in.</p>
@@ -26,7 +26,7 @@ export const EMAIL_TEMPLATES = {
       for all things third plane of development. Use the link below to sign in
       and set up your profile.</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
-      <p ${MUTED}>This link works once and expires in {{expires_minutes}} minutes.
+      <p ${MUTED}>This link works once and expires in {{expires_in}}.
       You can always request a fresh one at {{site}}/collective/login/.</p>
       {{dues_note}}
       <p ${MUTED}>Please take a moment to read our
@@ -37,13 +37,13 @@ export const EMAIL_TEMPLATES = {
   "member-login-link": {
     label: "Collective — sign-in link",
     description: "Sent when a member requests a magic sign-in link.",
-    vars: ["greeting_name", "link", "expires_minutes"],
+    vars: ["greeting_name", "link", "expires_in"],
     subject: "Your sign-in link for the Collective",
     html: `${WRAP_OPEN}
       <p>Hello{{greeting_name}},</p>
       <p>Here is your sign-in link for the Montessori Adolescent Collective:</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
-      <p ${MUTED}>This link works once and expires in {{expires_minutes}} minutes.
+      <p ${MUTED}>This link works once and expires in {{expires_in}}.
       If you didn't ask to sign in, you can safely ignore this email.</p>
     </div>`,
   },
@@ -52,7 +52,7 @@ export const EMAIL_TEMPLATES = {
     label: "Collective — welcome (comped member)",
     description:
       "Sent when an organiser adds someone by hand from Guru → Collective. Explains what the Collective is, that their membership is a gift with no dues, and carries their first sign-in link.",
-    vars: ["greeting_name", "link", "expires_minutes", "site"],
+    vars: ["greeting_name", "link", "expires_in", "site"],
     subject: "You have a place in the Montessori Adolescent Collective",
     html: `${WRAP_OPEN}
       <p>Hello{{greeting_name}},</p>
@@ -66,7 +66,7 @@ export const EMAIL_TEMPLATES = {
       nothing to set up, and nothing that will expire. Use the link below to
       sign in and set up your profile.</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
-      <p ${MUTED}>This link works once and expires in {{expires_minutes}} minutes.
+      <p ${MUTED}>This link works once and expires in {{expires_in}}.
       You can always request a fresh one at {{site}}/collective/login/. There are
       no passwords: we email you a link each time, or you can set a password once
       you are inside.</p>
@@ -124,12 +124,12 @@ export const EMAIL_TEMPLATES = {
     label: "Collective — sign-in link sent by an admin",
     description:
       'Sent when an admin clicks "Send login link" in Guru for a member.',
-    vars: ["greeting_name", "link", "expires_minutes", "site"],
+    vars: ["greeting_name", "link", "expires_in", "site"],
     subject: "Your sign-in link for the Collective",
     html: `${WRAP_OPEN}
       <p>Hello{{greeting_name}} — here's a fresh sign-in link:</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
-      <p ${MUTED}>This link works once and expires in {{expires_minutes}} minutes.
+      <p ${MUTED}>This link works once and expires in {{expires_in}}.
       You can always request another at {{site}}/collective/login/</p>
     </div>`,
   },

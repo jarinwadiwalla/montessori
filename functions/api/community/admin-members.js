@@ -145,13 +145,13 @@ async function sendCompedWelcome(context, email, name) {
   if (!env.RESEND_API_KEY) return false;
 
   try {
-    const { token, expiresMinutes } = await createLoginToken(env, email, "admin");
+    const { token, expiresIn } = await createLoginToken(env, email, "admin");
     const site = "https://montessoriforadolescents.com";
 
     const tpl = renderTemplate(await getTemplate(env, "member-comped-welcome"), {
       greeting_name: greetingName(name),
       link: `${site}/collective/verify/?token=${encodeURIComponent(token)}`,
-      expires_minutes: expiresMinutes,
+      expires_in: expiresIn,
       site,
     });
 
@@ -224,13 +224,13 @@ async function sendLoginLink(context, id) {
     return Response.json({ error: "Email is not configured" }, { status: 503 });
   }
 
-  const { token, expiresMinutes } = await createLoginToken(env, member.email, "admin");
+  const { token, expiresIn } = await createLoginToken(env, member.email, "admin");
   const link = `https://montessoriforadolescents.com/collective/verify/?token=${encodeURIComponent(token)}`;
 
   const tpl = renderTemplate(await getTemplate(env, "admin-login-link"), {
     greeting_name: greetingName(member.name),
     link,
-    expires_minutes: expiresMinutes,
+    expires_in: expiresIn,
     site: "https://montessoriforadolescents.com",
   });
 

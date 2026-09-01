@@ -385,7 +385,7 @@ async function sendWelcome(context, email, name, plan) {
   const { env } = context;
   if (!env.RESEND_API_KEY) return;
 
-  const { token, expiresMinutes } = await createLoginToken(env, email, "stripe");
+  const { token, expiresIn } = await createLoginToken(env, email, "stripe");
   const link = `${SITE}/collective/verify/?token=${encodeURIComponent(token)}`;
   const dues =
     plan === "annual"
@@ -399,7 +399,7 @@ async function sendWelcome(context, email, name, plan) {
     {
       greeting_name: greetingName(name),
       link,
-      expires_minutes: expiresMinutes,
+      expires_in: expiresIn,
       site: SITE,
     },
     {

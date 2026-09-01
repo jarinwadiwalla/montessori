@@ -13,7 +13,25 @@ const SESSION_COOKIE = "apc_session";
 // Long-lived on purpose: members stay signed in on a device until they
 // sign out, so the magic-link dance is a first-visit cost, not a ritual.
 const SESSION_DAYS = 180;
-const LOGIN_TOKEN_MINUTES = 20;
+// How long a sign-in link stays usable. These links are single-use — the
+// token is consumed on first click — so the exposure is the window before
+// someone uses it, not a link that lingers usefully in an inbox. A day
+// lets a member in another timezone open their email the next morning and
+// simply click, which twenty minutes did not.
+const LOGIN_TOKEN_MINUTES = 60 * 24;
+
+/** "24 hours" / "20 minutes" — so copy can't drift from the real value. */
+function expiryLabel(mins) {
+  if (mins % 1440 === 0) {
+    const d = mins / 1440;
+    return d === 1 ? "24 hours" : `${d} days`;
+  }
+  if (mins % 60 === 0) {
+    const h = mins / 60;
+    return h === 1 ? "1 hour" : `${h} hours`;
+  }
+  return `${mins} minutes`;
+}
 
 export function generateId(prefix = "") {
   const ts = Date.now().toString(36);
@@ -250,7 +268,11 @@ export async function createLoginToken(env, email, ip = "") {
     .bind(tokenHash, email, now.toISOString(), expires.toISOString(), ip)
     .run();
 
-  return { token, expiresMinutes: LOGIN_TOKEN_MINUTES };
+  return {
+    token,
+    expiresMinutes: LOGIN_TOKEN_MINUTES,
+    expiresIn: expiryLabel(LOGIN_TOKEN_MINUTES),
+  };
 }
 
 // Single-use: marks the token consumed and returns the email, or null.
