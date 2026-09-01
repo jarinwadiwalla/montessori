@@ -119,7 +119,55 @@ export async function onRequestPost(context) {
     if (row) await ensureHandle(env, row.id, name);
   }
 
-  return Response.json({ ok: true, created: true });
+  // Tell them. Adding someone by hand used to be silent: they had access
+  // and no way to know it, and an admin had to remember a second click to
+  // send a bare sign-in link that explained nothing.
+  const emailed = await sendCompedWelcome(context, email, name);
+
+  return Response.json({ ok: true, created: true, emailed });
+}
+
+/**
+ * Welcome for a member added by hand. Mirrors the paid welcome, minus the
+ * dues, and says plainly that the membership is a gift so an unexpected
+ * sign-in link doesn't read as phishing.
+ *
+ * Returns whether it went, rather than throwing: the member has been
+ * created either way, and losing that to a mail failure would be worse
+ * than an admin having to resend.
+ */
+async function sendCompedWelcome(context, email, name) {
+  const { env } = context;
+  if (!env.RESEND_API_KEY) return false;
+
+  try {
+    const { token, expiresMinutes } = await createLoginToken(env, email, "admin");
+    const site = "https://montessoriforadolescents.com";
+
+    const tpl = renderTemplate(await getTemplate(env, "member-comped-welcome"), {
+      greeting_name: greetingName(name),
+      link: `${site}/collective/verify/?token=${encodeURIComponent(token)}`,
+      expires_minutes: expiresMinutes,
+      site,
+    });
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "The Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>",
+        to: [email],
+        subject: tpl.subject,
+        html: tpl.html,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 // Email a member a fresh one-time sign-in link, on an admin's say-so.

@@ -197,7 +197,14 @@ async function colInvite() {
   });
   if (!data) return;
 
-  showToast(data.created ? "Member added (comped)." : "Already a member — reactivated.", "success");
+  showToast(
+    data.created
+      ? data.emailed
+        ? "Member added and welcome email sent."
+        : "Member added, but the welcome email did not send — use Send login link."
+      : "Already a member — reactivated.",
+    data.created && !data.emailed ? "error" : "success"
+  );
   document.getElementById("col-invite-email").value = "";
   document.getElementById("col-invite-name").value = "";
   colLoad();

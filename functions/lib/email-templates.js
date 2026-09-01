@@ -48,6 +48,34 @@ export const EMAIL_TEMPLATES = {
     </div>`,
   },
 
+  "member-comped-welcome": {
+    label: "Collective — welcome (comped member)",
+    description:
+      "Sent when an organiser adds someone by hand from Guru → Collective. Explains what the Collective is, that their membership is a gift with no dues, and carries their first sign-in link.",
+    vars: ["greeting_name", "link", "expires_minutes", "site"],
+    subject: "You have a place in the Montessori Adolescent Collective",
+    html: `${WRAP_OPEN}
+      <p>Hello{{greeting_name}},</p>
+      <p>You have been given a place in the <strong>Montessori Adolescent
+      Collective</strong>, a collaborative online community connecting Third
+      Plane practitioners worldwide.</p>
+      <p>Inside you will find a board for asking questions and sharing work,
+      monthly gatherings, a shared library of documents and photographs, and a
+      directory of practitioners open to exchanges and pen pal programmes.</p>
+      <p><strong>Your membership is a gift.</strong> There are no dues to pay,
+      nothing to set up, and nothing that will expire. Use the link below to
+      sign in and set up your profile.</p>
+      <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
+      <p ${MUTED}>This link works once and expires in {{expires_minutes}} minutes.
+      You can always request a fresh one at {{site}}/collective/login/. There are
+      no passwords: we email you a link each time, or you can set a password once
+      you are inside.</p>
+      <p ${MUTED}>Please take a moment to read our
+      <a href="{{site}}/collective/guidelines/">community guidelines</a> before
+      posting. They are short, and everyone agrees to them on the way in.</p>
+    </div>`,
+  },
+
   "member-new-message": {
     label: "Collective — new direct message",
     description:
