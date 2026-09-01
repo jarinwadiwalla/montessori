@@ -14,6 +14,7 @@ interface Props {
     | 'events'
     | 'resources'
     | 'blog'
+    | 'gallery'
     | 'members'
     | 'alerts';
 }
@@ -40,6 +41,7 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     <p class="side-heading">Library</p>
     <a href="/collective/resources/" class={cls('resources')}>Shared Resources</a>
     <a href="/collective/blog/" class={cls('blog')}>MFA Blog</a>
+    <a href="/collective/gallery/" class={cls('gallery')}>Gallery</a>
 
     <p class="side-heading">People</p>
     <!-- Direct messages live inside Members rather than as a destination of

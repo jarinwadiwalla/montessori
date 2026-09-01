@@ -1,0 +1,458 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Gallery"
+  description="Photographs shared by Collective members."
+  noindex
+>
+  <div class="container gallery-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="gallery" />
+
+      <header class="portal-page-head gal-head">
+        <div>
+          <h1>Gallery</h1>
+          <p>Prepared environments, work in progress, days worth remembering.</p>
+        </div>
+        <button class="gal-action gal-action--primary" id="add-btn" type="button">Add photos</button>
+      </header>
+
+      <p class="gal-error" id="gal-error" role="alert" hidden></p>
+
+      <div class="photo-grid" id="grid"></div>
+
+      <p class="gal-empty" id="empty" hidden>
+        Nothing here yet. Add the first photograph.
+      </p>
+
+      <p class="gal-note">
+        Photos stay inside the Collective. Where young people are recognisable,
+        make sure you have permission from their family, and see the
+        <a href="/collective/guidelines/">guidelines</a>.
+      </p>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden />
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lb-close" id="lb-close" type="button" aria-label="Close">×</button>
+    <button class="lb-nav lb-prev" id="lb-prev" type="button" aria-label="Previous">‹</button>
+    <figure class="lb-figure">
+      <img id="lb-img" alt="" />
+      <figcaption id="lb-cap"></figcaption>
+    </figure>
+    <button class="lb-nav lb-next" id="lb-next" type="button" aria-label="Next">›</button>
+  </div>
+</PageLayout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+
+  let photos: any[] = [];
+  let lbIndex = -1;
+
+  // Phone cameras produce 4000px, 8MB files. Uploading those to look at in
+  // a grid is wasteful for the member on a slow connection and for storage,
+  // so the browser downscales first. 1600px is plenty for full-screen
+  // viewing on any display we need to serve.
+  const MAX_EDGE = 1600;
+  const QUALITY = 0.85;
+
+  function el(tag: string, cls?: string, text?: string) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text; // never innerHTML
+    return n;
+  }
+
+  function showError(msg: string) {
+    const box = $('gal-error');
+    box.textContent = msg;
+    box.hidden = !msg;
+  }
+
+  async function downscale(file: File): Promise<{ blob: Blob; width: number; height: number }> {
+    const bitmap = await createImageBitmap(file);
+    let { width, height } = bitmap;
+
+    if (Math.max(width, height) > MAX_EDGE) {
+      const scale = MAX_EDGE / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close?.();
+
+    const blob: Blob = await new Promise((resolve, reject) =>
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(new Error('encode failed'))),
+        'image/jpeg',
+        QUALITY
+      )
+    );
+    return { blob, width, height };
+  }
+
+  // --- rendering ------------------------------------------------
+
+  async function load() {
+    const res = await fetch('/api/community/photos');
+    if (!res.ok) return showError('The gallery could not be loaded.');
+    const data = await res.json();
+    photos = data.photos || [];
+
+    const grid = $('grid');
+    grid.textContent = '';
+    $('empty').hidden = photos.length > 0;
+
+    photos.forEach((p, i) => {
+      const cell = el('figure', 'photo');
+
+      const img = el('img') as HTMLImageElement;
+      img.src = p.url;
+      img.alt = p.caption || `Photograph from ${p.uploader_name}`;
+      img.loading = 'lazy';
+      if (p.width && p.height) {
+        img.width = p.width;
+        img.height = p.height;
+      }
+      img.addEventListener('click', () => openLightbox(i));
+      cell.appendChild(img);
+
+      const cap = el('figcaption', 'photo-cap');
+      if (p.caption) cap.appendChild(el('span', 'photo-text', p.caption));
+      cap.appendChild(el('span', 'photo-by', p.uploader_name));
+      cell.appendChild(cap);
+
+      if (p.can_delete) {
+        const del = el('button', 'photo-del', '×');
+        del.setAttribute('type', 'button');
+        del.setAttribute('aria-label', 'Remove this photo');
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removePhoto(p);
+        });
+        cell.appendChild(del);
+      }
+
+      grid.appendChild(cell);
+    });
+  }
+
+  // --- lightbox -------------------------------------------------
+
+  function openLightbox(i: number) {
+    lbIndex = i;
+    const p = photos[i];
+    if (!p) return;
+    ($('lb-img') as HTMLImageElement).src = p.url;
+    ($('lb-img') as HTMLImageElement).alt = p.caption || '';
+    $('lb-cap').textContent = [p.caption, p.uploader_name].filter(Boolean).join(' · ');
+    $('lightbox').hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('lb-close').focus();
+  }
+
+  function closeLightbox() {
+    $('lightbox').hidden = true;
+    document.body.style.overflow = '';
+    lbIndex = -1;
+  }
+
+  function step(by: number) {
+    if (lbIndex < 0) return;
+    const next = (lbIndex + by + photos.length) % photos.length;
+    openLightbox(next);
+  }
+
+  // --- actions --------------------------------------------------
+
+  async function handleFiles(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const files = [...(input.files || [])];
+    input.value = '';
+    if (!files.length) return;
+
+    let done = 0;
+    for (const file of files) {
+      showError(`Uploading ${++done} of ${files.length}…`);
+      try {
+        const { blob, width, height } = await downscale(file);
+        const form = new FormData();
+        form.append('file', new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
+        form.append('width', String(width));
+        form.append('height', String(height));
+
+        const res = await fetch('/api/community/photos', { method: 'POST', body: form });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          showError(d.error || 'That photo did not upload.');
+          return;
+        }
+      } catch {
+        showError('That photo could not be read.');
+        return;
+      }
+    }
+
+    showError('');
+    load();
+  }
+
+  async function removePhoto(p: any) {
+    if (!window.confirm('Remove this photo? This cannot be undone.')) return;
+    const res = await fetch('/api/community/photos', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: p.id }),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      return showError(d.error || 'That photo could not be removed.');
+    }
+    showError('');
+    load();
+  }
+
+  // --- boot -----------------------------------------------------
+
+  async function boot() {
+    const me = await (await fetch('/api/community/me')).json();
+    if (!me.signedIn) {
+      window.location.href = '/collective/login/';
+      return;
+    }
+    if (me.lapsed) {
+      window.location.href = '/collective/portal/';
+      return;
+    }
+
+    $('loading').hidden = true;
+    $('main').hidden = false;
+    $('me-name').textContent = me.member.name || 'Member';
+    const av = document.getElementById('me-avatar') as HTMLImageElement;
+    if (me.member.avatar_url) {
+      av.src = me.member.avatar_url;
+      av.hidden = false;
+    }
+
+    $('signout-btn').addEventListener('click', async () => {
+      await fetch('/api/community/logout', { method: 'POST' });
+      window.location.href = '/collective/';
+    });
+
+    $('add-btn').addEventListener('click', () => ($('file-input') as HTMLInputElement).click());
+    $('file-input').addEventListener('change', handleFiles);
+
+    $('lb-close').addEventListener('click', closeLightbox);
+    $('lb-prev').addEventListener('click', () => step(-1));
+    $('lb-next').addEventListener('click', () => step(1));
+    $('lightbox').addEventListener('click', (e) => {
+      if (e.target === $('lightbox')) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if ($('lightbox').hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+
+    load();
+  }
+
+  boot();
+</script>
+
+<style>
+  .gallery-page { max-width: 1040px; }
+
+  .loading,
+  .gal-empty {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--space-2xl) 0;
+  }
+
+  .gal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .gal-action {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .gal-action--primary {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .gal-action:hover { background: var(--color-white); }
+
+  .gal-error {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-cream);
+    color: var(--color-terracotta-dark);
+    font-size: var(--text-sm);
+  }
+
+  /* Columns rather than a grid, so portraits and landscapes pack without
+     being cropped to a common ratio. */
+  .photo-grid {
+    column-count: 3;
+    column-gap: var(--space-sm);
+  }
+
+  .photo-grid :global(.photo) {
+    position: relative;
+    break-inside: avoid;
+    margin: 0 0 var(--space-sm);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .photo-grid :global(.photo img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+  }
+
+  .photo-grid :global(.photo-cap) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .photo-grid :global(.photo-text) {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: var(--leading-normal);
+  }
+
+  .photo-grid :global(.photo-by) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .photo-grid :global(.photo-del) {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    line-height: 1;
+    border: none;
+    border-radius: 50%;
+    background: rgba(30, 21, 15, 0.55);
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .photo-grid :global(.photo:hover .photo-del),
+  .photo-grid :global(.photo-del:focus) { opacity: 1; }
+
+  @media (hover: none) {
+    .photo-grid :global(.photo-del) { opacity: 1; }
+  }
+
+  .gal-note {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* --- lightbox --- */
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background: rgba(24, 16, 11, 0.92);
+  }
+
+  .lb-figure {
+    margin: 0;
+    max-width: min(1100px, 100%);
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .lb-figure img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+  }
+
+  .lb-figure figcaption {
+    color: rgba(238, 228, 219, 0.85);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  .lb-close,
+  .lb-nav {
+    background: none;
+    border: none;
+    color: rgba(238, 228, 219, 0.75);
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+
+  .lb-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-lg);
+    font-size: 30px;
+    line-height: 1;
+  }
+
+  .lb-nav { font-size: 40px; padding: 0 var(--space-sm); flex-shrink: 0; }
+  .lb-close:hover, .lb-nav:hover { color: #fff; }
+
+  @media (max-width: 900px) { .photo-grid { column-count: 2; } }
+  @media (max-width: 560px) {
+    .photo-grid { column-count: 1; }
+    .lb-nav { font-size: 30px; }
+  }
+</style>
