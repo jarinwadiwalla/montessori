@@ -23,6 +23,7 @@ async function colLoad() {
         <td>${m.joined_at ? new Date(m.joined_at).toLocaleDateString() : ""}</td>
         <td>${m.last_seen_at ? new Date(m.last_seen_at).toLocaleDateString() : "never"}</td>
         <td style="white-space:nowrap;">
+          <button class="btn btn-secondary btn-sm" onclick="colResendWelcome('${m.id}', '${escapeHtml(m.name || m.email)}')">Resend welcome</button>
           <button class="btn btn-secondary btn-sm" onclick="colSendLink('${m.id}')">Send login link</button>
           ${suspended
             ? `<button class="btn btn-secondary btn-sm" onclick="colAction('${m.id}','reactivate')">Reactivate</button>`
@@ -232,6 +233,17 @@ async function colSendLink(id) {
     body: JSON.stringify({ id, action: "send_login_link" }),
   });
   if (data) showToast("Sign-in link sent.", "success");
+}
+
+// The full welcome, not just a link. For anyone added before the welcome
+// was wired into the invite step, or who lost the original.
+async function colResendWelcome(id, who) {
+  if (!confirm(`Send the welcome email to ${who} again?\n\nIt explains what the Collective is, that their membership is free, and carries a fresh sign-in link valid for 20 minutes.`)) return;
+  const data = await apiFetch("/api/community/admin-members", {
+    method: "PUT",
+    body: JSON.stringify({ id, action: "resend_welcome" }),
+  });
+  if (data) showToast("Welcome email sent.", "success");
 }
 
 async function colResolveReport(reportId) {

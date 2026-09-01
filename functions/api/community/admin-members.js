@@ -51,13 +51,17 @@ export async function onRequestPut(context) {
 
   if (
     !id ||
-    !["suspend", "reactivate", "make_admin", "make_member", "send_login_link"].includes(action)
+    !["suspend", "reactivate", "make_admin", "make_member", "send_login_link", "resend_welcome"].includes(action)
   ) {
     return Response.json({ error: "id and a valid action are required" }, { status: 400 });
   }
 
   if (action === "send_login_link") {
     return sendLoginLink(context, id);
+  }
+
+  if (action === "resend_welcome") {
+    return resendWelcome(context, id);
   }
 
   if (action === "suspend") {
@@ -168,6 +172,37 @@ async function sendCompedWelcome(context, email, name) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Send the full comped welcome again, rather than a bare sign-in link.
+ *
+ * Anyone added before the welcome was wired into the invite step got
+ * nothing at all, and the only way to reach them was a link with no
+ * explanation attached. This gives them the email they should have had.
+ */
+async function resendWelcome(context, id) {
+  const { env } = context;
+
+  const member = await env.SITE_DB.prepare(
+    "SELECT id, email, name, status FROM community_members WHERE id = ?"
+  ).bind(id).first();
+
+  if (!member) {
+    return Response.json({ error: "No such member" }, { status: 404 });
+  }
+  if (member.status !== "active") {
+    return Response.json({ error: "That member is suspended" }, { status: 400 });
+  }
+  if (!env.RESEND_API_KEY) {
+    return Response.json({ error: "Email is not configured" }, { status: 503 });
+  }
+
+  const sent = await sendCompedWelcome(context, member.email, member.name);
+  if (!sent) {
+    return Response.json({ error: "The email could not be sent" }, { status: 502 });
+  }
+  return Response.json({ ok: true, emailed: true });
 }
 
 // Email a member a fresh one-time sign-in link, on an admin's say-so.
