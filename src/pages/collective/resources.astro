@@ -42,6 +42,24 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
         </ul>
       </aside>
 
+      <!-- Books worth reading, listed rather than hosted. A scanned copy of
+           an in-copyright title would contradict the guidelines this library
+           asks everyone else to follow, so these point at the publisher. -->
+      <aside class="reading-box">
+        <p class="free-label">Recommended reading</p>
+        <ul class="reading-list">
+          <li>
+            <span class="book-title">From Childhood to Adolescence</span>
+            <span class="book-meta">Maria Montessori · Montessori-Pierson Publishing Company</span>
+            <a class="book-link" href="https://montessori-pierson.com/"
+               target="_blank" rel="noopener noreferrer">Publisher</a>
+          </li>
+        </ul>
+        <p class="reading-note">
+          Have one to add? Mention <strong>@jarinwadiwalla</strong> on the board.
+        </p>
+      </aside>
+
       <section class="res-section drive">
         <!-- Toolbar: breadcrumb on the left, actions on the right. The
              breadcrumb is what tells you whether you're looking at the
@@ -874,5 +892,77 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   .free-links span {
     font-size: var(--text-xs);
     color: var(--color-text-light);
+  }
+
+  /* --- recommended reading --- */
+
+  .reading-box {
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-earth-light);
+    border-radius: var(--radius-md);
+  }
+
+  .reading-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .reading-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'title link' 'meta link';
+    align-items: center;
+    gap: 0 var(--space-md);
+  }
+
+  .book-title {
+    grid-area: title;
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    color: var(--color-earth-dark);
+  }
+
+  .book-meta {
+    grid-area: meta;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .book-link {
+    grid-area: link;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .book-link:hover {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .reading-note {
+    margin: var(--space-md) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  @media (max-width: 520px) {
+    .reading-list li {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'title' 'meta' 'link';
+      gap: 0.25rem;
+    }
+    .book-link { justify-self: start; margin-top: 0.35rem; }
   }
 </style>
