@@ -14,20 +14,24 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     <div id="main" hidden>
       <PortalNav active="gallery" />
 
-      <header class="portal-page-head gal-head">
-        <div>
-          <h1>Gallery</h1>
-          <p>Prepared environments, work in progress, days worth remembering.</p>
-        </div>
-        <button class="gal-action gal-action--primary" id="add-btn" type="button">Add photos</button>
+      <header class="portal-page-head">
+        <h1>Gallery</h1>
+        <p>Prepared environments, work in progress, days worth remembering.</p>
       </header>
+
+      <div class="gal-bar">
+        <nav class="crumbs" id="crumbs" aria-label="Album path"></nav>
+        <div class="gal-actions" id="gal-actions"></div>
+      </div>
 
       <p class="gal-error" id="gal-error" role="alert" hidden></p>
 
-      <div class="photo-grid" id="grid"></div>
+      <div class="album-grid" id="album-grid"></div>
+
+      <div class="photo-grid" id="grid" hidden></div>
 
       <p class="gal-empty" id="empty" hidden>
-        Nothing here yet. Add the first photograph.
+        Nothing in this album yet. Use <strong>Add photos</strong> to start it.
       </p>
 
       <p class="gal-note">
@@ -55,6 +59,9 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 <script>
   const $ = (id: string) => document.getElementById(id)!;
 
+  let albums: any[] = [];
+  let openAlbumId = '';   // '' means the album grid
+  let isAdmin = false;
   let photos: any[] = [];
   let lbIndex = -1;
 
@@ -104,11 +111,121 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     return { blob, width, height };
   }
 
-  // --- rendering ------------------------------------------------
+  // --- albums ---------------------------------------------------
 
-  async function load() {
-    const res = await fetch('/api/community/photos');
-    if (!res.ok) return showError('The gallery could not be loaded.');
+  const currentAlbum = () => albums.find((a) => a.id === openAlbumId);
+
+  function renderBar() {
+    const crumbs = $('crumbs');
+    const actions = $('gal-actions');
+    crumbs.textContent = '';
+    actions.textContent = '';
+
+    const root = el('button', 'crumb', 'Albums');
+    root.setAttribute('type', 'button');
+
+    if (!openAlbumId) {
+      root.classList.add('is-current');
+      crumbs.appendChild(root);
+      if (isAdmin) {
+        const add = el('button', 'gal-action', 'New album');
+        add.setAttribute('type', 'button');
+        add.addEventListener('click', newAlbum);
+        actions.appendChild(add);
+      }
+      return;
+    }
+
+    root.addEventListener('click', openAlbumGrid);
+    crumbs.appendChild(root);
+    crumbs.appendChild(el('span', 'crumb-sep', '/'));
+
+    const a = currentAlbum();
+    crumbs.appendChild(el('span', 'crumb is-current', a?.name || 'Album'));
+
+    const add = el('button', 'gal-action gal-action--primary', 'Add photos');
+    add.setAttribute('type', 'button');
+    add.addEventListener('click', () => ($('file-input') as HTMLInputElement).click());
+    actions.appendChild(add);
+
+    if (a?.can_edit) {
+      const rename = el('button', 'gal-action', 'Rename');
+      rename.setAttribute('type', 'button');
+      rename.addEventListener('click', () => renameAlbum(a));
+      actions.appendChild(rename);
+
+      const del = el('button', 'gal-action', 'Delete album');
+      del.setAttribute('type', 'button');
+      del.addEventListener('click', () => deleteAlbum(a));
+      actions.appendChild(del);
+    }
+  }
+
+  async function loadAlbums(keepOpen = true) {
+    const res = await fetch('/api/community/albums');
+    if (!res.ok) return showError('The albums could not be loaded.');
+    const data = await res.json();
+    albums = data.albums || [];
+    isAdmin = !!data.is_admin;
+
+    if (keepOpen && openAlbumId && currentAlbum()) {
+      openAlbum(openAlbumId);
+    } else {
+      openAlbumGrid();
+    }
+  }
+
+  function openAlbumGrid() {
+    openAlbumId = '';
+    $('album-grid').hidden = false;
+    $('grid').hidden = true;
+    $('empty').hidden = true;
+    renderBar();
+
+    const grid = $('album-grid');
+    grid.textContent = '';
+
+    for (const a of albums) {
+      const tile = el('button', 'album');
+      tile.setAttribute('type', 'button');
+
+      const frame = el('div', 'album-cover');
+      if (a.cover) {
+        const img = el('img') as HTMLImageElement;
+        img.src = a.cover;
+        img.alt = '';
+        img.loading = 'lazy';
+        frame.appendChild(img);
+      } else {
+        frame.appendChild(el('span', 'album-blank', 'No photos yet'));
+      }
+      tile.appendChild(frame);
+
+      const meta = el('div', 'album-meta');
+      meta.appendChild(el('span', 'album-name', a.name));
+      meta.appendChild(
+        el('span', 'album-count', a.count === 1 ? '1 photo' : `${a.count} photos`)
+      );
+      tile.appendChild(meta);
+
+      tile.addEventListener('click', () => openAlbum(a.id));
+      grid.appendChild(tile);
+    }
+  }
+
+  async function openAlbum(id: string) {
+    openAlbumId = id;
+    $('album-grid').hidden = true;
+    $('grid').hidden = false;
+    renderBar();
+    await loadPhotos();
+  }
+
+  // --- photos ---------------------------------------------------
+
+  async function loadPhotos() {
+    const res = await fetch(`/api/community/photos?album_id=${encodeURIComponent(openAlbumId)}`);
+    if (!res.ok) return showError('The photos could not be loaded.');
     const data = await res.json();
     photos = data.photos || [];
 
@@ -136,7 +253,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       cell.appendChild(cap);
 
       if (p.can_delete) {
-        const del = el('button', 'photo-del', '×');
+        const del = el('button', 'photo-del', '\u00d7');
         del.setAttribute('type', 'button');
         del.setAttribute('aria-label', 'Remove this photo');
         del.addEventListener('click', (e) => {
@@ -178,6 +295,43 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
   // --- actions --------------------------------------------------
 
+  async function albumApi(method: string, body: any) {
+    const res = await fetch('/api/community/albums', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, data };
+  }
+
+  async function newAlbum() {
+    const name = window.prompt('Name the album');
+    if (!name) return;
+    const { ok, data } = await albumApi('POST', { name });
+    if (!ok) return showError(data.error || 'That album could not be created.');
+    showError('');
+    loadAlbums(false);
+  }
+
+  async function renameAlbum(a: any) {
+    const name = window.prompt('Rename the album', a.name);
+    if (!name || name === a.name) return;
+    const { ok, data } = await albumApi('PUT', { id: a.id, name });
+    if (!ok) return showError(data.error || 'That album could not be renamed.');
+    showError('');
+    loadAlbums();
+  }
+
+  async function deleteAlbum(a: any) {
+    if (!window.confirm(`Delete the album "${a.name}"?`)) return;
+    const { ok, data } = await albumApi('DELETE', { id: a.id });
+    if (!ok) return showError(data.error || 'That album could not be deleted.');
+    showError('');
+    openAlbumId = '';
+    loadAlbums(false);
+  }
+
   async function handleFiles(e: Event) {
     const input = e.target as HTMLInputElement;
     const files = [...(input.files || [])];
@@ -193,6 +347,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
         form.append('file', new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
         form.append('width', String(width));
         form.append('height', String(height));
+        form.append('album_id', openAlbumId);
 
         const res = await fetch('/api/community/photos', { method: 'POST', body: form });
         if (!res.ok) {
@@ -207,7 +362,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
 
     showError('');
-    load();
+    await loadPhotos();
+    loadAlbums();   // counts and covers change too
   }
 
   async function removePhoto(p: any) {
@@ -222,7 +378,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       return showError(d.error || 'That photo could not be removed.');
     }
     showError('');
-    load();
+    await loadPhotos();
+    loadAlbums();
   }
 
   // --- boot -----------------------------------------------------
@@ -252,7 +409,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       window.location.href = '/collective/';
     });
 
-    $('add-btn').addEventListener('click', () => ($('file-input') as HTMLInputElement).click());
     $('file-input').addEventListener('change', handleFiles);
 
     $('lb-close').addEventListener('click', closeLightbox);
@@ -268,7 +424,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       if (e.key === 'ArrowRight') step(1);
     });
 
-    load();
+    loadAlbums(false);
   }
 
   boot();
@@ -283,33 +439,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     color: var(--color-text-light);
     padding: var(--space-2xl) 0;
   }
-
-  .gal-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-  }
-
-  .gal-action {
-    background: none;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    padding: 0.45rem 1rem;
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    color: var(--color-text-light);
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .gal-action--primary {
-    border-color: var(--color-terracotta);
-    color: var(--color-terracotta-dark);
-  }
-
-  .gal-action:hover { background: var(--color-white); }
 
   .gal-error {
     margin: 0 0 var(--space-md);
@@ -454,5 +583,123 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   @media (max-width: 560px) {
     .photo-grid { column-count: 1; }
     .lb-nav { font-size: 30px; }
+  }
+
+  /* --- album grid --- */
+
+  .gal-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-md);
+  }
+
+  .crumbs { display: flex; align-items: baseline; gap: 0.45rem; min-width: 0; }
+
+  .gallery-page :global(.crumb) {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+
+  .gallery-page :global(button.crumb:hover) { color: var(--color-terracotta-dark); }
+  .gallery-page :global(.crumb.is-current) { color: var(--color-earth-dark); cursor: default; }
+  .gallery-page :global(.crumb-sep) { color: var(--color-cream-dark); font-size: var(--text-lg); }
+
+  .gal-actions { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+
+  .gallery-page :global(.gal-action) {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.32rem 0.85rem;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .gallery-page :global(.gal-action:hover) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+    background: var(--color-white);
+  }
+
+  .gallery-page :global(.gal-action--primary) {
+    border-color: var(--color-terracotta);
+    color: var(--color-terracotta-dark);
+  }
+
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .gallery-page :global(.album) {
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    overflow: hidden;
+    text-align: left;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .gallery-page :global(.album:hover) {
+    border-color: var(--color-terracotta);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-page :global(.album:hover) { transform: none; }
+  }
+
+  /* A fixed 4:3 window, so albums line up however their cover is shaped.
+     Inside an album the photos keep their own proportions. */
+  .gallery-page :global(.album-cover) {
+    aspect-ratio: 4 / 3;
+    background: var(--color-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gallery-page :global(.album-cover img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .gallery-page :global(.album-blank) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .gallery-page :global(.album-meta) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .gallery-page :global(.album-name) {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .gallery-page :global(.album-count) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
   }
 </style>

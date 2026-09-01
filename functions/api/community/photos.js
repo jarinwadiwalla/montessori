@@ -1,7 +1,7 @@
 // The Collective's photo gallery.
 //
-//   GET    /api/community/photos                       — newest first
-//   POST   /api/community/photos  (multipart: file, caption?, width?, height?)
+//   GET    /api/community/photos?album_id=<id>          — newest first
+//   POST   /api/community/photos  (multipart: file, album_id, caption?, width?, height?)
 //   DELETE /api/community/photos  { id }
 //
 // Images only. The browser downscales before uploading, so what arrives
@@ -28,14 +28,19 @@ export async function onRequestGet(context) {
   const { env } = context;
   const isAdmin = member.role === "admin";
 
+  // Scoped to one album; the gallery only ever shows a wall of pictures
+  // once you're inside one.
+  const albumId = new URL(context.request.url).searchParams.get("album_id") || "";
+
   const { results } = await env.SITE_DB.prepare(
     `SELECT p.*, m.name AS uploader_name, m.avatar_url AS uploader_avatar
      FROM community_photos p
      LEFT JOIN community_members m ON m.id = p.member_id
+     WHERE p.album_id = ?
      ORDER BY p.created_at DESC
      LIMIT ?`
   )
-    .bind(PAGE)
+    .bind(albumId, PAGE)
     .all();
 
   return Response.json({
@@ -73,6 +78,14 @@ export async function onRequestPost(context) {
   const file = form.get("file");
   if (!file || typeof file === "string") {
     return Response.json({ error: "No photo was received." }, { status: 400 });
+  }
+
+  const albumId = String(form.get("album_id") || "");
+  const album = await env.SITE_DB.prepare(
+    "SELECT id FROM community_albums WHERE id = ?"
+  ).bind(albumId).first();
+  if (!album) {
+    return Response.json({ error: "Open an album first." }, { status: 400 });
   }
 
   const declared = file.type || "";
@@ -113,12 +126,13 @@ export async function onRequestPost(context) {
   const id = generateId("pho_");
   await env.SITE_DB.prepare(
     `INSERT INTO community_photos
-       (id, member_id, caption, url, r2_key, width, height, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+       (id, member_id, album_id, caption, url, r2_key, width, height, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       id,
       member.id,
+      albumId,
       String(form.get("caption") || "").trim().slice(0, 300),
       `/community-media/${key}`,
       key,
