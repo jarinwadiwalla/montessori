@@ -22,6 +22,26 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
         <p>A shared resource library for the Collective to upload to. Keep titles of documents short and descriptive.</p>
       </header>
 
+      <!-- Free, openly-licensed curricula worth knowing about. Hand-kept
+           rather than uploaded, because these are living sites that get
+           updated, and a link stays current where a downloaded copy
+           quietly goes stale. -->
+      <aside class="free-box">
+        <p class="free-label">Free learning resources</p>
+        <ul class="free-links">
+          <li>
+            <a href="https://www.commonsense.org/education/digital-literacy/grades-9-12"
+               target="_blank" rel="noopener noreferrer">Digital Literacy</a>
+            <span>Common Sense Education, grades 9–12</span>
+          </li>
+          <li>
+            <a href="https://www.oerproject.com/Big-History"
+               target="_blank" rel="noopener noreferrer">Big History</a>
+            <span>OER Project</span>
+          </li>
+        </ul>
+      </aside>
+
       <section class="res-section drive">
         <!-- Toolbar: breadcrumb on the left, actions on the right. The
              breadcrumb is what tells you whether you're looking at the
@@ -801,5 +821,58 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
   /* Touch has no hover, so the arrows are simply always visible. */
   @media (hover: none) {
     .drive :global(.tile-nudge) { opacity: 1; }
+  }
+
+  /* --- free resources box --- */
+
+  .free-box {
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-terracotta);
+    border-radius: var(--radius-md);
+  }
+
+  .free-label {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-terracotta-dark);
+  }
+
+  .free-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .free-links li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .free-links a {
+    font-size: var(--text-sm);
+    color: var(--color-earth-dark);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-cream-dark);
+  }
+
+  .free-links a:hover {
+    color: var(--color-terracotta-dark);
+    text-decoration-color: var(--color-terracotta);
+  }
+
+  .free-links span {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
   }
 </style>
