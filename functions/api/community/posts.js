@@ -32,7 +32,7 @@ export async function onRequestGet(context) {
      FROM community_posts p
      JOIN community_members m ON m.id = p.member_id
      WHERE p.status = 'visible' ${filtered ? "AND p.space = ?" : ""}
-     ORDER BY p.created_at DESC
+     ORDER BY (p.pinned_at != '') DESC, p.pinned_at DESC, p.created_at DESC
      LIMIT ? OFFSET ?`
   )
     .bind(...(filtered ? [space] : []), PAGE_SIZE + 1, offset)
@@ -76,7 +76,10 @@ export async function onRequestGet(context) {
         country: p.author_country || "",
       },
       attachments: attachmentsByPost[p.id] || [],
+      pinned: !!p.pinned_at,
       can_delete: p.member_id === member.id || member.role === "admin",
+      // Holding a post at the top of everyone's feed is an organiser's call.
+      can_pin: member.role === "admin",
     })),
     page,
     hasMore,
@@ -204,6 +207,50 @@ export async function onRequestPost(context) {
       can_delete: true,
     },
   });
+}
+
+/**
+ * PUT /api/community/posts  { id, action: 'pin' | 'unpin' }
+ *
+ * Organisers only: a pin changes what every member sees first, which is
+ * not something one member should be able to do to everyone else's feed.
+ */
+export async function onRequestPut(context) {
+  const { member, response } = await requireMember(context);
+  if (response) return response;
+
+  const { env } = context;
+
+  let payload;
+  try {
+    payload = await context.request.json();
+  } catch {
+    return Response.json({ error: "Invalid request." }, { status: 400 });
+  }
+
+  const id = String(payload.id || "");
+  const action = payload.action === "unpin" ? "unpin" : "pin";
+  if (!id) return Response.json({ error: "Invalid request." }, { status: 400 });
+
+  if (member.role !== "admin") {
+    return Response.json(
+      { error: "Only an organiser can pin a post." },
+      { status: 403 }
+    );
+  }
+
+  const post = await env.SITE_DB.prepare(
+    "SELECT id FROM community_posts WHERE id = ? AND status = 'visible'"
+  ).bind(id).first();
+  if (!post) return Response.json({ error: "Not found." }, { status: 404 });
+
+  await env.SITE_DB.prepare(
+    "UPDATE community_posts SET pinned_at = ?, updated_at = ? WHERE id = ?"
+  )
+    .bind(action === "pin" ? new Date().toISOString() : "", new Date().toISOString(), id)
+    .run();
+
+  return Response.json({ ok: true, pinned: action === "pin" });
 }
 
 export async function onRequestDelete(context) {

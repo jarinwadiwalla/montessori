@@ -640,8 +640,12 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   });
 
   function renderPost(post: any) {
-    const article = el('article', 'post');
+    const article = el('article', post.pinned ? 'post is-pinned' : 'post');
     article.dataset.postId = post.id;
+
+    if (post.pinned) {
+      article.appendChild(el('span', 'pin-flag', 'Pinned'));
+    }
 
     const head = el('header', 'post-head');
     head.appendChild(avatarFor(post.author));
@@ -683,6 +687,22 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     // No per-post report button — anything amiss goes straight to the
     // team (see Start here). Admins can still delete anything.
+
+    if (post.can_pin) {
+      const pin = el('button', 'action-btn', post.pinned ? 'Unpin' : 'Pin to top');
+      pin.addEventListener('click', async () => {
+        (pin as HTMLButtonElement).disabled = true;
+        const { ok } = await api('/api/community/posts', {
+          method: 'PUT',
+          body: JSON.stringify({ id: post.id, action: post.pinned ? 'unpin' : 'pin' }),
+        });
+        // Reload rather than reorder by hand: a pin changes where the post
+        // sits in the list, and moving one card without the rest looks broken.
+        if (ok) loadFeed(true);
+        else (pin as HTMLButtonElement).disabled = false;
+      });
+      actions.appendChild(pin);
+    }
 
     if (post.can_delete) {
       const del = el('button', 'action-btn action-btn--danger', 'Delete');
@@ -1288,5 +1308,26 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     font-family: var(--font-body);
     font-size: var(--text-sm);
     cursor: pointer;
+  }
+
+  /* --- pinned posts --- */
+
+  .feed :global(.post.is-pinned) {
+    position: relative;
+    border-color: var(--color-terracotta);
+  }
+
+  .feed :global(.pin-flag) {
+    position: absolute;
+    top: -9px;
+    left: var(--space-lg);
+    background: var(--color-terracotta);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 0.1rem 0.6rem;
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 </style>

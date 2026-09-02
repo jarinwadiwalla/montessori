@@ -177,3 +177,9 @@ CREATE INDEX IF NOT EXISTS idx_notifications_member
   ON community_notifications(member_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_notifications_unread
   ON community_notifications(member_id, read_at);
+
+-- Pinned posts ------------------------------------------------
+-- Added 2026-09-02. Organisers can hold a post at the top of the feed.
+-- Empty means unpinned; a timestamp means pinned, and the most recently
+-- pinned sits highest so a new pin does not hide behind an older one.
+ALTER TABLE community_posts ADD COLUMN pinned_at TEXT DEFAULT '';
