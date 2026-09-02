@@ -64,6 +64,7 @@
       <div class="sub-tab active" data-sub="blog-editor">Editor</div>
       <div class="sub-tab" data-sub="blog-drafts">Drafts</div>
       <div class="sub-tab" data-sub="blog-published">Published</div>
+      <div class="sub-tab" data-sub="blog-ideas">Ideas</div>
     </div>
 
     <!-- Blog Editor -->
@@ -158,6 +159,41 @@
       <div class="card">
         <h3>Published Posts</h3>
         <div id="published-list"><p class="empty-state">Loading...</p></div>
+      </div>
+    </div>
+
+    <!-- Blog Ideas: a running list of what to write next. Stored in the
+         settings blob like Notes, so it needs no table of its own. -->
+    <div class="sub-section" id="sub-blog-ideas">
+      <div class="card">
+        <h3>Add an idea</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="idea-title" class="form-input" placeholder="What a day actually looks like in a Montessori adolescent programme">
+          </div>
+          <div class="form-group" style="max-width:220px;">
+            <label class="form-label">Status</label>
+            <select id="idea-status" class="form-input">
+              <option value="idea">Idea</option>
+              <option value="drafting">Drafting</option>
+              <option value="done">Published</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes — the angle, what to include, which resources to pull from</label>
+          <textarea id="idea-notes" class="form-input" rows="3" placeholder="Why this one, and what it should cover"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="ideaAdd()">Add idea</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;">Ideas</h3>
+          <span id="idea-count" style="font-size:12px;color:var(--gray-500);"></span>
+        </div>
+        <div id="idea-list"><p class="empty-state">Loading...</p></div>
       </div>
     </div>
   </div>
@@ -615,6 +651,7 @@
 
 <script src="/guru/js/guru-core.js"></script>
 <script src="/guru/js/guru-blog.js"></script>
+<script src="/guru/js/guru-ideas.js"></script>
 <script src="/guru/js/guru-newsletter.js"></script>
 <script src="/guru/js/guru-comments.js"></script>
 <script src="/guru/js/guru-notes.js"></script>

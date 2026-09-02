@@ -99,6 +99,7 @@ function setupSubTabs() {
 
       if (subName === "blog-drafts") blogLoadDrafts();
       if (subName === "blog-published") blogLoadPublished();
+      if (subName === "blog-ideas") ideasLoad();
       if (subName === "nl-campaigns") nlLoadCampaigns();
       if (subName === "nl-templates") nlLoadTemplatesList();
       if (subName === "nl-retries") nlLoadRetries();
