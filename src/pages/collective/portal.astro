@@ -799,7 +799,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   function attachMentions(field: HTMLTextAreaElement | null) {
-    if (!field) return;
+    // Must already be in the document: this wraps the field in a holder,
+    // and a detached node has no parent to insert that holder into.
+    // Failing loudly here once took the whole comment form down with it.
+    if (!field || !field.parentNode) return;
 
     // The list is positioned against a wrapper so it can sit under the
     // field without depending on where the field is on screen.
@@ -898,7 +901,6 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     input.placeholder = 'Write a reply…';
     const send = el('button', 'comment-send', 'Reply');
     const err = el('p', 'form-error');
-    attachMentions(input);
 
     send.addEventListener('click', async () => {
       const body = input.value.trim();
@@ -923,6 +925,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     form.appendChild(send);
     form.appendChild(err);
     wrap.appendChild(form);
+
+    // Only once the field is in the document: attachMentions wraps it, and
+    // a detached node has no parent to wrap it against.
+    attachMentions(input);
   }
 
   function renderComment(c: any) {
