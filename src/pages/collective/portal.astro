@@ -504,6 +504,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     loadFeed(true);
   });
 
+  attachMentions(document.getElementById('composer-body') as HTMLTextAreaElement);
+
   $('signout-btn').addEventListener('click', async () => {
     await fetch('/api/community/logout', { method: 'POST' });
     window.location.href = '/collective/';
@@ -771,6 +773,111 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     return frame;
   }
 
+  // ---- @mention autocomplete -----------------------------------
+  //
+  // Typing "@" then a few letters offers matching members and inserts the
+  // real handle. Mentions are the only thing that notifies anyone here, so
+  // a mistyped handle silently reaches nobody — this makes that hard to do
+  // by accident.
+
+  let _mentionPeople: any[] | null = null;
+
+  async function mentionPeople() {
+    if (_mentionPeople) return _mentionPeople;
+    const { ok, data } = await api('/api/community/members');
+    // Members without a handle can't be mentioned, so leave them out.
+    _mentionPeople = ok ? (data.members || []).filter((m: any) => m.handle) : [];
+    return _mentionPeople;
+  }
+
+  /** The @word being typed at the caret, or null. */
+  function mentionToken(field: HTMLTextAreaElement) {
+    const upto = field.value.slice(0, field.selectionStart ?? 0);
+    const m = upto.match(/(^|\s)@([a-z0-9_]*)$/i);
+    if (!m) return null;
+    return { query: m[2].toLowerCase(), start: upto.length - m[2].length - 1 };
+  }
+
+  function attachMentions(field: HTMLTextAreaElement | null) {
+    if (!field) return;
+
+    // The list is positioned against a wrapper so it can sit under the
+    // field without depending on where the field is on screen.
+    const holder = el('div', 'mention-holder');
+    field.parentNode!.insertBefore(holder, field);
+    holder.appendChild(field);
+
+    const list = el('div', 'mention-list');
+    list.hidden = true;
+    holder.appendChild(list);
+
+    let matches: any[] = [];
+    let active = 0;
+
+    const close = () => { list.hidden = true; matches = []; active = 0; };
+
+    function paint() {
+      list.textContent = '';
+      matches.forEach((m, i) => {
+        const row = el('button', `mention-row${i === active ? ' is-active' : ''}`);
+        row.setAttribute('type', 'button');
+        if (m.avatar_url) {
+          const img = el('img', 'mention-avatar') as HTMLImageElement;
+          img.src = m.avatar_url;
+          img.alt = '';
+          row.appendChild(img);
+        } else {
+          row.appendChild(el('span', 'mention-avatar mention-avatar--blank'));
+        }
+        const txt = el('span', 'mention-text');
+        txt.appendChild(el('span', 'mention-name', m.name));
+        txt.appendChild(el('span', 'mention-handle', '@' + m.handle));
+        row.appendChild(txt);
+        // mousedown, not click: the field blurs first on click and the
+        // caret position we need is gone by then.
+        row.addEventListener('mousedown', (e) => { e.preventDefault(); choose(m); });
+        list.appendChild(row);
+      });
+      list.hidden = matches.length === 0;
+    }
+
+    function choose(m: any) {
+      const tok = mentionToken(field);
+      if (!tok) return close();
+      const before = field.value.slice(0, tok.start);
+      const after = field.value.slice(field.selectionStart ?? 0);
+      field.value = `${before}@${m.handle} ${after}`;
+      const caret = before.length + m.handle.length + 2;
+      field.setSelectionRange(caret, caret);
+      field.focus();
+      close();
+    }
+
+    field.addEventListener('input', async () => {
+      const tok = mentionToken(field);
+      if (!tok) return close();
+      const people = await mentionPeople();
+      matches = people
+        .filter((m: any) =>
+          !tok.query ||
+          m.handle.toLowerCase().startsWith(tok.query) ||
+          m.name.toLowerCase().includes(tok.query))
+        .slice(0, 6);
+      active = 0;
+      paint();
+    });
+
+    field.addEventListener('keydown', (e) => {
+      if (list.hidden || !matches.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % matches.length; paint(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + matches.length) % matches.length; paint(); }
+      else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); choose(matches[active]); }
+      else if (e.key === 'Escape') { close(); }
+    });
+
+    field.addEventListener('blur', () => setTimeout(close, 120));
+  }
+
   // ---- comments -----------------------------------------------
 
   async function loadComments(postId: string, wrap: HTMLElement) {
@@ -791,6 +898,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     input.placeholder = 'Write a reply…';
     const send = el('button', 'comment-send', 'Reply');
     const err = el('p', 'form-error');
+    attachMentions(input);
 
     send.addEventListener('click', async () => {
       const body = input.value.trim();
@@ -1329,5 +1437,72 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     font-size: 10px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  /* --- @mention autocomplete --- */
+
+  .feed :global(.mention-holder),
+  .composer :global(.mention-holder) { position: relative; }
+
+  .feed :global(.mention-list),
+  .composer :global(.mention-list) {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    top: 100%;
+    margin-top: 4px;
+    min-width: 240px;
+    max-width: 320px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 24px rgba(30, 21, 15, 0.12);
+    overflow: hidden;
+  }
+
+  .feed :global(.mention-row),
+  .composer :global(.mention-row) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: 0.5rem var(--space-md);
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+
+  .feed :global(.mention-row.is-active),
+  .composer :global(.mention-row.is-active),
+  .feed :global(.mention-row:hover),
+  .composer :global(.mention-row:hover) { background: var(--color-cream); }
+
+  .feed :global(.mention-avatar),
+  .composer :global(.mention-avatar) {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .feed :global(.mention-avatar--blank),
+  .composer :global(.mention-avatar--blank) { background: var(--color-cream-dark); }
+
+  .feed :global(.mention-text),
+  .composer :global(.mention-text) { display: flex; flex-direction: column; min-width: 0; }
+
+  .feed :global(.mention-name),
+  .composer :global(.mention-name) {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .feed :global(.mention-handle),
+  .composer :global(.mention-handle) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
   }
 </style>
