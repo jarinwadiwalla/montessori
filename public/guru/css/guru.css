@@ -215,6 +215,8 @@ tr:hover td { background: var(--gray-50); }
 .tier-subscriber { background: var(--gray-100); color: var(--gray-600); }
 .tier-founding { background: #fef3c7; color: #92400e; }
 .tier-donor { background: #ede4f8; color: #5a3d7a; }
+.tier-collective { background: #f6e6d9; color: #8a4f26; }
+.tier-waitlist { background: #ece6df; color: #6b5a4a; }
 .tier-all { background: #dbeafe; color: #1e40af; }
 .tier-test { background: var(--gray-100); color: var(--gray-500); }
 .tier-custom { background: #e0e7ff; color: #3730a3; }

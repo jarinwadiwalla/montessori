@@ -11,6 +11,17 @@ export async function onRequestPost(context) {
     return Response.json({ error: "oldEmail is required" }, { status: 400 });
   }
 
+  // Tier decides who a send reaches, so an unknown value is refused rather
+  // than stored: a blank tier would quietly drop someone out of a
+  // Subscribers-only send, or lift them into a general one.
+  const TIERS = ["subscriber", "founding", "donor", "collective", "waitlist"];
+  if (tier !== undefined && !TIERS.includes(tier)) {
+    return Response.json(
+      { error: `Unknown tier: ${JSON.stringify(tier)}` },
+      { status: 400 }
+    );
+  }
+
   const subscriber = await env.SITE_DB.prepare(
     "SELECT * FROM subscribers WHERE email = ?"
   ).bind(oldEmail).first();

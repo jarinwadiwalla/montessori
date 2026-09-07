@@ -579,7 +579,14 @@ function openSubscriberEdit(email, first, last, tier, pref) {
   document.getElementById("sub-edit-email").value = email;
   document.getElementById("sub-edit-first").value = first;
   document.getElementById("sub-edit-last").value = last;
-  document.getElementById("sub-edit-tier").value = tier;
+  // A tier with no matching <option> would leave the select on "" and
+  // saving would wipe the real value, so carry it in as its own option.
+  const tierEl = document.getElementById("sub-edit-tier");
+  tierEl.value = tier;
+  if (tierEl.value !== tier) {
+    tierEl.add(new Option(tier, tier));
+    tierEl.value = tier;
+  }
   document.getElementById("sub-edit-pref").value = pref;
   document.getElementById("subscriber-edit-overlay").classList.add("active");
 }
