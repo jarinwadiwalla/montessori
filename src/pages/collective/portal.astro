@@ -680,6 +680,37 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     // Actions
     const actions = el('div', 'post-actions');
 
+    // Heart first: it's the lightest way to answer a post, and the one
+    // most people will reach for.
+    const heart = el('button', `action-btn heart-btn${post.hearted ? ' is-on' : ''}`);
+    const paintHeart = () => {
+      heart.textContent = post.hearted ? '\u2665' : '\u2661';
+      if (post.hearts) heart.appendChild(el('span', 'heart-count', String(post.hearts)));
+      heart.classList.toggle('is-on', !!post.hearted);
+      heart.setAttribute('aria-label', post.hearted ? 'Remove your heart' : 'Heart this post');
+    };
+    paintHeart();
+    heart.addEventListener('click', async () => {
+      // Flip straight away, then correct from the server: waiting a round
+      // trip to shade a heart feels broken.
+      post.hearted = !post.hearted;
+      post.hearts = Math.max(0, (post.hearts || 0) + (post.hearted ? 1 : -1));
+      paintHeart();
+      const { ok, data } = await api('/api/community/reactions', {
+        method: 'POST',
+        body: JSON.stringify({ post_id: post.id }),
+      });
+      if (ok) {
+        post.hearted = data.hearted;
+        post.hearts = data.hearts;
+      } else {
+        post.hearted = !post.hearted;
+        post.hearts = Math.max(0, (post.hearts || 0) + (post.hearted ? 1 : -1));
+      }
+      paintHeart();
+    });
+    actions.appendChild(heart);
+
     const commentToggle = el(
       'button',
       'action-btn',
@@ -940,10 +971,73 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     const cflag = flagEmoji(c.author.country || '');
     head.appendChild(el('span', 'comment-author', c.author.name + (cflag ? ` ${cflag}` : '')));
     head.appendChild(el('span', 'comment-time', timeAgo(c.created_at)));
+    // Marked rather than silent: nobody should be able to quietly change
+    // what they said after someone replied to it.
+    if (c.edited_at) head.appendChild(el('span', 'comment-edited', 'edited'));
     main.appendChild(head);
     main.appendChild(withMentions('comment-body', c.body));
 
     const actions = el('div', 'comment-actions');
+
+    if (c.can_edit) {
+      const edit = el('button', 'action-btn', 'Edit');
+      edit.addEventListener('click', () => {
+        const box = document.createElement('textarea');
+        box.className = 'comment-edit';
+        box.value = c.body;
+        box.rows = 3;
+        box.maxLength = 3000;
+
+        const save = el('button', 'comment-send', 'Save');
+        const cancel = el('button', 'action-btn', 'Cancel');
+        const err = el('p', 'form-error');
+        const form = el('div', 'comment-form');
+        form.appendChild(box);
+        form.appendChild(save);
+        form.appendChild(cancel);
+        form.appendChild(err);
+
+        const bodyEl = main.querySelector('.comment-body') as HTMLElement;
+        bodyEl.hidden = true;
+        actions.hidden = true;
+        main.insertBefore(form, actions);
+        // Only once it's in the document: attachMentions wraps the field.
+        attachMentions(box);
+        box.focus();
+
+        const restore = () => {
+          form.remove();
+          bodyEl.hidden = false;
+          actions.hidden = false;
+        };
+        cancel.addEventListener('click', restore);
+
+        save.addEventListener('click', async () => {
+          const body = box.value.trim();
+          if (!body) return;
+          (save as HTMLButtonElement).disabled = true;
+          const { ok, data } = await api('/api/community/comments', {
+            method: 'PUT',
+            body: JSON.stringify({ id: c.id, body }),
+          });
+          (save as HTMLButtonElement).disabled = false;
+          if (!ok) {
+            err.textContent = data.error || 'That could not be saved.';
+            return;
+          }
+          c.body = data.body;
+          c.edited_at = data.edited_at;
+          const fresh = withMentions('comment-body', c.body);
+          main.replaceChild(fresh, bodyEl);
+          if (!head.querySelector('.comment-edited')) {
+            head.appendChild(el('span', 'comment-edited', 'edited'));
+          }
+          form.remove();
+          actions.hidden = false;
+        });
+      });
+      actions.appendChild(edit);
+    }
 
     if (c.can_delete) {
       const del = el('button', 'action-btn action-btn--danger', 'Delete');
@@ -1510,5 +1604,42 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .composer :global(.mention-handle) {
     font-size: var(--text-xs);
     color: var(--color-text-light);
+  }
+
+  /* --- hearts --- */
+
+  .feed :global(.heart-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--text-base);
+    line-height: 1;
+  }
+
+  .feed :global(.heart-btn.is-on) {
+    color: var(--color-terracotta-dark);
+    border-color: var(--color-terracotta);
+  }
+
+  .feed :global(.heart-count) { font-size: var(--text-xs); }
+
+  /* --- edited comments --- */
+
+  .feed :global(.comment-edited) {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    font-style: italic;
+    margin-left: 0.4rem;
+  }
+
+  .feed :global(.comment-edit) {
+    width: 100%;
+    resize: vertical;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
   }
 </style>

@@ -38,7 +38,11 @@ export async function onRequestGet(context) {
         avatar_url: c.author_avatar || "",
         country: c.author_country || "",
       },
+      edited_at: c.edited_at || "",
       can_delete: c.member_id === member.id || member.role === "admin",
+      // Only the author edits their own words. An organiser can remove a
+      // comment but not rewrite what someone said.
+      can_edit: c.member_id === member.id,
     })),
   });
 }
@@ -125,6 +129,69 @@ export async function onRequestPost(context) {
       can_delete: true,
     },
   });
+}
+
+/**
+ * PUT /api/community/comments  { id, body }
+ *
+ * Authors only. An organiser can delete a comment but never rewrite it —
+ * putting words in someone's mouth is a different power from removing
+ * them, and this board runs on people speaking candidly.
+ *
+ * Edits are marked rather than silent, so nobody can quietly change what
+ * they said after it was replied to.
+ */
+export async function onRequestPut(context) {
+  const { member, response } = await requireMember(context);
+  if (response) return response;
+
+  const { env } = context;
+
+  let payload;
+  try {
+    payload = await context.request.json();
+  } catch {
+    return Response.json({ error: "Invalid request." }, { status: 400 });
+  }
+
+  const id = String(payload.id || "");
+  const body = String(payload.body || "").trim();
+  if (!id || !body) {
+    return Response.json({ error: "Write something before saving." }, { status: 400 });
+  }
+  if (body.length > MAX_BODY) {
+    return Response.json(
+      { error: `Comments are limited to ${MAX_BODY} characters.` },
+      { status: 400 }
+    );
+  }
+
+  const comment = await env.SITE_DB.prepare(
+    "SELECT * FROM community_comments WHERE id = ? AND status = 'visible'"
+  ).bind(id).first();
+  if (!comment) return Response.json({ error: "Not found." }, { status: 404 });
+
+  if (comment.member_id !== member.id) {
+    return Response.json(
+      { error: "You can only edit your own comments." },
+      { status: 403 }
+    );
+  }
+
+  const now = new Date().toISOString();
+  await env.SITE_DB.prepare(
+    "UPDATE community_comments SET body = ?, edited_at = ? WHERE id = ?"
+  ).bind(body, now, id).run();
+
+  // A mention added while editing should still reach the person.
+  await notifyMentions(context, {
+    text: body,
+    author: member,
+    kind: "comment",
+    postId: comment.post_id,
+  });
+
+  return Response.json({ ok: true, body, edited_at: now });
 }
 
 export async function onRequestDelete(context) {

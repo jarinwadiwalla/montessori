@@ -41,6 +41,25 @@ export async function onRequestGet(context) {
   const hasMore = posts.length > PAGE_SIZE;
   const pagePosts = posts.slice(0, PAGE_SIZE);
 
+  // Hearts for this page in one pass, rather than a query per post.
+  let heartsByPost = {};
+  let myHearts = new Set();
+  if (pagePosts.length) {
+    const ph = pagePosts.map(() => "?").join(",");
+    const ids = pagePosts.map((p) => p.id);
+    const { results: rows } = await env.SITE_DB.prepare(
+      `SELECT post_id, COUNT(*) AS n FROM community_reactions
+       WHERE post_id IN (${ph}) GROUP BY post_id`
+    ).bind(...ids).all();
+    for (const r of rows || []) heartsByPost[r.post_id] = r.n;
+
+    const { results: mine } = await env.SITE_DB.prepare(
+      `SELECT post_id FROM community_reactions
+       WHERE member_id = ? AND post_id IN (${ph})`
+    ).bind(member.id, ...ids).all();
+    for (const r of mine || []) myHearts.add(r.post_id);
+  }
+
   // Fetch attachments for this page in one query.
   let attachmentsByPost = {};
   if (pagePosts.length) {
@@ -77,6 +96,8 @@ export async function onRequestGet(context) {
       },
       attachments: attachmentsByPost[p.id] || [],
       pinned: !!p.pinned_at,
+      hearts: heartsByPost[p.id] || 0,
+      hearted: myHearts.has(p.id),
       can_delete: p.member_id === member.id || member.role === "admin",
       // Holding a post at the top of everyone's feed is an organiser's call.
       can_pin: member.role === "admin",
