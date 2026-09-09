@@ -29,15 +29,22 @@ const Element = href ? 'a' : 'div';
     flex-direction: column;
     background: var(--color-white);
     border-top: 2px solid #d0905b;
-    padding: var(--space-xl) var(--space-lg) var(--space-lg);
-    transition: transform 0.25s;
+    border-radius: 2px 2px var(--radius-lg) var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.25s, box-shadow 0.25s;
     color: inherit;
     text-decoration: none;
   }
 
   a.card:hover {
     transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
     color: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a.card:hover { transform: none; }
   }
 
   .card-tag {
@@ -46,7 +53,7 @@ const Element = href ? 'a' : 'div';
     font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(208, 144, 91, 0.85);
+    color: var(--color-earth);
     margin-bottom: var(--space-md);
     display: flex;
     align-items: center;
@@ -64,16 +71,16 @@ const Element = href ? 'a' : 'div';
 
   .card-title {
     font-family: 'Georgia Pro', Georgia, 'Times New Roman', serif;
-    font-size: var(--text-xl);
-    font-weight: 300;
+    font-size: var(--text-2xl);
+    font-weight: 400;
     color: var(--color-earth-dark);
-    line-height: 1.3;
-    margin-bottom: var(--space-sm);
+    line-height: 1.25;
+    margin-bottom: var(--space-md);
   }
 
   .card-description {
-    font-size: var(--text-sm);
-    color: var(--color-text-light);
+    font-size: var(--text-base);
+    color: var(--color-earth);
     line-height: var(--leading-relaxed);
     flex: 1;
     margin-bottom: var(--space-lg);
