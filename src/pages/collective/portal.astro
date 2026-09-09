@@ -88,6 +88,14 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     <div id="portal-main" hidden>
       <PortalNav active="board" />
 
+      <header class="feed-masthead">
+        <img class="masthead-mark" src="/images/logo-terracotta-mark.png" alt="" width="46" height="46" />
+        <div>
+          <h1>The Collective</h1>
+          <p>A shared room for third-plane practitioners.</p>
+        </div>
+      </header>
+
       <!-- Space header, shown when the feed is filtered to one space -->
       <section class="space-head" id="space-head" hidden>
         <h2 id="space-title"></h2>
@@ -1070,6 +1078,49 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     max-width: 1100px;
   }
 
+  /* Masthead — the feed opened straight onto a composer, with nothing to
+     arrive at. The mark and the serif give the room a name. */
+  .feed-masthead {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* A short accent rule sitting on the hairline, not replacing it. */
+  .feed-masthead::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 64px;
+    height: 2px;
+    background: var(--color-terracotta);
+  }
+
+  .masthead-mark {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .feed-masthead h1 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+  }
+
+  .feed-masthead p {
+    margin: 0.15rem 0 0;
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+
   .portal-loading,
   .feed-empty {
     text-align: center;
@@ -1089,7 +1140,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
   .profile-setup h2 {
     font-family: var(--font-heading);
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
     font-size: var(--text-2xl);
   }
 
@@ -1145,8 +1196,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     margin-left: var(--space-sm);
     padding: 0.1rem 0.5rem;
     border-radius: 999px;
-    background: var(--color-lavender);
-    color: var(--color-purple);
+    background: rgba(208, 144, 91, 0.16);
+    color: var(--color-earth-dark);
     font-size: 0.7rem;
   }
 
@@ -1175,14 +1226,14 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .profile-setup .ghost:hover {
-    border-color: var(--color-purple);
-    color: var(--color-purple);
+    border-color: var(--color-earth-dark);
+    color: var(--color-earth-dark);
   }
 
   .profile-setup button,
   .post-btn,
   .feed :global(.comment-send) {
-    background: var(--color-purple);
+    background: var(--color-earth-dark);
     color: var(--color-white);
     border: none;
     padding: 0.8rem 1.6rem;
@@ -1215,7 +1266,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .lapsed h2 {
     font-family: var(--font-heading);
     font-size: var(--text-2xl);
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
     margin-bottom: var(--space-md);
   }
 
@@ -1231,7 +1282,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .lapsed button {
-    background: var(--color-purple);
+    background: var(--color-earth-dark);
     color: var(--color-white);
     border: none;
     padding: 0.9rem 1.8rem;
@@ -1248,7 +1299,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .lapsed-help a {
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
   }
 
   /* Exchange opt-in */
@@ -1281,6 +1332,19 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     margin-bottom: var(--space-2xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* The default focus ring is a blue that belongs to no palette here. */
+  .profile-setup input[type='text']:focus,
+  .profile-setup input[type='password']:focus,
+  .profile-setup select:focus,
+  .profile-setup textarea:focus,
+  .feed :global(.comment-form textarea:focus),
+  .composer textarea:focus {
+    outline: none;
+    border-color: var(--color-terracotta);
+    box-shadow: 0 0 0 3px rgba(208, 144, 91, 0.18);
   }
 
   .composer textarea {
@@ -1298,8 +1362,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    background: var(--color-lavender);
-    color: var(--color-purple);
+    background: rgba(208, 144, 91, 0.16);
+    color: var(--color-earth-dark);
     border-radius: 999px;
     padding: 0.3rem 0.5rem 0.3rem 0.8rem;
     font-size: var(--text-xs);
@@ -1308,7 +1372,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .composer-attachments :global(.chip-remove) {
     background: none;
     border: none;
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
@@ -1334,8 +1398,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .tool-btn:hover {
-    border-color: var(--color-purple);
-    color: var(--color-purple);
+    border-color: var(--color-earth-dark);
+    color: var(--color-earth-dark);
   }
 
   .feed :global(.post-btn) {
@@ -1349,6 +1413,12 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .feed :global(.post:hover) {
+    box-shadow: var(--shadow-md);
   }
 
   .feed :global(.post-head) {
@@ -1370,8 +1440,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-lavender);
-    color: var(--color-purple);
+    background: var(--color-terracotta-light);
+    color: var(--color-earth-dark);
     font-family: var(--font-heading);
   }
 
@@ -1382,8 +1452,10 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
   .feed :global(.post-author),
   .feed :global(.comment-author) {
-    color: var(--color-purple);
-    font-weight: 500;
+    font-family: var(--font-heading);
+    font-size: 1.02em;
+    color: var(--color-earth-dark);
+    font-weight: 600;
   }
 
   .feed :global(.post-time),
@@ -1401,8 +1473,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .feed :global(.mention) {
-    color: var(--color-purple);
-    background: var(--color-lavender);
+    color: var(--color-earth-dark);
+    background: rgba(208, 144, 91, 0.16);
     border-radius: 4px;
     padding: 0 3px;
     font-weight: 500;
@@ -1426,7 +1498,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     background: var(--color-cream);
     border-radius: var(--radius-md);
     padding: 0.7rem 1rem;
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
     text-decoration: none;
     font-size: var(--text-sm);
   }
@@ -1466,7 +1538,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .feed :global(.action-btn:hover) {
-    color: var(--color-purple);
+    color: var(--color-earth-dark);
   }
 
   .feed :global(.action-btn--danger:hover) {
@@ -1475,9 +1547,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
   /* Comments */
   .feed :global(.comments) {
-    margin-top: var(--space-lg);
-    padding-top: var(--space-md);
+    margin: var(--space-lg) calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg));
+    padding: var(--space-md) var(--space-lg) var(--space-sm);
     border-top: 1px solid var(--color-border);
+    background: rgba(208, 144, 91, 0.09);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
   }
 
   .feed :global(.comment) {
@@ -1509,8 +1583,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     display: block;
     margin: 0 auto var(--space-2xl);
     background: none;
-    border: 1px solid var(--color-purple);
-    color: var(--color-purple);
+    border: 1px solid var(--color-earth-dark);
+    color: var(--color-earth-dark);
     border-radius: 999px;
     padding: 0.7rem 1.6rem;
     font-family: var(--font-body);
@@ -1530,7 +1604,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     top: -9px;
     left: var(--space-lg);
     background: var(--color-terracotta);
-    color: var(--color-white);
+    color: var(--color-earth-dark);
+    font-weight: 600;
     border-radius: 999px;
     padding: 0.1rem 0.6rem;
     font-family: var(--font-body);
