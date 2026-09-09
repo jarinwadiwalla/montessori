@@ -24,10 +24,13 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   <div class="container">
     <div class="stage-grid">
       <div class="stage">
-        <p class="stage-name">Farm-Based Residential Living</p>
+        <p class="stage-name">Farm-Based Community Living</p>
       </div>
       <div class="stage">
-        <p class="stage-name">A Center of Study and Work</p>
+        <p class="stage-name">A Center for Study and Work</p>
+      </div>
+      <div class="stage">
+        <p class="stage-name">Project Based Academic Integration</p>
       </div>
     </div>
   </div>
@@ -113,10 +116,14 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 
   .stage-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--space-2xl);
-    max-width: 820px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xl);
+    max-width: 900px;
     margin: 0 auto var(--space-3xl);
+  }
+
+  @media (max-width: 780px) {
+    .stage-grid { grid-template-columns: minmax(0, 1fr); }
   }
 
   /* An arch rather than a rectangle: these are read, not clicked, and the
