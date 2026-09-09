@@ -616,33 +616,43 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
 
   .folder-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: var(--space-sm);
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: var(--space-md);
   }
 
   .drive :global(.folder-tile) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.3rem;
-    padding: var(--space-md) var(--space-sm);
+    gap: 0.45rem;
+    padding: var(--space-md) var(--space-sm) 0.9rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     background: var(--color-white);
-    font-family: var(--font-body);
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    color: var(--color-earth-dark);
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.15s, background-color 0.15s;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s,
+      transform 0.15s;
   }
 
   .drive :global(.folder-tile:hover) {
     background: var(--color-cream);
     border-color: var(--color-terracotta);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drive :global(.folder-tile:hover) { transform: none; }
   }
 
   .drive :global(.folder-icon) {
-    width: 22px;
-    height: 22px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     fill: var(--color-terracotta);
   }
@@ -672,6 +682,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     border-radius: var(--radius-lg);
     background: var(--color-white);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
   }
 
   .file-head,
@@ -859,6 +870,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     border: 1px solid var(--color-border);
     border-left: 3px solid var(--color-terracotta);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
   }
 
   .free-label {
@@ -866,7 +878,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--color-terracotta-dark);
+    color: var(--color-earth);
   }
 
   .free-links {
@@ -912,6 +924,7 @@ const ACCEPT = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.doc,.pptx,.ppt,.xlsx,.xls
     border: 1px solid var(--color-border);
     border-left: 3px solid var(--color-earth-light);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
   }
 
   .reading-list {

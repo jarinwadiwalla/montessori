@@ -459,11 +459,17 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .photo-grid :global(.photo) {
     position: relative;
     break-inside: avoid;
-    margin: 0 0 var(--space-sm);
+    margin: 0 0 var(--space-md);
     background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .photo-grid :global(.photo:hover) {
+    box-shadow: var(--shadow-md);
   }
 
   .photo-grid :global(.photo img) {
@@ -658,6 +664,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   .gallery-page :global(.album:hover) {
     border-color: var(--color-terracotta);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -694,8 +701,9 @@ import PortalNav from '../../components/collective/PortalNav.astro';
   }
 
   .gallery-page :global(.album-name) {
-    font-size: var(--text-sm);
-    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    color: var(--color-earth-dark);
   }
 
   .gallery-page :global(.album-count) {

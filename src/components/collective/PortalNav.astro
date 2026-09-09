@@ -153,19 +153,34 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     align-items: start;
   }
 
-  /* Compact page heading used instead of the old full-width hero. */
+  /* Compact page heading used instead of the old full-width hero. Echoes
+     the feed masthead so the pages read as one place. */
   .portal-page-head {
+    position: relative;
     margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .portal-page-head::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 64px;
+    height: 2px;
+    background: var(--color-terracotta);
   }
 
   .portal-page-head h1 {
     margin: 0 0 0.25rem;
     font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
   }
 
   .portal-page-head p {
     margin: 0;
-    color: var(--color-text-light);
+    color: var(--color-earth);
   }
 
   :where(div, section):has(> .portal-side) > :not(.portal-side) {
