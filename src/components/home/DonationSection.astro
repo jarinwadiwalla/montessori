@@ -6,9 +6,6 @@ import DonateButton from '../shared/DonateButton.astro';
   <div class="container donation-inner">
     <p class="donation-eyebrow">Support Access</p>
     <h2 class="donation-title">Adolescents Need These Environments</h2>
-    <p class="donation-sub">
-      Your contribution helps in the creation of new Centers of Study and Work worldwide.
-    </p>
     <div class="donation-action">
       <DonateButton label="Support Our Work" />
     </div>
@@ -64,19 +61,9 @@ import DonateButton from '../shared/DonateButton.astro';
     color: #ffffff;
     line-height: 1.2;
     letter-spacing: -0.01em;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-xl);
   }
 
-  .donation-sub {
-    font-size: var(--text-base);
-    color: rgba(250, 247, 242, 0.6);
-    font-weight: 300;
-    font-style: italic;
-    max-width: 560px;
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-xl);
-    letter-spacing: 0.02em;
-  }
 
   .donation-action :global(.donate-button) {
     background: transparent;
