@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import ArchPanels from '../components/shared/ArchPanels.astro';
 import Button from '../components/shared/Button.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
@@ -12,6 +13,10 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   heroImage="/images/ground-up.jpg"
   heroImagePosition="center 15%"
 >
+  <div class="container">
+    <ArchPanels items={['Webinars', 'Downloadable Resources', '1:1 Partnership']} />
+  </div>
+
   <div class="container container--narrow">
     <section class="page-section">
       <p>
@@ -46,32 +51,6 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
       </ul>
     </section>
 
-    <section class="page-section">
-      <h2>How It Works</h2>
-      <div class="steps">
-        <div class="step">
-          <span class="step-number">1</span>
-          <div>
-            <h3>Discovery Call</h3>
-            <p>It all starts with a conversation to understand your vision, your community, your resources, and where you are in the process.</p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-number">2</span>
-          <div>
-            <h3>Assessment & Planning</h3>
-            <p>Together we assess your environment, understand your unique realities, and map out a clear path forward, virtually or in person.</p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-number">3</span>
-          <div>
-            <h3>Ongoing Partnership</h3>
-            <p>Through regular virtual sessions and resources, with on-site visits when needed, we walk alongside you from environment design through program launch and beyond.</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
   </div>
 
@@ -125,45 +104,10 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     color: var(--color-terracotta);
   }
 
-  .steps {
-    display: grid;
-    gap: var(--space-lg);
-    margin-top: var(--space-xl);
-  }
 
-  .step {
-    display: flex;
-    gap: var(--space-xl);
-    align-items: flex-start;
-    background: var(--color-white);
-    border-top: 2px solid #d0905b;
-    padding: var(--space-xl) var(--space-lg) var(--space-lg);
-  }
 
-  .step-number {
-    font-family: 'Georgia Pro', Georgia, serif;
-    font-size: 2rem;
-    font-weight: 300;
-    color: rgba(208, 144, 91, 0.4);
-    line-height: 1;
-    min-width: 2rem;
-    flex-shrink: 0;
-  }
 
-  .step h3 {
-    font-family: 'Georgia Pro', Georgia, serif;
-    font-size: var(--text-xl);
-    font-weight: 300;
-    color: var(--color-earth-dark);
-    margin-bottom: var(--space-xs);
-  }
 
-  .step p {
-    font-size: var(--text-base);
-    color: var(--color-text-light);
-    margin-bottom: 0;
-    line-height: var(--leading-relaxed);
-  }
 
   .cta-actions {
     margin-top: var(--space-lg);

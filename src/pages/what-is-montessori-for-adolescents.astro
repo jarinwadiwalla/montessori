@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import ArchPanels from '../components/shared/ArchPanels.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 ---
@@ -22,17 +23,11 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   </div>
 
   <div class="container">
-    <div class="stage-grid">
-      <div class="stage">
-        <p class="stage-name">Farm-Based Community Living</p>
-      </div>
-      <div class="stage">
-        <p class="stage-name">A Center for Study and Work</p>
-      </div>
-      <div class="stage">
-        <p class="stage-name">Project Based Academic Integration</p>
-      </div>
-    </div>
+    <ArchPanels items={[
+      'Farm-Based Community Living',
+      'A Center for Study and Work',
+      'Project Based Academic Integration',
+    ]} />
   </div>
 
   <div class="carousel-section">
@@ -114,51 +109,8 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     letter-spacing: 0;
   }
 
-  .stage-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-xl);
-    max-width: 900px;
-    margin: 0 auto var(--space-3xl);
-  }
-
-  @media (max-width: 780px) {
-    .stage-grid { grid-template-columns: minmax(0, 1fr); }
-  }
-
-  /* An arch rather than a rectangle: these are read, not clicked, and the
-     shape says so before the cursor has to. */
-  .stage {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 220px;
-    background: var(--color-white);
-    /* A gentler arch than a full semicircle, which left a large empty dome
-       above the text once the ages came out. */
-    border-radius: 150px 150px var(--radius-lg) var(--radius-lg);
-    padding: var(--space-2xl) var(--space-xl);
-    text-align: center;
-    box-shadow: var(--shadow-md);
-  }
 
 
-  .stage-name::before {
-    content: '';
-    display: block;
-    width: 28px;
-    height: 1px;
-    margin: 0 auto var(--space-lg);
-    background: var(--color-terracotta);
-  }
-
-  .stage-name {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    line-height: 1.3;
-    color: var(--color-earth-dark);
-    margin: 0;
-  }
   .page-section {
     margin-bottom: var(--space-3xl);
   }
