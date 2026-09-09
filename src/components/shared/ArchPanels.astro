@@ -1,18 +1,33 @@
 ---
-// Informational arch panels. Not links — the shape is doing the work of
-// saying so, which is why they are not built on Card.
+// Arch panels. An item is either a plain label, which renders as something
+// to read, or a label with an href, which renders as a link. Where both
+// appear together the linked ones carry an arrow, since nothing else about
+// an arch tells you it can be clicked.
+type Item = string | { label: string; href: string };
+
 interface Props {
-  items: string[];
+  items: Item[];
 }
 const { items } = Astro.props;
+
+const norm = items.map((i) =>
+  typeof i === 'string' ? { label: i, href: undefined } : i
+);
 ---
 
 <div class="stage-grid">
-  {items.map((label) => (
-    <div class="stage">
-      <p class="stage-name">{label}</p>
-    </div>
-  ))}
+  {norm.map((item) =>
+    item.href ? (
+      <a class="stage stage--link" href={item.href}>
+        <p class="stage-name">{item.label}</p>
+        <span class="stage-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    ) : (
+      <div class="stage">
+        <p class="stage-name">{item.label}</p>
+      </div>
+    )
+  )}
 </div>
 
 <style>
@@ -49,6 +64,32 @@ const { items } = Astro.props;
     margin: 0 auto var(--space-lg);
     background: var(--color-terracotta);
   }
+  .stage--link {
+    text-decoration: none;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .stage--link:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+  }
+
+  .stage--link:focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage--link:hover { transform: none; }
+  }
+
+  .stage-arrow {
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    line-height: 1;
+    color: var(--color-terracotta-dark);
+  }
+
   .stage-name {
     font-family: var(--font-heading);
     font-size: var(--text-xl);

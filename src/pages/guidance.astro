@@ -13,21 +13,26 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   heroImage="/images/ground-up.jpg"
   heroImagePosition="center 15%"
 >
-  <div class="container">
-    <ArchPanels items={['Webinars', 'Downloadable Resources', '1:1 Partnership']} />
-  </div>
-
   <div class="container container--narrow">
     <section class="page-section">
-      <p>
-        We provide practical, virtual or on-site guidance to help you build a living adolescent community,
-        based on Montessori principles. We help you see your vision with the daily flow, the rhythms and
-        rituals, and the deep preparation of the adult who will walk alongside these young people.
-        Whether we're working together over video calls or in person, we're right there with you
-        every step of the way.
-      </p>
+      <h2>Who This Is For</h2>
+      <ul class="page-list">
+        <li>Communities with established primary programs ready to extend into the adolescent years</li>
+        <li>Guides who have completed an orientation to adolescence and are seeking the practical next steps</li>
+        <li>Organizations exploring Erdkinder or land-based models of adolescent education</li>
+        <li>Anyone called to start a Montessori or alternative adolescent program</li>
+      </ul>
     </section>
   </div>
+
+  <div class="container">
+    <ArchPanels items={[
+      { label: 'Webinars', href: '/resources/' },
+      { label: 'Downloadable Resources', href: '/resources/' },
+      { label: '1:1 Partnership', href: '/partnership/' },
+    ]} />
+  </div>
+
 
   <div class="carousel-section">
     <PhotoCarousel autoplay={true} photos={[
@@ -40,19 +45,6 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     ]} />
   </div>
 
-  <div class="container container--narrow">
-    <section class="page-section">
-      <h2>Who This Is For</h2>
-      <ul class="page-list">
-        <li>Communities with established primary programs ready to extend into the adolescent years</li>
-        <li>Guides who have completed an orientation to adolescence and are seeking the practical next steps</li>
-        <li>Organizations exploring Erdkinder or land-based models of adolescent education</li>
-        <li>Anyone called to start a Montessori or alternative adolescent program</li>
-      </ul>
-    </section>
-
-
-  </div>
 
   <section class="ready-banner">
     <div class="container ready-inner">

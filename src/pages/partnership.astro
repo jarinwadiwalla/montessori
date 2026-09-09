@@ -1,0 +1,424 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import QuoteBanner from '../components/shared/QuoteBanner.astro';
+
+// Prices are not set yet. Fill a `price` in and it replaces "Pricing on
+// request" for that tier — nothing else needs changing.
+const tiers = [
+  {
+    label: 'Tier one',
+    name: 'The Seed',
+    tagline: 'On-demand guidance. No commitment required.',
+    price: '',
+    bestFor:
+      'Established programs with a focused challenge, or communities and individuals exploring where to begin.',
+    included: [
+      'Scheduled 30- or 60-minute guidance calls',
+      'Written follow-up notes sent after each session',
+      'À la carte add-ons available for additional pricing',
+      'Email support for 48 hours post-call',
+      'No retainer or contract required',
+      'Scheduling within 5 business days',
+    ],
+  },
+  {
+    label: 'Tier two',
+    name: 'The Tending',
+    tagline: 'Weekly guidance and à la carte support. Month to month.',
+    price: '',
+    bestFor:
+      'Communities actively building who need consistent guidance, accountability, and the freedom to adjust month to month.',
+    included: [
+      'Four 60-minute guidance calls, one per week',
+      'One complimentary à la carte add-on during your first month',
+      'Written call notes and action items after each session',
+      'Email support between calls, with 48-hour response',
+      'Scheduling within 3 business days',
+      'Month to month, no contract required',
+    ],
+  },
+  {
+    label: 'Tier three',
+    name: 'The Blooming',
+    tagline: 'A full three-month engagement. Side-by-side program building.',
+    price: '',
+    bestFor:
+      'Communities building a program from the ground up, or undertaking a full redesign.',
+    included: [
+      'Four 60-minute guidance calls, one per week',
+      'Written call notes and action items after each session',
+      'Custom monthly checklist and planning document',
+      'Two complimentary à la carte add-ons, included once during your initial three-month engagement and not carried over on renewal',
+      'Email support throughout the engagement',
+      'Access to the Montessori for Adolescents online resource library',
+      'Scheduling within 3 business days',
+    ],
+    note: 'Renewal option: a locked-in renewal rate for additional months.',
+  },
+];
+
+const addOnGroups = [
+  {
+    title: 'Planning and preparation',
+    items: [
+      'Custom monthly checklist and planning document',
+      'The prepared environment for adolescents: essential pillars, with charts, readings and case studies',
+      'Montessori philosophy for the adolescent: guided readings and a reflection packet',
+      'Montessori adult preparation documents, for guides and visiting specialists',
+    ],
+  },
+  {
+    title: 'Environment structure',
+    items: [
+      'How to plan and execute a study and work term',
+      'Custom student curriculum map and free curriculum resources list',
+      'Complete mathematics curriculum: student maps and self-paced learning',
+      'Detailed schedule flows: the first three weeks, the daily flow and the weekly flow, created together',
+      'Daily life example guides: meal rituals, responsibilities, meeting agenda and managers',
+    ],
+  },
+  {
+    title: 'Administrative',
+    items: [
+      'Marketing checklist',
+      'Student enrollment checklist',
+      'Visiting specialists checklist: recruitment of experts',
+      'Website design and development, coordinated by MFA through our design partner BijanTech',
+    ],
+  },
+  {
+    title: 'On-site visits',
+    items: ['On-site observation, feedback and side-by-side facilitation.'],
+  },
+];
+---
+
+<PageLayout
+  title="Partnership"
+  description="Three tiers of Montessori adolescent consulting, from a single guidance call to a full three-month engagement building your program side by side."
+  heroTitle="Partnership"
+  heroImage="/images/guidance-photo-6.jpg"
+  heroImagePosition="center 40%"
+>
+  <div class="container container--narrow">
+    <section class="page-section">
+      <p class="lede">
+        <em>Erdkinder</em>, German for children of the earth, was Maria
+        Montessori's vision for adolescent education. She believed young people
+        needed more than a classroom: real work, real community, and a real
+        connection to the land.
+      </p>
+      <p>
+        Our consulting supports communities ready to bring that vision to life.
+        Every consultant holds the AMI 12&ndash;18 Adolescent Diploma and has
+        built programs from the ground up.
+      </p>
+    </section>
+  </div>
+
+  <div class="container">
+    <section class="page-section">
+      <h2 class="tiers-heading">Guidance tiers</h2>
+      <div class="tier-grid">
+        {tiers.map((tier) => (
+          <article class="tier">
+            <p class="tier-label">{tier.label}</p>
+            <h3 class="tier-name">{tier.name}</h3>
+            <p class="tier-tagline">{tier.tagline}</p>
+
+            <p class="tier-price">{tier.price || 'Pricing on request'}</p>
+
+            <p class="tier-bestfor"><strong>Best for</strong> {tier.bestFor}</p>
+
+            <p class="tier-included-label">What's included</p>
+            <ul class="tier-list">
+              {tier.included.map((item) => <li>{item}</li>)}
+            </ul>
+
+            {tier.note && <p class="tier-note">{tier.note}</p>}
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <div class="container container--narrow">
+    <section class="page-section">
+      <h2>À la carte add-ons</h2>
+      <p class="addon-note">
+        A complimentary 30-minute call is offered with add-ons that need
+        tailored information.
+      </p>
+      <div class="addon-grid">
+        {addOnGroups.map((group) => (
+          <div class="addon-group">
+            <h3>{group.title}</h3>
+            <ul class="page-list">
+              {group.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <section class="ready-banner">
+    <div class="container ready-inner">
+      <p class="ready-eyebrow">Ready to begin?</p>
+      <h2 class="ready-title">Every Erdkinder starts with a seed.</h2>
+      <p class="ready-sub">
+        Tell us where you are and we will tell you which tier fits.
+      </p>
+      <a href="/contact/" class="ready-cta">Get in touch</a>
+    </div>
+  </section>
+
+  <QuoteBanner
+    text="The greatest sign of success for a teacher is to be able to say, 'The children are now working as if I did not exist.'"
+    author="Maria Montessori"
+  />
+</PageLayout>
+
+<style>
+  .page-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .page-section h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-lg);
+  }
+
+  .page-section p {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .lede {
+    font-size: var(--text-lg);
+  }
+
+  /* --- tiers --- */
+
+  .tiers-heading {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xl);
+    max-width: 1060px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .tier-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .tier {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-white);
+    border-top: 3px solid var(--color-terracotta);
+    border-radius: 3px 3px var(--radius-lg) var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .tier-label {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .tier-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .tier-tagline {
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    margin: 0 0 var(--space-lg);
+  }
+
+  /* Sits on its own line with rules above and below, so a price can be
+     dropped in later without the layout shifting around it. */
+  .tier-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    text-align: center;
+    padding: var(--space-md) 0;
+    margin: 0 0 var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tier-bestfor {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+  }
+
+  .tier-bestfor strong {
+    display: block;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin-bottom: 0.35rem;
+  }
+
+  .tier-included-label {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin-bottom: var(--space-sm);
+  }
+
+  .tier-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+  }
+
+  .tier-list li {
+    position: relative;
+    padding-left: 1.1rem;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .tier-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+  }
+
+  .tier-note {
+    margin: var(--space-lg) 0 0;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-earth);
+  }
+
+  /* --- add-ons --- */
+
+  .addon-note {
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    margin-bottom: var(--space-xl);
+  }
+
+  .addon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  .addon-group h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .page-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page-list li {
+    position: relative;
+    padding-left: 1.1rem;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .page-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+  }
+
+  /* --- closing banner --- */
+
+  .ready-banner {
+    background: var(--color-earth-dark);
+    padding-block: var(--space-4xl);
+    text-align: center;
+  }
+
+  .ready-eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-terracotta-light);
+    margin-bottom: var(--space-md);
+  }
+
+  .ready-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    font-weight: 300;
+    color: var(--color-cream);
+    margin-bottom: var(--space-md);
+  }
+
+  .ready-sub {
+    color: rgba(238, 228, 219, 0.85);
+    margin-bottom: var(--space-xl);
+  }
+
+  .ready-cta {
+    display: inline-block;
+    background: var(--color-cream);
+    color: var(--color-earth-dark);
+    padding: 0.9rem 2.2rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ready-cta:hover {
+    background: var(--color-white);
+  }
+</style>
