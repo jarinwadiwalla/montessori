@@ -6,6 +6,7 @@ interface Props {
   title: string;
   description: string;
   heroTitle?: string;
+  heroLogo?: string;
   heroSubtitle?: string;
   heroEyebrow?: string;
   heroCta?: string;
@@ -16,7 +17,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image, noindex } = Astro.props;
+const { title, description, heroTitle, heroLogo, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image, noindex } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={image} noindex={noindex}>
@@ -29,6 +30,7 @@ const { title, description, heroTitle, heroSubtitle, heroEyebrow, heroCta, heroC
       ctaHref={heroCtaHref}
       image={heroImage}
       imagePosition={heroImagePosition}
+      logo={heroLogo}
     />
   )}
   <div class:list={['page-content', { 'page-content--flush': !heroTitle }]} id="content">

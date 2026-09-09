@@ -7,6 +7,8 @@ interface Props {
   ctaHref?: string;
   image?: string;
   imagePosition?: string;
+  logo?: string;
+  logoAlt?: string;
 }
 
 const {
@@ -17,6 +19,8 @@ const {
   ctaHref = '#content',
   image = '/images/banner-lavender.jpg',
   imagePosition = 'center',
+  logo,
+  logoAlt,
 } = Astro.props;
 ---
 
@@ -26,7 +30,14 @@ const {
 
   <div class="container hero-inner">
     {eyebrow && <p class="hero-eyebrow">{eyebrow}</p>}
-    <h1 class="page-hero-title">{title}</h1>
+    {logo ? (
+      <>
+        <img class="hero-logo" src={logo} alt={logoAlt || title} />
+        <h1 class="visually-hidden">{title}</h1>
+      </>
+    ) : (
+      <h1 class="page-hero-title">{title}</h1>
+    )}
     {subtitle && <p class="page-hero-subtitle">{subtitle}</p>}
     {ctaLabel && <a href={ctaHref} class="hero-cta">{ctaLabel}</a>}
   </div>
@@ -107,6 +118,27 @@ const {
     height: 0.5px;
     background: rgba(201, 169, 110, 0.7);
     flex-shrink: 0;
+  }
+
+  .hero-logo {
+    display: block;
+    width: 100%;
+    max-width: 460px;
+    height: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  /* Off-screen rather than display:none, which screen readers skip. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .page-hero-title {

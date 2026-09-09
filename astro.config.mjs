@@ -26,8 +26,11 @@ export default defineConfig({
     }),
   ],
   redirects: {
-    '/about/': '/support/',
-    '/consulting/': '/support/',
+    // /support/ became /guidance/ when the homepage tiers were renamed.
+    // These two pointed at it and would now land on nothing.
+    '/about/': '/guidance/',
+    '/consulting/': '/guidance/',
+    '/support/': '/guidance/',
     '/partners/': '/our-team/',
     '/whole-person/': '/whole-human/',
   },
