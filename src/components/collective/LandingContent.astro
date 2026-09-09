@@ -10,6 +10,15 @@ const annualLink = 'https://buy.stripe.com/8x2aEX2QS2tAeAg4834sE0b';
 
 const annualFull = monthlyPrice * 12;
 const annualSaving = annualFull - annualPrice;
+
+const donateLink = 'https://buy.stripe.com/fZuaEXcrsgkq77OcEz4sE05';
+
+// Three fixed tiers rather than an open amount: a plain fixed-price
+// Payment Link is the easy case in Stripe. Open-ended giving is the
+// "support our work" line under the pills, which uses the donate link.
+const sponsorOne = 'https://buy.stripe.com/6oU6oH2QSd8edwcdID4sE0f';
+const sponsorThree = 'https://buy.stripe.com/9B6eVd778c4afEkeMH4sE0e';
+const sponsorTen = 'https://buy.stripe.com/8x28wP634gkqeAg9sn4sE0g';
 ---
 
 <div class="container collective">
@@ -121,6 +130,44 @@ const annualSaving = annualFull - annualPrice;
     </p>
     <p class="join-fine">
       By joining you agree to our <a href="/collective/guidelines/">community guidelines</a>.
+    </p>
+  </section>
+
+  <section class="sponsor">
+    <h2>Sponsor a membership</h2>
+
+    <p class="sponsor-lede">
+      Montessori education is revolutionary for adolescents, but support and
+      resources are hard to come by. The Montessori Adolescent Collective is a
+      community of adolescent guides that support one another with resources,
+      problem solving, and building school connections.
+    </p>
+
+    <p class="sponsor-lede">
+      Monthly dues are purposefully low, but they are not low everywhere.
+      Sponsoring a membership opens the Collective to a teacher working in an
+      under-resourced community.
+    </p>
+
+    <div class="sponsor-pills">
+      <a class="sponsor-pill" href={sponsorOne} target="_blank" rel="noopener noreferrer">
+        <span class="sponsor-amount">${annualPrice}</span>
+        <span class="sponsor-what">One teacher, one year</span>
+      </a>
+      <a class="sponsor-pill" href={sponsorThree} target="_blank" rel="noopener noreferrer">
+        <span class="sponsor-amount">${annualPrice * 3}</span>
+        <span class="sponsor-what">Three teachers, one year</span>
+      </a>
+      <a class="sponsor-pill" href={sponsorTen} target="_blank" rel="noopener noreferrer">
+        <span class="sponsor-amount">${annualPrice * 10}</span>
+        <span class="sponsor-what">Ten teachers, one year</span>
+      </a>
+    </div>
+
+    <p class="sponsor-or">
+      Any amount helps. You can also <a href={donateLink} target="_blank" rel="noopener noreferrer">support
+      our work</a> directly, and it goes to the same place: the Collective and
+      the teachers it reaches.
     </p>
   </section>
 
@@ -361,6 +408,103 @@ const annualSaving = annualFull - annualPrice;
     color: var(--color-earth);
   }
 
+  /* --- sponsorship --- */
+
+  /* White where the dues block is washed terracotta, so the two asks read
+     as separate moments rather than one long price list. */
+  .sponsor {
+    margin-top: var(--space-3xl);
+    padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+  }
+
+  .sponsor h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-sm);
+  }
+
+  .sponsor h2::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-lg);
+    background: var(--color-terracotta);
+  }
+
+  .sponsor-lede {
+    max-width: 58ch;
+    margin: 0 auto;
+    color: var(--color-earth);
+    line-height: var(--leading-relaxed);
+  }
+
+  .sponsor-lede + .sponsor-lede {
+    margin-top: var(--space-md);
+  }
+
+  /* A grid, not a wrapping flex row: three equal pills that drop straight
+     to one column, rather than stranding the third on a line of its own. */
+  .sponsor-pills {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  @media (max-width: 620px) {
+    .sponsor-pills { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .sponsor-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 1.05rem 1.4rem;
+    border: 1px solid var(--color-terracotta);
+    border-radius: 999px;
+    background: var(--color-white);
+    text-decoration: none;
+    transition: background-color 0.18s, transform 0.18s, box-shadow 0.18s;
+  }
+
+  .sponsor-pill:hover {
+    background: rgba(208, 144, 91, 0.14);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .sponsor-amount {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    line-height: 1.1;
+  }
+
+  .sponsor-what {
+    font-size: var(--text-xs);
+    color: var(--color-earth);
+  }
+
+  .sponsor-or {
+    margin-top: var(--space-xl);
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sponsor-pill:hover { transform: none; }
+  }
+
+  .sponsor-or a,
   .join-fine a,
   .already a {
     color: var(--color-earth-dark);
