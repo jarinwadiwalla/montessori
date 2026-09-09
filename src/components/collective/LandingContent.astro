@@ -13,12 +13,15 @@ const annualSaving = annualFull - annualPrice;
 
 const donateLink = 'https://buy.stripe.com/fZuaEXcrsgkq77OcEz4sE05';
 
-// Three fixed tiers rather than an open amount: a plain fixed-price
-// Payment Link is the easy case in Stripe. Open-ended giving is the
-// "support our work" line under the pills, which uses the donate link.
+// Three fixed tiers, each its own fixed-price Payment Link. Smaller gifts
+// go through the ghost pill below them, which uses donateLink.
 const sponsorOne = 'https://buy.stripe.com/6oU6oH2QSd8edwcdID4sE0f';
 const sponsorThree = 'https://buy.stripe.com/9B6eVd778c4afEkeMH4sE0e';
 const sponsorTen = 'https://buy.stripe.com/8x28wP634gkqeAg9sn4sE0g';
+
+// donateLink is a $10 item whose quantity the giver can raise at checkout,
+// so it doubles as the small-gift option.
+const smallAmount = 10;
 ---
 
 <div class="container collective">
@@ -164,11 +167,16 @@ const sponsorTen = 'https://buy.stripe.com/8x28wP634gkqeAg9sn4sE0g';
       </a>
     </div>
 
-    <p class="sponsor-or">
-      Any amount helps. You can also <a href={donateLink} target="_blank" rel="noopener noreferrer">support
-      our work</a> directly, and it goes to the same place: the Collective and
-      the teachers it reaches.
-    </p>
+    <div class="sponsor-more">
+      <a class="sponsor-pill sponsor-pill--ghost" href={donateLink} target="_blank" rel="noopener noreferrer">
+        <span class="sponsor-amount">${smallAmount}</span>
+        <span class="sponsor-what">Give a smaller amount</span>
+      </a>
+      <p class="sponsor-note">
+        Change the quantity at checkout to give more. It all goes to the same
+        place: the Collective and the teachers it reaches.
+      </p>
+    </div>
   </section>
 
   <section class="already">
@@ -494,10 +502,35 @@ const sponsorTen = 'https://buy.stripe.com/8x28wP634gkqeAg9sn4sE0g';
     color: var(--color-earth);
   }
 
-  .sponsor-or {
-    margin-top: var(--space-xl);
-    font-size: var(--text-sm);
+  .sponsor-more {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  /* Softer edge and a smaller figure: this is the modest option, and it
+     should not compete with the three tiers above it. */
+  .sponsor-pill--ghost {
+    border-color: var(--color-cream-dark);
+    padding: 0.8rem 1.5rem;
+  }
+
+  .sponsor-pill--ghost:hover {
+    border-color: var(--color-terracotta);
+  }
+
+  .sponsor-pill--ghost .sponsor-amount {
+    font-size: var(--text-lg);
+  }
+
+  .sponsor-note {
+    max-width: 44ch;
+    margin: 0;
+    font-size: var(--text-xs);
     color: var(--color-earth);
+    line-height: var(--leading-relaxed);
   }
 
   @media (prefers-reduced-motion: reduce) {
