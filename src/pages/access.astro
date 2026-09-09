@@ -1,7 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import SponsorTiers from '../components/shared/SponsorTiers.astro';
-import DonateButton from '../components/shared/DonateButton.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 ---
@@ -31,6 +30,95 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
       ]}
     />
 
+    <section class="page-section text-center">
+      <p class="give-note">
+        Montessori for Adolescents is not yet a registered charity, so
+        contributions are not tax-deductible. Every gift goes directly into the
+        work described below.
+      </p>
+    </section>
+  </div>
+
+  <section class="gratitude-banner">
+    <div class="container gratitude-inner">
+      <p class="gratitude-eyebrow">With Gratitude</p>
+      <h2 class="gratitude-title">This work is made possible by the generosity of people who believe in it.</h2>
+      <div class="donor-grid">
+        <span class="donor-chip">Shaukat Wadiwalla</span>
+        <span class="donor-chip">Deborah Wadiwalla</span>
+        <span class="donor-chip">Antony Chiang</span>
+        <span class="donor-chip">William Lovett</span>
+        <span class="donor-chip">Janna Moreau-Carrera</span>
+        <span class="donor-chip">Armine Olivas</span>
+        <span class="donor-chip">Dr. Julia Martz</span>
+        <span class="donor-chip">Ajay Ahuja</span>
+        <span class="donor-chip">Dr. Daniel Vo</span>
+        <span class="donor-chip">Wagas Kurjee</span>
+        <span class="donor-chip">Dr. Nam Nguyen</span>
+        <span class="donor-chip">Ayan Goswami</span>
+        <span class="donor-chip">Pavla Guggenheim</span>
+        <span class="donor-chip">Farhana Kurjee</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container container--narrow">
+    <section class="page-section">
+      <p class="section-eyebrow">How Your Support Helps</p>
+      <div class="impact-grid">
+        <div class="impact-card">
+          <h3>Training</h3>
+          <p>Funding Montessori adolescent training for educators in communities where the cost would otherwise be a barrier.</p>
+        </div>
+        <div class="impact-card">
+          <h3>Programs</h3>
+          <p>Helping communities create their own spaces for adolescents to learn, work, and grow together.</p>
+        </div>
+        <div class="impact-card">
+          <h3>On-Site Support</h3>
+          <p>Being there in person, side by side, to help turn a vision into something real.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <p class="section-eyebrow">Progress</p>
+      <div class="progress-tracker">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 22.4%;"></div>
+        </div>
+        <div class="progress-milestones">
+          <div class="milestone" style="left: 0%;">
+            <span class="milestone-amount">$1k</span>
+            <span class="milestone-label">Registered</span>
+          </div>
+          <div class="milestone" style="left: 50%;">
+            <span class="milestone-amount">$2.5k</span>
+            <span class="milestone-label">Halfway</span>
+          </div>
+          <div class="milestone" style="left: 90%;">
+            <span class="milestone-amount">$5k</span>
+            <span class="milestone-label">Foundation</span>
+          </div>
+        </div>
+        <p class="progress-message">
+          <strong>$1,120 raised</strong> toward the $5,000 Foundation goal. After that, $10,000 opens a community and $15,000 launches the first pilot programme.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div class="carousel-section">
+    <PhotoCarousel autoplay={true} photos={[
+      { src: '/images/access-photo-1.jpg', alt: 'Montessori access' },
+      { src: '/images/access-photo-2.jpg', alt: 'Montessori access' },
+      { src: '/images/access-photo-3.jpg', alt: 'Montessori access' },
+      { src: '/images/access-photo-4.jpg', alt: 'Montessori access' },
+      { src: '/images/access-photo-5.jpg', alt: 'Montessori access' },
+    ]} />
+  </div>
+
+  <div class="container container--narrow">
     <section class="page-section message-section">
       <div class="stats-strip">
         <div class="stat-item">
@@ -57,36 +145,6 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
       <p>
         We're just getting started, and we're so grateful that you found us.
       </p>
-    </section>
-  </div>
-
-  <div class="carousel-section">
-    <PhotoCarousel autoplay={true} photos={[
-      { src: '/images/access-photo-1.jpg', alt: 'Montessori access' },
-      { src: '/images/access-photo-2.jpg', alt: 'Montessori access' },
-      { src: '/images/access-photo-3.jpg', alt: 'Montessori access' },
-      { src: '/images/access-photo-4.jpg', alt: 'Montessori access' },
-      { src: '/images/access-photo-5.jpg', alt: 'Montessori access' },
-    ]} />
-  </div>
-
-  <div class="container container--narrow">
-    <section class="page-section">
-      <p class="section-eyebrow">How Your Support Helps</p>
-      <div class="impact-grid">
-        <div class="impact-card">
-          <h3>Training</h3>
-          <p>Funding Montessori adolescent training for educators in communities where the cost would otherwise be a barrier.</p>
-        </div>
-        <div class="impact-card">
-          <h3>Programs</h3>
-          <p>Helping communities create their own spaces for adolescents to learn, work, and grow together.</p>
-        </div>
-        <div class="impact-card">
-          <h3>On-Site Support</h3>
-          <p>Being there in person, side by side, to help turn a vision into something real.</p>
-        </div>
-      </div>
     </section>
 
     <section class="page-section">
@@ -122,66 +180,11 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
       </div>
     </section>
 
-    <section class="page-section">
-      <p class="section-eyebrow">Progress</p>
-      <div class="progress-tracker">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 5.1%;"></div>
-        </div>
-        <div class="progress-milestones">
-          <div class="milestone" style="left: 5%;">
-            <span class="milestone-amount">$1k</span>
-            <span class="milestone-label">Registration</span>
-          </div>
-          <div class="milestone" style="left: 25%;">
-            <span class="milestone-amount">$5k</span>
-            <span class="milestone-label">Foundation</span>
-          </div>
-          <div class="milestone" style="left: 50%;">
-            <span class="milestone-amount">$10k</span>
-            <span class="milestone-label">Access</span>
-          </div>
-          <div class="milestone" style="left: 90%;">
-            <span class="milestone-amount">$15k+</span>
-            <span class="milestone-label">Pilot</span>
-          </div>
-        </div>
-        <p class="progress-message">
-          <strong>$1,120 raised</strong>. Contributions to Montessori for Adolescents are not yet tax-deductible.
-        </p>
-      </div>
-    </section>
-
-    <section class="page-section text-center">
-      <div class="donate-action">
-        <DonateButton label="Support the Vision" />
-      </div>
-    </section>
-
+    <SponsorTiers
+      heading="Ready when you are"
+      lede={['$50 gives one teacher a year of support. If you have read this far, you already know why it matters.']}
+    />
   </div>
-
-  <section class="gratitude-banner">
-    <div class="container gratitude-inner">
-      <p class="gratitude-eyebrow">With Gratitude</p>
-      <h2 class="gratitude-title">This work is made possible by the generosity of people who believe in it.</h2>
-      <div class="donor-grid">
-        <span class="donor-chip">Shaukat Wadiwalla</span>
-        <span class="donor-chip">Deborah Wadiwalla</span>
-        <span class="donor-chip">Antony Chiang</span>
-        <span class="donor-chip">William Lovett</span>
-        <span class="donor-chip">Janna Moreau-Carrera</span>
-        <span class="donor-chip">Armine Olivas</span>
-        <span class="donor-chip">Dr. Julia Martz</span>
-        <span class="donor-chip">Ajay Ahuja</span>
-        <span class="donor-chip">Dr. Daniel Vo</span>
-        <span class="donor-chip">Wagas Kurjee</span>
-        <span class="donor-chip">Dr. Nam Nguyen</span>
-        <span class="donor-chip">Ayan Goswami</span>
-        <span class="donor-chip">Pavla Guggenheim</span>
-        <span class="donor-chip">Farhana Kurjee</span>
-      </div>
-    </div>
-  </section>
 
   <QuoteBanner
     text="Education is the most powerful weapon which you can use to change the world."
@@ -254,7 +257,7 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     font-family: 'Georgia Pro', Georgia, serif;
     font-size: clamp(2rem, 3.5vw, 3rem);
     font-weight: 300;
-    color: #d0905b;
+    color: var(--color-earth-dark);
     line-height: 1;
   }
 
@@ -315,7 +318,7 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(208, 144, 91, 0.8);
+    color: var(--color-earth);
   }
 
   .phase-card h3 {
@@ -330,7 +333,7 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     font-family: 'Georgia Pro', Georgia, serif;
     font-size: var(--text-2xl);
     font-weight: 300;
-    color: #d0905b;
+    color: var(--color-earth-dark);
     line-height: 1;
     margin-bottom: var(--space-sm);
   }
@@ -391,22 +394,36 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 
   .milestone-label {
     font-size: var(--text-xs);
-    color: var(--color-text-light);
+    color: var(--color-earth);
   }
 
   .progress-message {
     font-size: var(--text-sm) !important;
-    color: var(--color-text-light) !important;
+    color: var(--color-earth) !important;
     margin-top: var(--space-md);
     border-top: 0.5px solid var(--color-border);
     padding-top: var(--space-md);
   }
 
-  .donate-action {
-    margin-top: var(--space-lg);
-    display: flex;
+
+  /* Was used on the old donate block but never defined, so it did nothing. */
+  .text-center {
+    text-align: center;
+  }
+
+  /* The eyebrow is a flex row, so centring the text alone leaves it left. */
+  .text-center .section-eyebrow {
     justify-content: center;
   }
+
+  .give-note {
+    max-width: 56ch;
+    margin: 0 auto;
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    line-height: var(--leading-relaxed);
+  }
+
 
   /* With Gratitude banner */
   .gratitude-banner {
