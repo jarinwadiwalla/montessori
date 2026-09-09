@@ -24,11 +24,9 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   <div class="container">
     <div class="stage-grid">
       <div class="stage">
-        <p class="stage-age">12&ndash;15 years old</p>
         <p class="stage-name">Farm-Based Residential Living</p>
       </div>
       <div class="stage">
-        <p class="stage-age">16&ndash;18 years old</p>
         <p class="stage-name">A Center of Study and Work</p>
       </div>
     </div>
@@ -124,28 +122,26 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
   /* An arch rather than a rectangle: these are read, not clicked, and the
      shape says so before the cursor has to. */
   .stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 220px;
     background: var(--color-white);
-    border-radius: 999px 999px var(--radius-lg) var(--radius-lg);
-    padding: var(--space-3xl) var(--space-xl) var(--space-2xl);
+    /* A gentler arch than a full semicircle, which left a large empty dome
+       above the text once the ages came out. */
+    border-radius: 150px 150px var(--radius-lg) var(--radius-lg);
+    padding: var(--space-2xl) var(--space-xl);
     text-align: center;
     box-shadow: var(--shadow-md);
   }
 
-  .stage-age {
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-earth);
-    margin: 0 0 var(--space-md);
-  }
 
-  .stage-age::after {
+  .stage-name::before {
     content: '';
     display: block;
     width: 28px;
     height: 1px;
-    margin: var(--space-md) auto 0;
+    margin: 0 auto var(--space-lg);
     background: var(--color-terracotta);
   }
 
