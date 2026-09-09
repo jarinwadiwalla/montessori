@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import SponsorTiers from '../components/shared/SponsorTiers.astro';
 import DonateButton from '../components/shared/DonateButton.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
@@ -21,7 +22,17 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
       <p>
         Montessori education offers something different: real autonomy, real community, and real work that adolescents can believe in. It meets young people where they are, with respect for who they're becoming, not just who they've been told to be.
       </p>
+    </section>
 
+    <SponsorTiers
+      heading="Sponsor a teacher"
+      lede={[
+        'The fastest way to reach an adolescent is to support the adult in the room with them. A sponsored membership gives a teacher in an under-resourced community a year inside the Montessori Adolescent Collective: a shared resource library, people to ask when something is not working, and partnerships with schools doing the same work.',
+        'Every amount below is a real place for a real teacher.',
+      ]}
+    />
+
+    <section class="page-section message-section">
       <div class="stats-strip">
         <div class="stat-item">
           <span class="stat-number">73%</span>
