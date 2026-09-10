@@ -11,6 +11,7 @@ interface Props {
     | 'start-here'
     | 'say-hello'
     | 'announcements'
+    | 'meetings'
     | 'events'
     | 'resources'
     | 'blog'
@@ -36,6 +37,7 @@ const cls = (name: string) => (active === name ? 'is-active' : '');
     <a href="/collective/start-here/" class={cls('start-here')}>Start here</a>
     <a href="/collective/portal/?space=say-hello" class={cls('say-hello')} data-keep-space>Say hello</a>
     <a href="/collective/portal/?space=announcements" class={cls('announcements')} data-keep-space>Announcements</a>
+    <a href="/collective/meetings/" class={cls('meetings')}>Meetings</a>
     <a href="/collective/events/" class={cls('events')}>Events</a>
 
     <p class="side-heading">Library</p>

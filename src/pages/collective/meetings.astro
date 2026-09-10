@@ -1,0 +1,489 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PortalNav from '../../components/collective/PortalNav.astro';
+---
+
+<PageLayout
+  title="Meetings"
+  description="The Collective's monthly meetings, their hosts and their agendas."
+  noindex
+>
+  <div class="container meetings-page">
+    <p class="loading" id="loading">Loading…</p>
+
+    <div id="main" hidden>
+      <PortalNav active="meetings" />
+
+      <header class="portal-page-head">
+        <h1>Meetings</h1>
+        <p>We meet on the first Thursday of the month. Every meeting needs a host.</p>
+      </header>
+
+      <p class="mt-error" id="mt-error" role="alert" hidden></p>
+
+      <!-- The next meeting, pinned -->
+      <section class="next" id="next" hidden>
+        <p class="next-label">Next meeting</p>
+        <h2 id="next-title"></h2>
+        <p class="next-when" id="next-when"></p>
+        <p class="next-zones" id="next-zones"></p>
+        <p class="next-host" id="next-host"></p>
+        <div class="next-actions" id="next-actions"></div>
+      </section>
+
+      <!-- Who is hosting what -->
+      <section class="hosts">
+        <h2>Meeting hosts</h2>
+        <p class="hosts-note">
+          Hosting means opening the call, keeping time, and writing the agenda
+          beforehand. Take one whenever you are ready.
+        </p>
+        <div class="host-list" id="host-list"></div>
+      </section>
+
+      <!-- Agenda for the next meeting -->
+      <section class="agenda" id="agenda-section" hidden>
+        <h2>Agenda</h2>
+        <p class="agenda-for" id="agenda-for"></p>
+        <div class="agenda-body" id="agenda-body"></div>
+        <div class="agenda-edit" id="agenda-edit" hidden>
+          <textarea id="agenda-input" rows="8" maxlength="5000"
+            placeholder="One item per line."></textarea>
+          <div class="agenda-actions">
+            <button id="agenda-save" type="button">Save agenda</button>
+            <button id="agenda-cancel" type="button" class="ghost">Cancel</button>
+          </div>
+        </div>
+        <button id="agenda-open" type="button" class="agenda-open" hidden>Write the agenda</button>
+      </section>
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+  let meetings: any = { upcoming: [], past: [] };
+
+  function fail(msg: string) {
+    const box = $('mt-error');
+    box.textContent = msg;
+    box.hidden = false;
+  }
+
+  // Dates are stored in UTC and rendered in whatever timezone the reader is
+  // in, so nobody has to do the arithmetic themselves.
+  function localWhen(iso: string) {
+    return new Date(iso).toLocaleString(undefined, {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      hour: 'numeric', minute: '2-digit',
+    });
+  }
+
+  function shortWhen(iso: string) {
+    return new Date(iso).toLocaleString(undefined, {
+      day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
+    });
+  }
+
+  async function load() {
+    const res = await fetch('/api/community/meetings');
+    if (res.status === 401) { window.location.href = '/collective/login/'; return; }
+    if (!res.ok) { fail('Could not load the meetings.'); return; }
+    meetings = await res.json();
+    render();
+  }
+
+  function render() {
+    renderNext();
+    renderHosts();
+  }
+
+  function renderNext() {
+    const next = meetings.upcoming[0];
+    const sec = $('next');
+    const agendaSec = $('agenda-section');
+    if (!next) { sec.hidden = true; agendaSec.hidden = true; return; }
+    sec.hidden = false;
+
+    $('next-title').textContent = next.title;
+    $('next-when').textContent = localWhen(next.starts_at);
+    $('next-zones').textContent = next.timezone_note || '';
+    $('next-host').textContent = next.host_name
+      ? `Hosted by ${next.host_name}`
+      : 'No host yet';
+
+    const actions = $('next-actions');
+    actions.textContent = '';
+    if (next.link) {
+      const a = document.createElement('a');
+      a.className = 'join-link';
+      a.href = next.link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = 'Join the call';
+      actions.appendChild(a);
+    }
+    actions.appendChild(hostButton(next));
+
+    renderAgenda(next);
+  }
+
+  function hostButton(m: any) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    if (m.is_host) {
+      btn.className = 'host-btn host-btn--mine';
+      btn.textContent = 'You are hosting. Step down';
+      btn.addEventListener('click', () => setHost(m.id, 'unhost'));
+    } else if (m.can_host) {
+      btn.className = 'host-btn';
+      btn.textContent = 'Sign up to host';
+      btn.addEventListener('click', () => setHost(m.id, 'host'));
+    } else {
+      btn.className = 'host-btn host-btn--taken';
+      btn.disabled = true;
+      btn.textContent = m.host_name ? `Hosted by ${m.host_name}` : 'Closed';
+    }
+    return btn;
+  }
+
+  function renderHosts() {
+    const list = $('host-list');
+    list.textContent = '';
+    if (!meetings.upcoming.length) {
+      list.innerHTML = '<p class="empty-state">No meetings scheduled yet.</p>';
+      return;
+    }
+    for (const m of meetings.upcoming) {
+      const row = document.createElement('div');
+      row.className = 'host-row';
+
+      const when = document.createElement('div');
+      when.className = 'host-when';
+      when.textContent = shortWhen(m.starts_at);
+
+      const who = document.createElement('div');
+      who.className = 'host-who';
+      who.textContent = m.host_name || 'Needs a host';
+      if (!m.host_name) who.classList.add('host-who--empty');
+
+      row.appendChild(when);
+      row.appendChild(who);
+      row.appendChild(hostButton(m));
+      list.appendChild(row);
+    }
+  }
+
+  function renderAgenda(m: any) {
+    const sec = $('agenda-section');
+    sec.hidden = false;
+    $('agenda-for').textContent = `${m.title}, ${shortWhen(m.starts_at)}`;
+
+    const body = $('agenda-body');
+    body.textContent = '';
+    if (m.agenda.trim()) {
+      const ol = document.createElement('ol');
+      ol.className = 'agenda-list';
+      for (const line of m.agenda.split('\n').map((l: string) => l.trim()).filter(Boolean)) {
+        const li = document.createElement('li');
+        li.textContent = line;
+        ol.appendChild(li);
+      }
+      body.appendChild(ol);
+    } else {
+      const p = document.createElement('p');
+      p.className = 'empty-state';
+      p.textContent = m.can_edit_agenda
+        ? 'No agenda yet. You are hosting, so this one is yours to write.'
+        : 'The host has not written the agenda yet.';
+      body.appendChild(p);
+    }
+
+    ($('agenda-open') as HTMLButtonElement).hidden = !m.can_edit_agenda;
+    ($('agenda-open') as HTMLButtonElement).textContent =
+      m.agenda.trim() ? 'Edit the agenda' : 'Write the agenda';
+    $('agenda-edit').hidden = true;
+    ($('agenda-input') as HTMLTextAreaElement).value = m.agenda;
+  }
+
+  async function setHost(id: string, action: 'host' | 'unhost') {
+    const res = await fetch('/api/community/meetings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_id: id, action }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { fail(data.error || 'That did not work.'); await load(); return; }
+    $('mt-error').hidden = true;
+    await load();
+  }
+
+  $('agenda-open').addEventListener('click', () => {
+    $('agenda-edit').hidden = false;
+    ($('agenda-open') as HTMLButtonElement).hidden = true;
+    ($('agenda-input') as HTMLTextAreaElement).focus();
+  });
+
+  $('agenda-cancel').addEventListener('click', () => {
+    $('agenda-edit').hidden = true;
+    ($('agenda-open') as HTMLButtonElement).hidden = false;
+  });
+
+  $('agenda-save').addEventListener('click', async () => {
+    const next = meetings.upcoming[0];
+    if (!next) return;
+    const agenda = ($('agenda-input') as HTMLTextAreaElement).value;
+    const res = await fetch('/api/community/meetings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_id: next.id, agenda }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { fail(data.error || 'Could not save the agenda.'); return; }
+    $('mt-error').hidden = true;
+    await load();
+  });
+
+  load().then(() => {
+    $('loading').hidden = true;
+    $('main').hidden = false;
+  });
+</script>
+
+<style>
+  .loading,
+  .meetings-page :global(.empty-state) {
+    color: var(--color-earth);
+    padding: var(--space-lg) 0;
+  }
+
+  .mt-error {
+    color: var(--color-terracotta-dark);
+    margin-bottom: var(--space-lg);
+  }
+
+  /* --- the pinned meeting --- */
+
+  .next {
+    position: relative;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-terracotta);
+    border-radius: 3px 3px var(--radius-xl) var(--radius-xl);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .next-label {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .next h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .next-when {
+    font-size: var(--text-lg);
+    color: var(--color-earth-dark);
+    margin: 0 0 0.2rem;
+  }
+
+  .next-zones,
+  .next-host {
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    margin: 0 0 0.2rem;
+  }
+
+  .next-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  /* Built by the script, so it needs :global to survive scoping. */
+  .meetings-page :global(.join-link) {
+    display: inline-block;
+    background: var(--color-earth-dark);
+    color: var(--color-cream);
+    padding: 0.7rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  /* --- host list --- */
+
+  .hosts h2,
+  .agenda h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .hosts-note,
+  .agenda-for {
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .host-list {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .meetings-page :global(.host-row) {
+    display: grid;
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 0.9rem var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .meetings-page :global(.host-row:last-child) { border-bottom: none; }
+
+  .meetings-page :global(.host-when) {
+    font-size: var(--text-sm);
+    color: var(--color-earth-dark);
+  }
+
+  .meetings-page :global(.host-who) {
+    font-family: var(--font-heading);
+    color: var(--color-earth-dark);
+  }
+
+  .meetings-page :global(.host-who--empty) {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--color-earth);
+    font-style: italic;
+  }
+
+  .meetings-page :global(.host-btn) {
+    background: none;
+    border: 1px solid var(--color-terracotta);
+    color: var(--color-earth-dark);
+    border-radius: 999px;
+    padding: 0.45rem 1.1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .meetings-page :global(.host-btn:hover) {
+    background: rgba(208, 144, 91, 0.14);
+  }
+
+  .meetings-page :global(.host-btn--mine) {
+    border-color: var(--color-earth-dark);
+  }
+
+  .meetings-page :global(.host-btn--taken) {
+    border-color: var(--color-border);
+    color: var(--color-earth);
+    cursor: default;
+  }
+
+  .meetings-page :global(.host-btn--taken:hover) { background: none; }
+
+  /* --- agenda --- */
+
+  .agenda {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .meetings-page :global(.agenda-list) {
+    margin: 0;
+    padding-left: 1.3rem;
+  }
+
+  .meetings-page :global(.agenda-list li) {
+    margin-bottom: var(--space-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .agenda-open {
+    margin-top: var(--space-lg);
+    background: none;
+    border: 1px solid var(--color-terracotta);
+    color: var(--color-earth-dark);
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .agenda-open:hover { background: rgba(208, 144, 91, 0.14); }
+
+  .agenda-edit textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    resize: vertical;
+  }
+
+  .agenda-edit textarea:focus {
+    outline: none;
+    border-color: var(--color-terracotta);
+    box-shadow: 0 0 0 3px rgba(208, 144, 91, 0.18);
+  }
+
+  .agenda-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+
+  .agenda-actions button {
+    background: var(--color-earth-dark);
+    color: var(--color-cream);
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.4rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .agenda-actions .ghost {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-earth);
+  }
+
+  @media (max-width: 620px) {
+    .meetings-page :global(.host-row) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.35rem;
+    }
+  }
+</style>
