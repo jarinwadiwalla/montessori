@@ -64,3 +64,8 @@ Thumbs.db
 
 # Claude Code local config
 .claude/
+
+# Real consulting rates and the PDF built from them. The repo is public
+# and public/downloads/ is served live.
+scripts/partnership-prices.json
+public/downloads/partnership-rates.pdf

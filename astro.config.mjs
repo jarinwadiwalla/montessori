@@ -32,6 +32,8 @@ export default defineConfig({
     '/consulting/': '/guidance/',
     '/support/': '/guidance/',
     '/partners/': '/our-team/',
+    // The old consulting overview; the Partnership page replaced it.
+    '/resources/work-together/': '/partnership/',
     // The Whole Human page became the "what is this" explainer. Both its
     // old address and the one that already redirected to it move together.
     '/whole-human/': '/what-is-montessori-for-adolescents/',
