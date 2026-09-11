@@ -1,7 +1,28 @@
 {
   "monthly": "$000",
-  "threeMonth": { "perMonth": "$000", "total": "$0,000", "save": "Save 00%" },
-  "sixMonth":   { "perMonth": "$000", "total": "$0,000", "save": "Save 00%" },
-  "addOnRange": "$00 to $000 each, depending on depth",
-  "onSiteDay":  "$0,000 to $0,000 per day, plus travel and accommodation"
+  "threeMonth": {
+    "perMonth": "$000",
+    "total": "$0,000",
+    "save": "Save 00%"
+  },
+  "sixMonth": {
+    "perMonth": "$000",
+    "total": "$0,000",
+    "save": "Save 00%"
+  },
+  "onSiteDay": "$0,000 to $0,000 per day, plus travel and accommodation",
+  "addOns": {
+    "checklist": "$00",
+    "environment": "$00",
+    "philosophy": "$00",
+    "adultPrep": "$00",
+    "studyWorkTerm": "$00",
+    "curriculumMap": "$00",
+    "mathematics": "$00",
+    "scheduleFlows": "$00",
+    "dailyLife": "$00",
+    "marketing": "$00",
+    "enrollment": "$00",
+    "specialists": "$00"
+  }
 }

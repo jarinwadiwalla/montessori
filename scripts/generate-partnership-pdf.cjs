@@ -74,25 +74,25 @@ const MONTHLY_INCLUDES = [
 
 const ADD_ONS = [
   ["Planning and Preparation", [
-    "Custom monthly checklist and planning document",
-    "The prepared environment for adolescents: essential pillars, with charts, readings and case studies",
-    "Montessori philosophy for the adolescent: guided readings and a reflection packet",
-    "Montessori adult preparation documents, for guides and visiting specialists",
+    ["checklist", "Custom monthly checklist and planning document"],
+    ["environment", "The prepared environment for adolescents: essential pillars, with charts, readings and case studies"],
+    ["philosophy", "Montessori philosophy for the adolescent: guided readings and a reflection packet"],
+    ["adultPrep", "Montessori adult preparation documents, for guides and visiting specialists"],
   ]],
   ["Environment Structure", [
-    "How to plan and execute a study and work term",
-    "Custom student curriculum map and free curriculum resources list",
-    "Complete mathematics curriculum: student maps and self-paced learning",
-    "Detailed schedule flows: the first three weeks, the daily flow and the weekly flow, created together",
-    "Daily life example guides: meal rituals, responsibilities, meeting agenda and managers",
+    ["studyWorkTerm", "How to plan and execute a study and work term"],
+    ["curriculumMap", "Custom student curriculum map and free curriculum resources list"],
+    ["mathematics", "Complete mathematics curriculum: student maps and self-paced learning"],
+    ["scheduleFlows", "Detailed schedule flows: the first three weeks, the daily flow and the weekly flow, created together"],
+    ["dailyLife", "Daily life example guides: meal rituals, responsibilities, meeting agenda and managers"],
   ]],
   ["Administrative", [
-    "Marketing checklist",
-    "Student enrollment checklist",
-    "Visiting specialists checklist: recruitment of experts",
+    ["marketing", "Marketing checklist"],
+    ["enrollment", "Student enrollment checklist"],
+    ["specialists", "Visiting specialists checklist: recruitment of experts"],
   ]],
   ["On-Site Visits", [
-    "On-site observation, feedback and side-by-side facilitation",
+    [null, "On-site observation, feedback and side-by-side facilitation"],
   ]],
 ];
 
@@ -110,6 +110,22 @@ const tick = (text) => ({
     { text, style: "body", width: "*" },
   ],
   margin: [0, 0, 0, 5],
+});
+
+// Same row, with the price set hard right so the column reads as a column.
+const pricedTick = (text, price) => ({
+  columns: [
+    { text: "✓", color: TERRACOTTA_DARK, width: 14, fontSize: 10, margin: [0, 1, 0, 0] },
+    { text, style: "body", width: "*" },
+    {
+      text: price || "",
+      style: "body",
+      color: CHOCOLATE,
+      width: 52,
+      alignment: "right",
+    },
+  ],
+  margin: [0, 0, 0, 7],
 });
 
 const card = (body, fill = "#FFFFFF") => ({
@@ -219,16 +235,15 @@ const docDefinition = {
           text: "Available to anyone, whether or not you are in a Monthly Partnership. A complimentary 30-minute call is offered with Add-Ons that need tailored information.",
           style: "body", alignment: "center", margin: [30, 0, 30, 6],
         },
-        { text: PRICES.addOnRange, style: "body", alignment: "center", color: CHOCOLATE, margin: [0, 0, 0, 22] },
       ],
     },
     ...ADD_ONS.map(([title, items]) =>
       card([
         { text: title, style: "h3", margin: [0, 0, 0, 4] },
         { canvas: [{ type: "line", x1: 0, y1: 0, x2: 420, y2: 0, lineWidth: 0.5, lineColor: BORDER }], margin: [0, 0, 0, 10] },
-        ...items.map(tick),
+        ...items.map(([key, text]) => pricedTick(text, key ? PRICES.addOns[key] : "")),
         ...(title === "On-Site Visits"
-          ? [{ text: PRICES.onSiteDay, style: "small", color: CHOCOLATE, margin: [14, 6, 0, 0] }]
+          ? [{ text: PRICES.onSiteDay, style: "small", color: CHOCOLATE, margin: [14, 4, 0, 0] }]
           : []),
       ])
     ),
