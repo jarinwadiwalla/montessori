@@ -75,13 +75,13 @@ const MONTHLY_INCLUDES = [
 ];
 
 const ADD_ONS = [
-  ["Planning and Preparation", [
+  ["Environment Preparation", [
     ["philosophy", "Grounding the team in Montessori adolescent philosophy"],
     ["environment", "Designing the prepared environment"],
     ["adultPrep", "Preparing the adults who will hold the environment"],
     ["team", "Building and supporting your team"],
   ]],
-  ["Environment Structure", [
+  ["Planning and Logistics", [
     ["studyWorkTerm", "Planning and running a study and work term"],
     ["scheduleFlows", "Shaping the daily and weekly flow"],
     ["curriculumMap", "Curriculum planning and resources"],
