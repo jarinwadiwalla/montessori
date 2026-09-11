@@ -87,8 +87,8 @@ const eventJsonLd = JSON.stringify({
 ---
 
 <BaseLayout
-  title={webinar.data.title}
-  description={webinar.data.description}
+  title={webinar.data.seoTitle ?? webinar.data.title}
+  description={webinar.data.seoDescription ?? webinar.data.description}
   image={webinar.data.image}
 >
   <script type="application/ld+json" set:html={eventJsonLd} />

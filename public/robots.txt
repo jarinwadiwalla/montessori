@@ -8,6 +8,13 @@ Disallow: /collective/welcome/
 Disallow: /collective/members/
 Disallow: /collective/events/
 Disallow: /collective/alerts/
+Disallow: /collective/blog/
+Disallow: /collective/gallery/
+Disallow: /collective/meetings/
+Disallow: /collective/messages/
+Disallow: /collective/resources/
+Disallow: /collective/start-here/
+Disallow: /webinars/thank-you/
 Disallow: /community-media/
 
 Sitemap: https://montessoriforadolescents.com/sitemap-index.xml

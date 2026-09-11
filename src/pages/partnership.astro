@@ -3,6 +3,27 @@ import PageLayout from '../layouts/PageLayout.astro';
 import InterestForm from '../components/shared/InterestForm.astro';
 
 // One offer, month to month.
+const siteUrl = 'https://montessoriforadolescents.com';
+
+/* Service schema so "Montessori adolescent consultant" searches can surface
+   this page as an offering rather than a generic page. No price: the rate is
+   quoted by hand and the repo is public. */
+const serviceJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Monthly Montessori Adolescent Partnership',
+  serviceType: 'Montessori adolescent program consulting',
+  description:
+    'Month-to-month guidance for schools and guides starting or strengthening a Montessori adolescent programme, delivered by consultants holding the AMI 12\u201318 Adolescent Diploma.',
+  url: `${siteUrl}/partnership/`,
+  provider: { '@id': `${siteUrl}/#organization` },
+  areaServed: 'Worldwide',
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${siteUrl}/partnership/`,
+  },
+});
+
 const plan = {
   name: 'Monthly Partnership',
   included: [
@@ -56,6 +77,7 @@ const addOnGroups = [
   heroImagePosition="center 42%"
   description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
 >
+  <script type="application/ld+json" set:html={serviceJsonLd} />
   <div class="container">
 
     <p class="credential">

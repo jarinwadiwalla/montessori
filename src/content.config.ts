@@ -35,6 +35,11 @@ const webinars = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    // Search-result copy only. The title above is the visible H1 and can be
+    // as long as it needs to be; these keep the <title> and meta description
+    // inside the length Google actually shows.
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
     presenter: z.string(),
     duration: z.string().optional(),
     eventDate: z.coerce.date().optional(),
@@ -62,6 +67,10 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    // As above: overrides the <title> / meta description without touching
+    // the heading or the excerpt shown on the blog index.
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
     author: z.string().default('Jarin Wadiwalla'),
     publishDate: z.coerce.date(),
     image: z.string().optional(),

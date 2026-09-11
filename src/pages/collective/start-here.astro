@@ -15,7 +15,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       <PortalNav active="start-here" />
 
       <div class="start-content">
-        <h2>Welcome to the Collective</h2>
+        <h1>Welcome to the Collective</h1>
         <p>
           The Montessori Adolescent Collective is a shared room for people doing
           third-plane work: guides from adolescent environments around the
@@ -95,8 +95,11 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     max-width: 680px;
   }
 
-  .start-content h2 {
+  .start-content h1 {
     margin-top: 0;
+    /* It is the page's h1 for search engines and screen readers, but it
+       should still look the way it did as an h2. */
+    font-size: var(--text-4xl);
   }
 
   .start-content li {

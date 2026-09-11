@@ -1,6 +1,8 @@
 ---
 title: "An Overview of the Montessori Adolescent Environment and Q&A Session"
 description: "Join Montessori for Adolescents for a community presentation and overview of the Montessori adolescent environment, followed by a thorough Q&A. Our team all carry the AMI 12–18 Diploma and have worked in adolescent environments around the globe — from the U.S. to France, to Bali."
+seoTitle: "Adolescent Environment Webinar"
+seoDescription: "A live overview of the prepared Montessori adolescent environment, followed by a full Q&A with guides who hold the AMI 12–18 Diploma."
 presenter: "the Montessori for Adolescents team"
 eventDate: 2026-07-30
 eventTimeDisplay: "9:00–10:00 AM Singapore (SGT) · 6:00–7:00 PM July 29 California (PDT)"

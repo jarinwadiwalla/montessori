@@ -15,12 +15,15 @@ interface Props {
   heroImagePosition?: string;
   image?: string;
   noindex?: boolean;
+  type?: 'website' | 'article';
+  publishedTime?: Date | string;
+  author?: string;
 }
 
-const { title, description, heroTitle, heroLogo, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image, noindex } = Astro.props;
+const { title, description, heroTitle, heroLogo, heroSubtitle, heroEyebrow, heroCta, heroCtaHref, heroImage, heroImagePosition, image, noindex, type, publishedTime, author } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} image={image} noindex={noindex}>
+<BaseLayout title={title} description={description} image={image} noindex={noindex} type={type} publishedTime={publishedTime} author={author}>
   {heroTitle && (
     <PageHero
       title={heroTitle}

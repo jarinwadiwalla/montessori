@@ -49,10 +49,13 @@ const postJsonLd = JSON.stringify({
 ---
 
 <PageLayout
-  title={post.data.title}
-  description={post.data.description}
+  title={post.data.seoTitle ?? post.data.title}
+  description={post.data.seoDescription ?? post.data.description}
   heroTitle={post.data.title}
   image={post.data.image}
+  type="article"
+  publishedTime={post.data.publishDate}
+  author={post.data.author}
 >
   <script type="application/ld+json" set:html={postJsonLd} />
   <div class="post-wave-strip"></div>

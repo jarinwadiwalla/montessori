@@ -1,6 +1,7 @@
 ---
 title: "Rebuilding Adolescent Health"
 description: "Rebuilding adolescent health will require legal accountability, policy reform, and cultural courage. But it will also require rethinking the environments we build for young people every single day."
+seoDescription: "Adolescent health needs legal accountability, policy reform, and cultural courage — and a rethink of the environments we build for young people daily."
 author: "Jarin Wadiwalla"
 publishDate: 2026-04-12
 featured: false

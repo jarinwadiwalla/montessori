@@ -1,6 +1,8 @@
 ---
 title: "Work of the Heart: Wellness as the Foundation of Education"
 description: "Wellness as the Foundation of Education"
+seoTitle: "Work of the Heart"
+seoDescription: "Why wellness is the foundation of adolescent education, and what a stable ground of wellbeing makes possible in a Montessori environment."
 author: "Lola Odessey Waters"
 publishDate: 2026-05-04
 featured: false
