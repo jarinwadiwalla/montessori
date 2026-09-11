@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
+import InterestForm from '../components/shared/InterestForm.astro';
 
 // One offer, month to month, with a reduced rate for committing further
 // ahead. Fill in the two `save` values when they are settled; each falls
@@ -103,6 +104,10 @@ const addOnGroups = [
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
         </ul>
+        <InterestForm
+          about="Monthly Partnership"
+          label="Contact me about the Monthly Partnership"
+        />
       </article>
     </section>
 
@@ -122,6 +127,10 @@ const addOnGroups = [
             </div>
           ))}
         </div>
+        <InterestForm
+          about="Multi-Month Partnership"
+          label="Contact me about the Multi-Month Partnership"
+        />
       </article>
     </section>
   </div>
@@ -144,6 +153,10 @@ const addOnGroups = [
           </div>
         ))}
       </div>
+      <InterestForm
+        about="À La Carte Add-Ons"
+        label="Contact me about the À La Carte Items"
+      />
     </section>
   </div>
 

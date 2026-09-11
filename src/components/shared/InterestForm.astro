@@ -1,0 +1,138 @@
+---
+// An email box and a pill, for saying "tell me about this one".
+//
+// Posts to the same Formspree endpoint the contact page uses, so these
+// arrive in the same inbox. The `about` value rides along as a hidden
+// field, which is the only way to tell the three apart once they land.
+interface Props {
+  about: string;
+  label: string;
+  formspreeId?: string;
+}
+const { about, label, formspreeId = 'xpqjyzba' } = Astro.props;
+const id = `interest-${about.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+
+<form class="interest" data-formspree={`https://formspree.io/f/${formspreeId}`}>
+  <input type="hidden" name="about" value={about} />
+  <input type="hidden" name="_subject" value={`Enquiry: ${about}`} />
+
+  <label class="interest-label" for={id}>{label}</label>
+  <div class="interest-row">
+    <input
+      type="email"
+      id={id}
+      name="email"
+      required
+      placeholder="Your email address"
+      class="interest-input"
+    />
+    <button type="submit" class="interest-btn">Contact me</button>
+  </div>
+  <p class="interest-status" role="status"></p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form.interest').forEach((form) => {
+    const btn = form.querySelector('.interest-btn') as HTMLButtonElement;
+    const status = form.querySelector('.interest-status') as HTMLElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      status.textContent = '';
+      status.className = 'interest-status';
+
+      try {
+        const res = await fetch(form.dataset.formspree!, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        if (res.ok) {
+          form.reset();
+          status.textContent = 'Thank you. We will be in touch.';
+          status.classList.add('interest-status--ok');
+        } else {
+          status.textContent = 'Something went wrong. Please try again.';
+          status.classList.add('interest-status--bad');
+        }
+      } catch {
+        status.textContent = 'Something went wrong. Please try again.';
+        status.classList.add('interest-status--bad');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Contact me';
+    });
+  });
+</script>
+
+<style>
+  .interest {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .interest-label {
+    display: block;
+    font-size: var(--text-base);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-md);
+  }
+
+  .interest-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+
+  .interest-input {
+    /* min-width:0 or the input refuses to shrink under its basis and
+       pushes the page into a horizontal scroll on a phone. */
+    flex: 1 1 12rem;
+    min-width: 0;
+    max-width: 22rem;
+    padding: 0.75rem 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  .interest-input:focus {
+    outline: none;
+    border-color: var(--color-terracotta);
+    box-shadow: 0 0 0 3px rgba(208, 144, 91, 0.18);
+  }
+
+  .interest-btn {
+    flex: 0 0 auto;
+    background: var(--color-earth-dark);
+    color: var(--color-cream);
+    border: none;
+    border-radius: 999px;
+    padding: 0.75rem 1.8rem;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    cursor: pointer;
+  }
+
+  .interest-btn:hover { background: var(--color-earth); }
+  .interest-btn:disabled { opacity: 0.6; cursor: default; }
+
+  .interest-status {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--text-sm);
+    min-height: 1.2em;
+  }
+
+  .interest-status--ok { color: var(--color-earth-dark); }
+  .interest-status--bad { color: var(--color-terracotta-dark); }
+</style>
