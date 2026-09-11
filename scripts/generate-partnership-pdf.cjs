@@ -78,7 +78,7 @@ const ADD_ONS = [
   ["Environment Preparation", [
     ["philosophy", "Grounding the team in Montessori adolescent philosophy"],
     ["environment", "Designing the prepared environment"],
-    ["adultPrep", "Preparing the adults who will hold the environment"],
+    ["adultPrep", "Adult preparation"],
     ["team", "Building and supporting your team"],
   ]],
   ["Planning and Logistics", [
