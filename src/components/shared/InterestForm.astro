@@ -1,34 +1,41 @@
 ---
-// An email box and a pill, for saying "tell me about this one".
+// Name, email, phone and a pill. Posts to the same Formspree endpoint the
+// contact page uses, so enquiries land in one inbox.
 //
-// Posts to the same Formspree endpoint the contact page uses, so these
-// arrive in the same inbox. The `about` value rides along as a hidden
-// field, which is the only way to tell the three apart once they land.
+// `variant="dark"` is for the chocolate banner, where the light styling
+// would be invisible.
 interface Props {
   about: string;
-  label: string;
+  variant?: 'light' | 'dark';
   formspreeId?: string;
 }
-const { about, label, formspreeId = 'xpqjyzba' } = Astro.props;
-const id = `interest-${about.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+const { about, variant = 'light', formspreeId = 'xpqjyzba' } = Astro.props;
+const uid = about.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 ---
 
-<form class="interest" data-formspree={`https://formspree.io/f/${formspreeId}`}>
+<form class:list={['interest', variant === 'dark' && 'interest--dark']}
+      data-formspree={`https://formspree.io/f/${formspreeId}`}>
   <input type="hidden" name="about" value={about} />
   <input type="hidden" name="_subject" value={`Enquiry: ${about}`} />
 
-  <label class="interest-label" for={id}>{label}</label>
-  <div class="interest-row">
-    <input
-      type="email"
-      id={id}
-      name="email"
-      required
-      placeholder="Your email address"
-      class="interest-input"
-    />
+  <div class="interest-fields">
+    <div class="interest-pair">
+      <label class="visually-hidden" for={`${uid}-name`}>Your name</label>
+      <input id={`${uid}-name`} name="name" type="text" required
+             placeholder="Your name" class="interest-input" />
+
+      <label class="visually-hidden" for={`${uid}-phone`}>Phone number</label>
+      <input id={`${uid}-phone`} name="phone" type="tel"
+             placeholder="Phone number" class="interest-input" />
+    </div>
+
+    <label class="visually-hidden" for={`${uid}-email`}>Email address</label>
+    <input id={`${uid}-email`} name="email" type="email" required
+           placeholder="Email address" class="interest-input" />
+
     <button type="submit" class="interest-btn">Contact me</button>
   </div>
+
   <p class="interest-status" role="status"></p>
 </form>
 
@@ -71,32 +78,31 @@ const id = `interest-${about.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 <style>
   .interest {
-    margin-top: var(--space-xl);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--color-border);
+    max-width: 34rem;
+    margin: 0 auto;
     text-align: center;
   }
 
-  .interest-label {
-    display: block;
-    font-size: var(--text-base);
-    color: var(--color-earth-dark);
-    margin-bottom: var(--space-md);
-  }
-
-  .interest-row {
+  .interest-fields {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
     gap: var(--space-sm);
   }
 
-  .interest-input {
-    /* min-width:0 or the input refuses to shrink under its basis and
+  .interest-pair {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .interest-pair .interest-input {
+    /* Without this a flex item refuses to shrink past its content and
        pushes the page into a horizontal scroll on a phone. */
-    flex: 1 1 12rem;
+    flex: 1 1 0;
     min-width: 0;
-    max-width: 22rem;
+  }
+
+  .interest-input {
+    width: 100%;
     padding: 0.75rem 1.2rem;
     border: 1px solid var(--color-border);
     border-radius: 999px;
@@ -106,19 +112,22 @@ const id = `interest-${about.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     color: var(--color-text);
   }
 
+  .interest-input::placeholder { color: var(--color-earth); opacity: 1; }
+
   .interest-input:focus {
     outline: none;
     border-color: var(--color-terracotta);
-    box-shadow: 0 0 0 3px rgba(208, 144, 91, 0.18);
+    box-shadow: 0 0 0 3px rgba(208, 144, 91, 0.25);
   }
 
   .interest-btn {
-    flex: 0 0 auto;
+    align-self: center;
+    margin-top: var(--space-xs);
     background: var(--color-earth-dark);
     color: var(--color-cream);
     border: none;
     border-radius: 999px;
-    padding: 0.75rem 1.8rem;
+    padding: 0.8rem 2.2rem;
     font-family: var(--font-body);
     font-size: var(--text-base);
     cursor: pointer;
@@ -131,8 +140,38 @@ const id = `interest-${about.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     margin: var(--space-sm) 0 0;
     font-size: var(--text-sm);
     min-height: 1.2em;
+    color: var(--color-earth);
   }
 
-  .interest-status--ok { color: var(--color-earth-dark); }
   .interest-status--bad { color: var(--color-terracotta-dark); }
+
+  /* --- on the chocolate banner --- */
+
+  .interest--dark .interest-input {
+    border-color: rgba(238, 228, 219, 0.35);
+  }
+
+  .interest--dark .interest-btn {
+    background: var(--color-cream);
+    color: var(--color-earth-dark);
+  }
+
+  .interest--dark .interest-btn:hover { background: var(--color-white); }
+
+  .interest--dark .interest-status { color: var(--color-cream); }
+  .interest--dark .interest-status--bad { color: var(--color-terracotta-light); }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 520px) {
+    .interest-pair { flex-direction: column; }
+  }
 </style>

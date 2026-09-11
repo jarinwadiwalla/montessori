@@ -83,10 +83,6 @@ const addOnGroups = [
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
         </ul>
-        <InterestForm
-          about="Monthly Partnership"
-          label="Contact me about the Monthly Partnership"
-        />
       </article>
     </section>
 
@@ -110,10 +106,6 @@ const addOnGroups = [
           </div>
         ))}
       </div>
-      <InterestForm
-        about="À La Carte Add-Ons"
-        label="Contact me about the À La Carte Items"
-      />
     </section>
   </div>
 
@@ -125,7 +117,7 @@ const addOnGroups = [
         Tell us where you are and what your vision is. We can't wait to bring
         it to life, together!
       </p>
-      <a href="/contact/" class="ready-cta">Get in touch</a>
+      <InterestForm about="Partnership" variant="dark" />
     </div>
   </section>
 
@@ -338,19 +330,4 @@ const addOnGroups = [
     margin-bottom: var(--space-xl);
   }
 
-  .ready-cta {
-    display: inline-block;
-    background: var(--color-cream);
-    color: var(--color-earth-dark);
-    padding: 0.9rem 2.2rem;
-    border-radius: 999px;
-    text-decoration: none;
-    font-size: var(--text-base);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .ready-cta:hover {
-    background: var(--color-white);
-  }
 </style>
