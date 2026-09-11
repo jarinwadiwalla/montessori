@@ -1,16 +1,20 @@
 {
   "monthly": "$000",
   "addOns": {
-    "environment": "$00",
     "philosophy": "$00",
+    "environment": "$00",
     "adultPrep": "$00",
+    "team": "$00",
     "studyWorkTerm": "$00",
+    "scheduleFlows": "$00",
     "curriculumMap": "$00",
     "mathematics": "$00",
-    "scheduleFlows": "$00",
     "dailyLife": "$00",
     "marketing": "$00",
     "enrollment": "$00",
-    "specialists": "$00"
+    "specialists": "$00",
+    "parentEd": "$00",
+    "events": "$00",
+    "accreditation": "$00"
   }
 }

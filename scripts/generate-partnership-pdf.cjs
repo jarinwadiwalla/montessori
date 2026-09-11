@@ -76,21 +76,25 @@ const MONTHLY_INCLUDES = [
 
 const ADD_ONS = [
   ["Planning and Preparation", [
-    ["environment", "Designing the prepared environment"],
     ["philosophy", "Grounding the team in Montessori adolescent philosophy"],
-    ["adultPrep", "Preparing the adults: guides and visiting specialists"],
+    ["environment", "Designing the prepared environment"],
+    ["adultPrep", "Preparing the adults who will hold the environment"],
+    ["team", "Building and supporting your team"],
   ]],
   ["Environment Structure", [
     ["studyWorkTerm", "Planning and running a study and work term"],
-    ["curriculumMap", "Mapping the curriculum to your students"],
-    ["mathematics", "Building the mathematics sequence"],
     ["scheduleFlows", "Shaping the daily and weekly flow"],
-    ["dailyLife", "Establishing daily life: meals, responsibilities and student managers"],
+    ["curriculumMap", "Curriculum planning, mapped to your students"],
+    ["mathematics", "Building the mathematics sequence"],
+    ["dailyLife", "Establishing daily life: meal rituals, responsibilities and community management"],
   ]],
   ["Administrative", [
     ["marketing", "Marketing your program"],
     ["enrollment", "Enrolling your first students"],
     ["specialists", "Recruiting visiting specialists"],
+    ["parentEd", "Bringing parents with you"],
+    ["events", "Running events and raising funds"],
+    ["accreditation", "Navigating accreditation and GED options"],
   ]],
 ];
 
