@@ -1,6 +1,5 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import InterestForm from '../components/shared/InterestForm.astro';
 
 // One offer, month to month.
@@ -45,57 +44,46 @@ const addOnGroups = [
       'Visiting specialists checklist: recruitment of experts',
     ],
   },
-  {
-    title: 'On-Site Visits',
-    items: ['On-site observation, feedback and side-by-side facilitation.'],
-  },
 ];
 ---
 
 <PageLayout
   title="Partnership"
   description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
-  heroTitle="Partnership"
-  heroImage="/images/guidance-photo-6.jpg"
-  heroImagePosition="center 40%"
 >
-  <div class="container container--narrow">
-    <section class="page-section">
+  <div class="container">
+    <header class="page-head">
+      <h1>Partnership</h1>
+    </header>
+
+    <section class="page-section intro-tight">
       <p class="lede">
-        <em>Erdkinder</em>, German for children of the earth, was Maria
-        Montessori's vision for adolescent education. She believed young people
-        needed more than a classroom: real work, real community, and a real
-        connection to the land.
-      </p>
-      <p>
-        Our consulting supports communities ready to bring that vision to life.
+        <em>Erdkinder</em> was Maria Montessori's vision for adolescent
+        education: real work, real community, a real connection to the land.
         Every consultant holds the AMI 12&ndash;18 Adolescent Diploma and has
         built programs from the ground up.
       </p>
     </section>
-  </div>
 
-  <div class="container container--narrow">
+    <div class="offer-columns">
     <section class="page-section">
       <article class="offer-card">
         <h2 class="offer-title">{plan.name}</h2>
+        <p class="plan-intro">
+          Custom side-by-side partnership to help you navigate starting, or
+          optimizing your adolescent program, based on your needs right now.
+        </p>
+        <p class="plan-intro">
+          Strategy where you need it most; chosen areas of focus for each week.
+        </p>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
         </ul>
       </article>
     </section>
-
-  </div>
-
-  <div class="container container--narrow">
     <section class="page-section">
-      <h2>À La Carte Add-Ons</h2>
-      <p class="addon-note">
-        <strong>Available to anyone</strong>, whether or not you are in a
-        Monthly Partnership. A complimentary 30-minute call is offered with
-        Add-Ons that need tailored information.
-      </p>
+      <h2>Areas of Focus</h2>
       <div class="addon-grid">
         {addOnGroups.map((group) => (
           <div class="addon-group">
@@ -107,6 +95,14 @@ const addOnGroups = [
         ))}
       </div>
     </section>
+    </div>
+  </div>
+
+  <div class="container container--narrow">
+
+  </div>
+
+  <div class="container container--narrow">
   </div>
 
   <section class="ready-banner">
@@ -121,10 +117,6 @@ const addOnGroups = [
     </div>
   </section>
 
-  <QuoteBanner
-    text="The greatest sign of success for a teacher is to be able to say, 'The children are now working as if I did not exist.'"
-    author="Maria Montessori"
-  />
 </PageLayout>
 
 <style>
@@ -134,7 +126,7 @@ const addOnGroups = [
     background: var(--color-white);
     border: 1px solid var(--color-terracotta);
     border-radius: var(--radius-xl);
-    padding: var(--space-3xl) var(--space-2xl) var(--space-2xl);
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
     box-shadow: var(--shadow-lg);
     text-align: center;
   }
@@ -152,12 +144,24 @@ const addOnGroups = [
 
   .offer-title {
     font-family: var(--font-heading);
-    font-size: var(--text-3xl);
+    font-size: var(--text-2xl);
     color: var(--color-earth-dark);
-    margin: 0 0 var(--space-xl);
+    margin: 0 0 var(--space-sm);
   }
 
 
+
+  .plan-intro {
+    max-width: 44rem;
+    margin: 0 auto var(--space-sm);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-earth);
+  }
+
+  .plan-intro + .plan-included-label {
+    margin-top: var(--space-lg);
+  }
 
   .plan-included-label {
     font-family: var(--font-body);
@@ -172,14 +176,16 @@ const addOnGroups = [
     list-style: none;
     padding: 0;
     margin: 0 auto;
-    max-width: 34rem;
+    max-width: 30rem;
     text-align: left;
+    columns: 1;
   }
 
   .plan-list li {
     position: relative;
+    break-inside: avoid;
     padding-left: 1.2rem;
-    margin-bottom: var(--space-sm);
+    margin-bottom: 0.4rem;
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
     color: var(--color-text);
@@ -203,8 +209,38 @@ const addOnGroups = [
 
 
 
+  .page-head {
+    padding-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    text-align: center;
+  }
+
+  .page-head h1 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    margin: 0;
+  }
+
   .page-section {
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Side by side, so the whole offer is visible at once rather than
+     stacked into two screens. */
+  .offer-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  @media (max-width: 1040px) {
+    .offer-columns { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .intro-tight {
+    margin-bottom: var(--space-lg);
   }
 
   .page-section h2 {
@@ -241,36 +277,28 @@ const addOnGroups = [
 
   /* --- add-ons --- */
 
-  .addon-note {
-    font-size: var(--text-base);
-    color: var(--color-earth);
-    margin-bottom: var(--space-xl);
-  }
 
-  .addon-note strong {
-    color: var(--color-earth-dark);
-  }
 
   .addon-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--space-xl);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-sm);
   }
 
   .addon-group {
     background: var(--color-white);
     border: 1px solid var(--color-terracotta);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     box-shadow: var(--shadow-sm);
   }
 
   .addon-group h3 {
     font-family: var(--font-heading);
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     color: var(--color-earth-dark);
-    margin-bottom: var(--space-md);
-    padding-bottom: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-xs);
     border-bottom: 1px solid var(--color-border);
   }
 
@@ -283,9 +311,9 @@ const addOnGroups = [
   .page-list li {
     position: relative;
     padding-left: 1.1rem;
-    margin-bottom: var(--space-sm);
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
+    margin-bottom: 0.3rem;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     color: var(--color-text);
   }
 
@@ -304,7 +332,7 @@ const addOnGroups = [
 
   .ready-banner {
     background: var(--color-earth-dark);
-    padding-block: var(--space-4xl);
+    padding-block: var(--space-2xl);
     text-align: center;
   }
 
@@ -327,7 +355,7 @@ const addOnGroups = [
 
   .ready-sub {
     color: rgba(238, 228, 219, 0.85);
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-lg);
   }
 
 </style>

@@ -1,16 +1,5 @@
 {
   "monthly": "$000",
-  "threeMonth": {
-    "perMonth": "$000",
-    "total": "$0,000",
-    "save": "Save 00%"
-  },
-  "sixMonth": {
-    "perMonth": "$000",
-    "total": "$0,000",
-    "save": "Save 00%"
-  },
-  "onSiteDay": "$0,000 to $0,000 per day, plus travel and accommodation",
   "addOns": {
     "checklist": "$00",
     "environment": "$00",

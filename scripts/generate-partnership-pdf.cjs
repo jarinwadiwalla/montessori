@@ -91,9 +91,6 @@ const ADD_ONS = [
     ["enrollment", "Student enrollment checklist"],
     ["specialists", "Visiting specialists checklist: recruitment of experts"],
   ]],
-  ["On-Site Visits", [
-    [null, "On-site observation, feedback and side-by-side facilitation"],
-  ]],
 ];
 
 // ---------------------------------------------------------------------------
@@ -190,38 +187,6 @@ const docDefinition = {
       ...MONTHLY_INCLUDES.map(tick),
     ]),
 
-    // ---- multi-month ----
-    card([
-      { text: "Multi-Month Partnership", style: "h2", alignment: "center" },
-      { ...rule(46, TERRACOTTA, [0, 8, 0, 12]), alignment: "center" },
-      { text: "More commitment, less money, more goodies.", style: "body", alignment: "center", margin: [0, 0, 0, 16] },
-      {
-        columns: [
-          {
-            width: "*",
-            stack: [
-              { text: "Three months", style: "h3" },
-              { text: PRICES.threeMonth.save, style: "eyebrow", color: TERRACOTTA_DARK, margin: [0, 3, 0, 6] },
-              { text: `${PRICES.threeMonth.perMonth} per month`, style: "body" },
-              { text: `${PRICES.threeMonth.total} in total`, style: "small", margin: [0, 1, 0, 8] },
-              tick("One complimentary À La Carte Add-On"),
-            ],
-          },
-          { width: 18, text: "" },
-          {
-            width: "*",
-            stack: [
-              { text: "Six months", style: "h3" },
-              { text: PRICES.sixMonth.save, style: "eyebrow", color: TERRACOTTA_DARK, margin: [0, 3, 0, 6] },
-              { text: `${PRICES.sixMonth.perMonth} per month`, style: "body" },
-              { text: `${PRICES.sixMonth.total} in total`, style: "small", margin: [0, 1, 0, 8] },
-              tick("Two complimentary À La Carte Add-Ons"),
-              tick("On-site visit available at a reduced rate"),
-            ],
-          },
-        ],
-      },
-    ], CREAM_SOFT),
 
     // ---- add-ons ----
     // Heading, rule and intro travel together, or the heading is left
@@ -229,10 +194,10 @@ const docDefinition = {
     {
       unbreakable: true,
       stack: [
-        { text: "À La Carte Add-Ons", style: "h2", alignment: "center", margin: [0, 26, 0, 0] },
+        { text: "Areas of Focus", style: "h2", alignment: "center", margin: [0, 26, 0, 0] },
         { ...rule(46, TERRACOTTA, [0, 10, 0, 12]), alignment: "center" },
         {
-          text: "Available to anyone, whether or not you are in a Monthly Partnership. A complimentary 30-minute call is offered with Add-Ons that need tailored information.",
+          text: "Available to anyone, in a Monthly Partnership or not.",
           style: "body", alignment: "center", margin: [30, 0, 30, 6],
         },
       ],
@@ -242,9 +207,6 @@ const docDefinition = {
         { text: title, style: "h3", margin: [0, 0, 0, 4] },
         { canvas: [{ type: "line", x1: 0, y1: 0, x2: 420, y2: 0, lineWidth: 0.5, lineColor: BORDER }], margin: [0, 0, 0, 10] },
         ...items.map(([key, text]) => pricedTick(text, key ? PRICES.addOns[key] : "")),
-        ...(title === "On-Site Visits"
-          ? [{ text: PRICES.onSiteDay, style: "small", color: CHOCOLATE, margin: [14, 4, 0, 0] }]
-          : []),
       ])
     ),
 
