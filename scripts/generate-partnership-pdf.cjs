@@ -64,6 +64,8 @@ const logoDataUri =
 // Content, kept in step with /partnership/
 // ---------------------------------------------------------------------------
 const MONTHLY_INCLUDES = [
+  "Custom side-by-side partnership to help you navigate starting or optimizing your adolescent program, based on your needs right now",
+  "Strategy where you need it most; chosen areas of focus for each week",
   "Two 60-minute guidance calls, or four 30-minute calls",
   "Written call notes and action items after each session",
   "Custom monthly checklist and planning document",
@@ -74,21 +76,21 @@ const MONTHLY_INCLUDES = [
 
 const ADD_ONS = [
   ["Planning and Preparation", [
-    ["environment", "The prepared environment for adolescents: essential pillars, with charts, readings and case studies"],
-    ["philosophy", "Montessori philosophy for the adolescent: guided readings and a reflection packet"],
-    ["adultPrep", "Montessori adult preparation documents, for guides and visiting specialists"],
+    ["environment", "Designing the prepared environment"],
+    ["philosophy", "Grounding the team in Montessori adolescent philosophy"],
+    ["adultPrep", "Preparing the adults: guides and visiting specialists"],
   ]],
   ["Environment Structure", [
-    ["studyWorkTerm", "How to plan and execute a study and work term"],
-    ["curriculumMap", "Custom student curriculum map and free curriculum resources list"],
-    ["mathematics", "Complete mathematics curriculum: student maps and self-paced learning"],
-    ["scheduleFlows", "Detailed schedule flows: the first three weeks, the daily flow and the weekly flow, created together"],
-    ["dailyLife", "Daily life example guides: meal rituals, responsibilities, meeting agenda and managers"],
+    ["studyWorkTerm", "Planning and running a study and work term"],
+    ["curriculumMap", "Mapping the curriculum to your students"],
+    ["mathematics", "Building the mathematics sequence"],
+    ["scheduleFlows", "Shaping the daily and weekly flow"],
+    ["dailyLife", "Establishing daily life: meals, responsibilities and student managers"],
   ]],
   ["Administrative", [
-    ["marketing", "Marketing checklist"],
-    ["enrollment", "Student enrollment checklist"],
-    ["specialists", "Visiting specialists checklist: recruitment of experts"],
+    ["marketing", "Marketing your program"],
+    ["enrollment", "Enrolling your first students"],
+    ["specialists", "Recruiting visiting specialists"],
   ]],
 ];
 

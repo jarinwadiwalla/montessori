@@ -6,6 +6,8 @@ import InterestForm from '../components/shared/InterestForm.astro';
 const plan = {
   name: 'Monthly Partnership',
   included: [
+    'Custom side-by-side partnership to help you navigate starting or optimizing your adolescent program, based on your needs right now',
+    'Strategy where you need it most; chosen areas of focus for each week',
     'Two 60-minute guidance calls, or four 30-minute calls',
     'Written call notes and action items after each session',
     'Custom monthly checklist and planning document',
@@ -20,27 +22,27 @@ const addOnGroups = [
   {
     title: 'Planning and Preparation',
     items: [
-      'The prepared environment for adolescents: essential pillars, with charts, readings and case studies',
-      'Montessori philosophy for the adolescent: guided readings and a reflection packet',
-      'Montessori adult preparation documents, for guides and visiting specialists',
+      'Designing the prepared environment',
+      'Grounding the team in Montessori adolescent philosophy',
+      'Preparing the adults: guides and visiting specialists',
     ],
   },
   {
     title: 'Environment Structure',
     items: [
-      'How to plan and execute a study and work term',
-      'Custom student curriculum map and free curriculum resources list',
-      'Complete mathematics curriculum: student maps and self-paced learning',
-      'Detailed schedule flows: the first three weeks, the daily flow and the weekly flow, created together',
-      'Daily life example guides: meal rituals, responsibilities, meeting agenda and managers',
+      'Planning and running a study and work term',
+      'Mapping the curriculum to your students',
+      'Building the mathematics sequence',
+      'Shaping the daily and weekly flow',
+      'Establishing daily life: meals, responsibilities and student managers',
     ],
   },
   {
     title: 'Administrative',
     items: [
-      'Marketing checklist',
-      'Student enrollment checklist',
-      'Visiting specialists checklist: recruitment of experts',
+      'Marketing your program',
+      'Enrolling your first students',
+      'Recruiting visiting specialists',
     ],
   },
 ];
@@ -49,8 +51,8 @@ const addOnGroups = [
 <PageLayout
   title="Partnership"
   heroTitle="Partnership"
-  heroImage="/images/guidance-photo-6.jpg"
-  heroImagePosition="center 40%"
+  heroImage="/images/sunset-hero.jpg"
+  heroImagePosition="center 42%"
   description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
 >
   <div class="container">
@@ -68,13 +70,6 @@ const addOnGroups = [
     <section class="page-section">
       <article class="offer-card">
         <h2 class="offer-title">{plan.name}</h2>
-        <p class="plan-intro">
-          Custom side-by-side partnership to help you navigate starting, or
-          optimizing your adolescent program, based on your needs right now.
-        </p>
-        <p class="plan-intro">
-          Strategy where you need it most; chosen areas of focus for each week.
-        </p>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
@@ -149,17 +144,7 @@ const addOnGroups = [
 
 
 
-  .plan-intro {
-    max-width: 44rem;
-    margin: 0 auto var(--space-sm);
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
-    color: var(--color-earth);
-  }
 
-  .plan-intro + .plan-included-label {
-    margin-top: var(--space-lg);
-  }
 
   .plan-included-label {
     font-family: var(--font-body);
