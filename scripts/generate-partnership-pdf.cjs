@@ -84,8 +84,7 @@ const ADD_ONS = [
   ["Environment Structure", [
     ["studyWorkTerm", "Planning and running a study and work term"],
     ["scheduleFlows", "Shaping the daily and weekly flow"],
-    ["curriculumMap", "Curriculum planning, mapped to your students"],
-    ["mathematics", "Building the mathematics sequence"],
+    ["curriculumMap", "Curriculum planning and resources"],
     ["dailyLife", "Establishing daily life: meal rituals, responsibilities and community management"],
   ]],
   ["Administrative", [
