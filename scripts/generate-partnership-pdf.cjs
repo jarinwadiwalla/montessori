@@ -89,8 +89,6 @@ const ADD_ONS = [
   ]],
   ["Administrative", [
     ["marketing", "Marketing your program"],
-    ["enrollment", "Enrolling your first students"],
-    ["specialists", "Recruiting visiting specialists"],
     ["parentEd", "Parent Involvement and Education"],
     ["events", "Events and Fundraising"],
     ["accreditation", "Navigating accreditation and GED options"],
