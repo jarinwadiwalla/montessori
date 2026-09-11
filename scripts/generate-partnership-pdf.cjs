@@ -74,7 +74,6 @@ const MONTHLY_INCLUDES = [
 
 const ADD_ONS = [
   ["Planning and Preparation", [
-    ["checklist", "Custom monthly checklist and planning document"],
     ["environment", "The prepared environment for adolescents: essential pillars, with charts, readings and case studies"],
     ["philosophy", "Montessori philosophy for the adolescent: guided readings and a reflection packet"],
     ["adultPrep", "Montessori adult preparation documents, for guides and visiting specialists"],
