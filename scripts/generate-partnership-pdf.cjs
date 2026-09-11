@@ -82,7 +82,7 @@ const ADD_ONS = [
     ["team", "Building and supporting your team"],
   ]],
   ["Planning and Logistics", [
-    ["studyWorkTerm", "Planning and running a study and work term"],
+    ["studyWorkTerm", "Components of the study and work term"],
     ["scheduleFlows", "Shaping the daily and weekly flow"],
     ["curriculumMap", "Curriculum planning and resources"],
     ["dailyLife", "Establishing daily life: meal rituals, responsibilities and community management"],
