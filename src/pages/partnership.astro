@@ -97,9 +97,8 @@ const addOnGroups = [
 
   <div class="container container--narrow">
     <section class="page-section">
-      <article class="plan">
-        <p class="plan-eyebrow">The offer</p>
-        <h2 class="plan-name">{plan.name}</h2>
+      <article class="offer-card">
+        <h2 class="offer-title">{plan.name}</h2>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
@@ -108,20 +107,22 @@ const addOnGroups = [
     </section>
 
     <section class="page-section">
-      <h2 class="commit-heading">Multi-Month Partnership</h2>
-      <p class="commit-intro">More Commitment, Less Money, More Goodies!</p>
-      <div class="commit-grid">
-        {commitments.map((c) => (
-          <div class="commit">
-            <p class="commit-term">{c.term}</p>
-            <p class="commit-save">{c.save || 'Reduced rate'}</p>
-            <p class="commit-blurb">{c.blurb}</p>
-            <ul class="commit-list">
-              {c.extras.map((e) => <li>{e}</li>)}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <article class="offer-card">
+        <h2 class="offer-title">Multi-Month Partnership</h2>
+        <p class="commit-intro">More Commitment, Less Money, More Goodies!</p>
+        <div class="commit-grid">
+          {commitments.map((c) => (
+            <div class="commit">
+              <p class="commit-term">{c.term}</p>
+              <p class="commit-save">{c.save || 'Reduced rate'}</p>
+              <p class="commit-blurb">{c.blurb}</p>
+              <ul class="commit-list">
+                {c.extras.map((e) => <li>{e}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </article>
     </section>
   </div>
 
@@ -167,7 +168,7 @@ const addOnGroups = [
 <style>
   /* --- the offer --- */
 
-  .plan {
+  .offer-card {
     background: var(--color-white);
     border: 1px solid var(--color-terracotta);
     border-radius: var(--radius-xl);
@@ -176,17 +177,9 @@ const addOnGroups = [
     text-align: center;
   }
 
-  .plan-eyebrow {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-earth);
-    margin: 0 0 var(--space-sm);
-  }
 
   /* The same short rule the other section headings use. */
-  .plan-name::after {
+  .offer-title::after {
     content: '';
     display: block;
     width: 46px;
@@ -195,7 +188,7 @@ const addOnGroups = [
     background: var(--color-terracotta);
   }
 
-  .plan-name {
+  .offer-title {
     font-family: var(--font-heading);
     font-size: var(--text-3xl);
     color: var(--color-earth-dark);
@@ -246,17 +239,11 @@ const addOnGroups = [
 
   /* --- commitment rates --- */
 
-  .commit-heading {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    color: var(--color-earth-dark);
-    margin-bottom: var(--space-xs);
-  }
 
   .commit-intro {
     font-size: var(--text-lg);
     color: var(--color-earth);
-    margin-bottom: var(--space-xl);
+    margin: 0 0 var(--space-xl);
   }
 
   .commit-grid {
@@ -270,15 +257,18 @@ const addOnGroups = [
   }
 
   .commit {
-    background: var(--color-white);
-    border: 1px solid var(--color-terracotta);
+    /* The card around these centres its text; a ticked list has to sit
+       left or the ticks float away from what they tick. */
+    text-align: left;
+    background: var(--color-cream);
+    border: 1px solid var(--color-cream-dark);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
   }
 
   .commit:last-child {
-    box-shadow: var(--shadow-md);
+    border-color: var(--color-terracotta);
   }
 
   .commit-term {
