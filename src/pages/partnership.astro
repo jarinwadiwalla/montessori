@@ -3,9 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import InterestForm from '../components/shared/InterestForm.astro';
 
-// One offer, month to month, with a reduced rate for committing further
-// ahead. Fill in the two `save` values when they are settled; each falls
-// back to neutral wording until then.
+// One offer, month to month.
 const plan = {
   name: 'Monthly Partnership',
   included: [
@@ -18,25 +16,6 @@ const plan = {
   ],
 };
 
-const commitments = [
-  {
-    term: 'Three months',
-    save: '',
-    blurb: 'The same support, at a lower monthly rate.',
-    extras: [
-      'One complimentary À La Carte Add-On',
-    ],
-  },
-  {
-    term: 'Six months',
-    save: '',
-    blurb: 'The lowest monthly rate, for a programme being built from the ground up.',
-    extras: [
-      'Two complimentary À La Carte Add-Ons',
-      'On-site visit available at a reduced rate',
-    ],
-  },
-];
 
 const addOnGroups = [
   {
@@ -75,7 +54,7 @@ const addOnGroups = [
 
 <PageLayout
   title="Partnership"
-  description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective, cancel any time. Reduced rates for three or six months."
+  description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
   heroTitle="Partnership"
   heroImage="/images/guidance-photo-6.jpg"
   heroImagePosition="center 40%"
@@ -111,28 +90,6 @@ const addOnGroups = [
       </article>
     </section>
 
-    <section class="page-section">
-      <article class="offer-card">
-        <h2 class="offer-title">Multi-Month Partnership</h2>
-        <p class="commit-intro">More Commitment, Less Money, More Goodies!</p>
-        <div class="commit-grid">
-          {commitments.map((c) => (
-            <div class="commit">
-              <p class="commit-term">{c.term}</p>
-              <p class="commit-save">{c.save || 'Reduced rate'}</p>
-              <p class="commit-blurb">{c.blurb}</p>
-              <ul class="commit-list">
-                {c.extras.map((e) => <li>{e}</li>)}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <InterestForm
-          about="Multi-Month Partnership"
-          label="Contact me about the Multi-Month Partnership"
-        />
-      </article>
-    </section>
   </div>
 
   <div class="container container--narrow">
@@ -237,8 +194,7 @@ const addOnGroups = [
   }
 
 
-  .plan-list li::before,
-  .commit-list li::before {
+  .plan-list li::before {
     content: '';
     position: absolute;
     left: 1px;
@@ -250,76 +206,9 @@ const addOnGroups = [
     transform: rotate(45deg);
   }
 
-  /* --- commitment rates --- */
 
 
-  .commit-intro {
-    font-size: var(--text-lg);
-    color: var(--color-earth);
-    margin: 0 0 var(--space-xl);
-  }
 
-  .commit-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-xl);
-  }
-
-  @media (max-width: 720px) {
-    .commit-grid { grid-template-columns: minmax(0, 1fr); }
-  }
-
-  .commit {
-    /* The card around these centres its text; a ticked list has to sit
-       left or the ticks float away from what they tick. */
-    text-align: left;
-    background: var(--color-cream);
-    border: 1px solid var(--color-terracotta);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .commit:last-child {
-    box-shadow: var(--shadow-sm);
-  }
-
-  .commit-term {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    color: var(--color-earth-dark);
-    margin: 0 0 0.2rem;
-  }
-
-  .commit-save {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-terracotta-dark);
-    margin: 0 0 var(--space-md);
-  }
-
-  .commit-blurb {
-    font-size: var(--text-base);
-    color: var(--color-earth);
-    margin-bottom: var(--space-md);
-  }
-
-  .commit-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .commit-list li {
-    position: relative;
-    padding-left: 1.2rem;
-    margin-bottom: var(--space-sm);
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-  }
 
 
   .page-section {
@@ -343,13 +232,6 @@ const addOnGroups = [
     font-size: var(--text-xl);
   }
 
-  /* --- tiers --- */
-
-
-
-  @media (max-width: 900px) {
-    .tier-grid { grid-template-columns: minmax(0, 1fr); }
-  }
 
 
 
