@@ -91,8 +91,8 @@ const ADD_ONS = [
     ["marketing", "Marketing your program"],
     ["enrollment", "Enrolling your first students"],
     ["specialists", "Recruiting visiting specialists"],
-    ["parentEd", "Bringing parents with you"],
-    ["events", "Running events and raising funds"],
+    ["parentEd", "Parent Involvement and Education"],
+    ["events", "Events and Fundraising"],
     ["accreditation", "Navigating accreditation and GED options"],
   ]],
 ];
