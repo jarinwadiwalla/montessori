@@ -3,12 +3,10 @@ import PageLayout from '../layouts/PageLayout.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 
 // One offer, month to month, with a reduced rate for committing further
-// ahead. Fill in `price` and the two `save` values when they are settled;
-// each falls back to neutral wording until then.
+// ahead. Fill in the two `save` values when they are settled; each falls
+// back to neutral wording until then.
 const plan = {
-  name: 'Month to month',
-  tagline: 'Cancel any time. No contract, no pressure.',
-  price: '',
+  name: 'Monthly Partnership',
   included: [
     'Four 60-minute guidance calls, one per week',
     'Written call notes and action items after each session',
@@ -25,7 +23,7 @@ const commitments = [
     save: '',
     blurb: 'The same support, at a lower monthly rate.',
     extras: [
-      'One complimentary à la carte add-on',
+      'One complimentary À La Carte Add-On',
     ],
   },
   {
@@ -33,9 +31,8 @@ const commitments = [
     save: '',
     blurb: 'The lowest monthly rate, for a programme being built from the ground up.',
     extras: [
-      'Two complimentary à la carte add-ons',
+      'Two complimentary À La Carte Add-Ons',
       'On-site visit available at a reduced rate',
-      'A locked-in rate if you continue beyond six months',
     ],
   },
 ];
@@ -102,9 +99,8 @@ const addOnGroups = [
   <div class="container container--narrow">
     <section class="page-section">
       <article class="plan">
+        <p class="plan-eyebrow">The offer</p>
         <h2 class="plan-name">{plan.name}</h2>
-        <p class="plan-tagline">{plan.tagline}</p>
-        <p class="plan-price">{plan.price || 'Pricing on request'}</p>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
@@ -135,10 +131,11 @@ const addOnGroups = [
 
   <div class="container container--narrow">
     <section class="page-section">
-      <h2>À la carte add-ons</h2>
+      <h2>À La Carte Add-Ons</h2>
       <p class="addon-note">
-        A complimentary 30-minute call is offered with add-ons that need
-        tailored information.
+        <strong>Available to anyone</strong>, whether or not you are in a
+        Monthly Partnership. A complimentary 30-minute call is offered with
+        Add-Ons that need tailored information.
       </p>
       <div class="addon-grid">
         {addOnGroups.map((group) => (
@@ -175,35 +172,39 @@ const addOnGroups = [
 
   .plan {
     background: var(--color-white);
-    border-top: 3px solid var(--color-terracotta);
-    border-radius: 3px 3px var(--radius-xl) var(--radius-xl);
-    padding: var(--space-2xl) var(--space-xl);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl) var(--space-2xl) var(--space-2xl);
+    box-shadow: var(--shadow-lg);
     text-align: center;
+  }
+
+  .plan-eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-sm);
+  }
+
+  /* The same short rule the other section headings use. */
+  .plan-name::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto 0;
+    background: var(--color-terracotta);
   }
 
   .plan-name {
     font-family: var(--font-heading);
     font-size: var(--text-3xl);
     color: var(--color-earth-dark);
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 var(--space-xl);
   }
 
-  .plan-tagline {
-    font-size: var(--text-lg);
-    color: var(--color-earth);
-    margin: 0 0 var(--space-lg);
-  }
 
-  .plan-price {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    color: var(--color-earth-dark);
-    padding: var(--space-md) 0;
-    margin: 0 0 var(--space-lg);
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
 
   .plan-included-label {
     font-family: var(--font-body);
@@ -231,15 +232,18 @@ const addOnGroups = [
     color: var(--color-text);
   }
 
-  .plan-list li::before {
+
+  .plan-list li::before,
+  .commit-list li::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0.6em;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--color-terracotta);
+    left: 1px;
+    top: 0.42em;
+    width: 0.32rem;
+    height: 0.62rem;
+    border: solid var(--color-terracotta);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
   }
 
   /* --- commitment rates --- */
@@ -272,6 +276,11 @@ const addOnGroups = [
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
+  }
+
+  .commit:last-child {
+    border-color: var(--color-terracotta);
+    box-shadow: var(--shadow-md);
   }
 
   .commit-term {
@@ -311,16 +320,6 @@ const addOnGroups = [
     color: var(--color-text);
   }
 
-  .commit-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.6em;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--color-terracotta);
-  }
 
   .page-section {
     margin-bottom: var(--space-3xl);
@@ -373,10 +372,21 @@ const addOnGroups = [
     margin-bottom: var(--space-xl);
   }
 
+  .addon-note strong {
+    color: var(--color-earth-dark);
+  }
+
   .addon-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--space-xl);
+  }
+
+  .addon-group {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
   }
 
   .addon-group h3 {
