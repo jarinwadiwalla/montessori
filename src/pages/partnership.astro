@@ -2,58 +2,42 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 
-// Prices are not set yet. Fill a `price` in and it replaces "Pricing on
-// request" for that tier — nothing else needs changing.
-const tiers = [
+// One offer, month to month, with a reduced rate for committing further
+// ahead. Fill in `price` and the two `save` values when they are settled;
+// each falls back to neutral wording until then.
+const plan = {
+  name: 'Month to month',
+  tagline: 'Cancel any time. No contract, no pressure.',
+  price: '',
+  included: [
+    'Four 60-minute guidance calls, one per week',
+    'Written call notes and action items after each session',
+    'Custom monthly checklist and planning document',
+    'Email support between calls, with 48-hour response',
+    'Access to the Montessori for Adolescents online resource library',
+    'Scheduling within 3 business days',
+    'Cancel any time, for any reason',
+  ],
+};
+
+const commitments = [
   {
-    label: 'Tier one',
-    name: 'The Seed',
-    tagline: 'On-demand guidance. No commitment required.',
-    price: '',
-    bestFor:
-      'Established programs with a focused challenge, or communities and individuals exploring where to begin.',
-    included: [
-      'Scheduled 30- or 60-minute guidance calls',
-      'Written follow-up notes sent after each session',
-      'À la carte add-ons available for additional pricing',
-      'Email support for 48 hours post-call',
-      'No retainer or contract required',
-      'Scheduling within 5 business days',
+    term: 'Three months',
+    save: '',
+    blurb: 'The same support, at a lower monthly rate.',
+    extras: [
+      'One complimentary à la carte add-on',
     ],
   },
   {
-    label: 'Tier two',
-    name: 'The Tending',
-    tagline: 'Weekly guidance and à la carte support. Month to month.',
-    price: '',
-    bestFor:
-      'Communities actively building who need consistent guidance, accountability, and the freedom to adjust month to month.',
-    included: [
-      'Four 60-minute guidance calls, one per week',
-      'One complimentary à la carte add-on during your first month',
-      'Written call notes and action items after each session',
-      'Email support between calls, with 48-hour response',
-      'Scheduling within 3 business days',
-      'Month to month, no contract required',
+    term: 'Six months',
+    save: '',
+    blurb: 'The lowest monthly rate, for a programme being built from the ground up.',
+    extras: [
+      'Two complimentary à la carte add-ons',
+      'On-site visit available at a reduced rate',
+      'A locked-in rate if you continue beyond six months',
     ],
-  },
-  {
-    label: 'Tier three',
-    name: 'The Blooming',
-    tagline: 'A full three-month engagement. Side-by-side program building.',
-    price: '',
-    bestFor:
-      'Communities building a program from the ground up, or undertaking a full redesign.',
-    included: [
-      'Four 60-minute guidance calls, one per week',
-      'Written call notes and action items after each session',
-      'Custom monthly checklist and planning document',
-      'Two complimentary à la carte add-ons, included once during your initial three-month engagement and not carried over on renewal',
-      'Email support throughout the engagement',
-      'Access to the Montessori for Adolescents online resource library',
-      'Scheduling within 3 business days',
-    ],
-    note: 'Renewal option: a locked-in renewal rate for additional months.',
   },
 ];
 
@@ -116,27 +100,35 @@ const addOnGroups = [
     </section>
   </div>
 
-  <div class="container">
+  <div class="container container--narrow">
     <section class="page-section">
-      <h2 class="tiers-heading">Guidance tiers</h2>
-      <div class="tier-grid">
-        {tiers.map((tier) => (
-          <article class="tier">
-            <p class="tier-label">{tier.label}</p>
-            <h3 class="tier-name">{tier.name}</h3>
-            <p class="tier-tagline">{tier.tagline}</p>
+      <article class="plan">
+        <h2 class="plan-name">{plan.name}</h2>
+        <p class="plan-tagline">{plan.tagline}</p>
+        <p class="plan-price">{plan.price || 'Pricing on request'}</p>
+        <p class="plan-included-label">Every month includes</p>
+        <ul class="plan-list">
+          {plan.included.map((item) => <li>{item}</li>)}
+        </ul>
+      </article>
+    </section>
 
-            <p class="tier-price">{tier.price || 'Pricing on request'}</p>
-
-            <p class="tier-bestfor"><strong>Best for</strong> {tier.bestFor}</p>
-
-            <p class="tier-included-label">What's included</p>
-            <ul class="tier-list">
-              {tier.included.map((item) => <li>{item}</li>)}
+    <section class="page-section">
+      <h2 class="commit-heading">Commit further ahead, pay less</h2>
+      <p class="commit-intro">
+        The support is the same either way. Committing further ahead simply costs
+        less per month, and carries a little extra.
+      </p>
+      <div class="commit-grid">
+        {commitments.map((c) => (
+          <div class="commit">
+            <p class="commit-term">{c.term}</p>
+            <p class="commit-save">{c.save || 'Reduced rate'}</p>
+            <p class="commit-blurb">{c.blurb}</p>
+            <ul class="commit-list">
+              {c.extras.map((e) => <li>{e}</li>)}
             </ul>
-
-            {tier.note && <p class="tier-note">{tier.note}</p>}
-          </article>
+          </div>
         ))}
       </div>
     </section>
@@ -180,6 +172,157 @@ const addOnGroups = [
 </PageLayout>
 
 <style>
+  /* --- the offer --- */
+
+  .plan {
+    background: var(--color-white);
+    border-top: 3px solid var(--color-terracotta);
+    border-radius: 3px 3px var(--radius-xl) var(--radius-xl);
+    padding: var(--space-2xl) var(--space-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+
+  .plan-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .plan-tagline {
+    font-size: var(--text-lg);
+    color: var(--color-earth);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .plan-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    padding: var(--space-md) 0;
+    margin: 0 0 var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .plan-included-label {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin-bottom: var(--space-md);
+  }
+
+  .plan-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 34rem;
+    text-align: left;
+  }
+
+  .plan-list li {
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .plan-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+  }
+
+  /* --- commitment rates --- */
+
+  .commit-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-xs);
+  }
+
+  .commit-intro {
+    color: var(--color-earth);
+    margin-bottom: var(--space-xl);
+  }
+
+  .commit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 720px) {
+    .commit-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .commit {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .commit-term {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 0.2rem;
+  }
+
+  .commit-save {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-terracotta-dark);
+    margin: 0 0 var(--space-md);
+  }
+
+  .commit-blurb {
+    font-size: var(--text-base);
+    color: var(--color-earth);
+    margin-bottom: var(--space-md);
+  }
+
+  .commit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .commit-list li {
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .commit-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+  }
+
   .page-section {
     margin-bottom: var(--space-3xl);
   }
@@ -203,129 +346,25 @@ const addOnGroups = [
 
   /* --- tiers --- */
 
-  .tiers-heading {
-    text-align: center;
-    margin-bottom: var(--space-2xl);
-  }
 
-  .tier-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-xl);
-    max-width: 1060px;
-    margin: 0 auto;
-    align-items: start;
-  }
 
   @media (max-width: 900px) {
     .tier-grid { grid-template-columns: minmax(0, 1fr); }
   }
 
-  .tier {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: var(--color-white);
-    border-top: 3px solid var(--color-terracotta);
-    border-radius: 3px 3px var(--radius-lg) var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-md);
-  }
 
-  .tier-label {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-earth);
-    margin: 0 0 var(--space-xs);
-  }
 
-  .tier-name {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    color: var(--color-earth-dark);
-    margin: 0 0 var(--space-sm);
-  }
 
-  .tier-tagline {
-    font-size: var(--text-base);
-    color: var(--color-earth);
-    margin: 0 0 var(--space-lg);
-  }
 
   /* Sits on its own line with rules above and below, so a price can be
      dropped in later without the layout shifting around it. */
-  .tier-price {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    color: var(--color-earth-dark);
-    text-align: center;
-    padding: var(--space-md) 0;
-    margin: 0 0 var(--space-lg);
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
 
-  .tier-bestfor {
-    font-size: var(--text-base);
-    color: var(--color-text);
-    margin-bottom: var(--space-lg);
-  }
 
-  .tier-bestfor strong {
-    display: block;
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-earth);
-    margin-bottom: 0.35rem;
-  }
 
-  .tier-included-label {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-earth);
-    margin-bottom: var(--space-sm);
-  }
 
-  .tier-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex: 1;
-  }
 
-  .tier-list li {
-    position: relative;
-    padding-left: 1.1rem;
-    margin-bottom: var(--space-sm);
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-  }
 
-  .tier-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.55em;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--color-terracotta);
-  }
 
-  .tier-note {
-    margin: var(--space-lg) 0 0;
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--color-border);
-    font-size: var(--text-sm);
-    color: var(--color-earth);
-  }
 
   /* --- add-ons --- */
 
