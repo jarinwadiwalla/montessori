@@ -93,6 +93,19 @@
         <div class="form-group">
           <label class="form-label">Description</label>
           <input type="text" id="blog-description" class="form-input" placeholder="Brief description for previews">
+          <small style="color:var(--gray-400);">Shown on the blog index card. Any length.</small>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="max-width:260px;">
+            <label class="form-label">Search title <span style="font-weight:400;color:var(--gray-400);">(optional)</span></label>
+            <input type="text" id="blog-seo-title" class="form-input" placeholder="Shorter title for Google">
+            <small style="color:var(--gray-400);">Leave blank to use the title above.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Search snippet <span style="font-weight:400;color:var(--gray-400);">(optional)</span></label>
+            <input type="text" id="blog-seo-description" class="form-input" maxlength="160" placeholder="The grey text under your link on Google" oninput="blogSeoCount()">
+            <small style="color:var(--gray-400);">Google cuts this off past 160 characters. <span id="blog-seo-count">0/160</span></small>
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">

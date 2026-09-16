@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS blog_drafts (
   date TEXT DEFAULT '',
   author TEXT DEFAULT 'Jarin Wadiwalla',
   description TEXT DEFAULT '',
+  seoTitle TEXT DEFAULT '',
+  seoDescription TEXT DEFAULT '',
   image TEXT DEFAULT '',
   body TEXT DEFAULT '',
   featured INTEGER DEFAULT 0,

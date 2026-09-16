@@ -26,14 +26,16 @@ export async function onRequestPost(context) {
   const now = new Date().toISOString();
 
   await env.SITE_DB.prepare(
-    `INSERT OR REPLACE INTO blog_drafts (slug, title, date, author, description, image, body, featured, scheduledAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT OR REPLACE INTO blog_drafts (slug, title, date, author, description, seoTitle, seoDescription, image, body, featured, scheduledAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     draft.slug,
     draft.title,
     draft.date || new Date().toISOString().split("T")[0],
     draft.author || "Jarin Wadiwalla",
     draft.description || "",
+    draft.seoTitle || "",
+    draft.seoDescription || "",
     draft.image || "",
     draft.body || "",
     draft.featured ? 1 : 0,

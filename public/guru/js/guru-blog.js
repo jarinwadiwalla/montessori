@@ -62,6 +62,8 @@ function blogCollectDraft() {
     date: document.getElementById("blog-date").value,
     author: document.getElementById("blog-author").value,
     description: document.getElementById("blog-description").value,
+    seoTitle: document.getElementById("blog-seo-title").value,
+    seoDescription: document.getElementById("blog-seo-description").value,
     image: document.getElementById("blog-image").value,
     body: document.getElementById("blog-body").value,
     featured: document.getElementById("blog-featured").checked,
@@ -74,10 +76,13 @@ function blogLoadIntoDraft(draft) {
   document.getElementById("blog-date").value = draft.date || "";
   document.getElementById("blog-author").value = draft.author || "Jarin Wadiwalla";
   document.getElementById("blog-description").value = draft.description || "";
+  document.getElementById("blog-seo-title").value = draft.seoTitle || "";
+  document.getElementById("blog-seo-description").value = draft.seoDescription || "";
   document.getElementById("blog-image").value = draft.image || "";
   document.getElementById("blog-body").value = draft.body || "";
   document.getElementById("blog-featured").checked = !!draft.featured;
   _blogCurrentSlug = draft.slug || null;
+  blogSeoCount();
   blogUpdatePreview();
 }
 
@@ -88,9 +93,12 @@ function blogClearEditor() {
   document.getElementById("blog-date").value = new Date().toISOString().split("T")[0];
   document.getElementById("blog-author").value = "Jarin Wadiwalla";
   document.getElementById("blog-description").value = "";
+  document.getElementById("blog-seo-title").value = "";
+  document.getElementById("blog-seo-description").value = "";
   document.getElementById("blog-image").value = "";
   document.getElementById("blog-body").value = "";
   document.getElementById("blog-featured").checked = false;
+  blogSeoCount();
   document.getElementById("blog-preview").innerHTML = '<p style="color:var(--gray-400);">Preview will appear here...</p>';
   document.getElementById("blog-auto-save-status").textContent = "";
   localStorage.removeItem(BLOG_DRAFT_KEY);
@@ -363,3 +371,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("blog-date").value = new Date().toISOString().split("T")[0];
   }
 });
+
+// Live length readout for the search snippet, so the 160-character limit is
+// visible while typing rather than discovered in Google weeks later.
+function blogSeoCount() {
+  const el = document.getElementById("blog-seo-description");
+  const out = document.getElementById("blog-seo-count");
+  if (!el || !out) return;
+  const n = el.value.length;
+  out.textContent = n + "/160";
+  out.style.color = n > 155 ? "var(--red-500, #c0392b)" : "";
+}

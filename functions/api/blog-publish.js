@@ -1,19 +1,44 @@
 import { requireAdmin } from "../lib/auth.js";
 
+function yamlString(value) {
+  // Backslashes first, then quotes: the other order double-escapes.
+  const escaped = String(value ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return `"${escaped}"`;
+}
+
 function buildMarkdown(draft) {
   const featured = draft.featured ? "true" : "false";
   const date = draft.date || new Date().toISOString().split("T")[0];
 
-  return `---
-title: "${draft.title.replace(/"/g, '\\"')}"
-description: "${(draft.description || "").replace(/"/g, '\\"')}"
-author: "${(draft.author || "Jarin Wadiwalla").replace(/"/g, '\\"')}"
-publishDate: ${date}
-featured: ${featured}
----
+  const lines = [
+    "---",
+    `title: ${yamlString(draft.title)}`,
+    `description: ${yamlString(draft.description || "")}`,
+  ];
 
-${draft.body || ""}
-`;
+  // Search-snippet overrides, written only when set so posts that don't need
+  // them stay clean. Both are optional in src/content.config.ts.
+  if (draft.seoTitle) {
+    lines.push(`seoTitle: ${yamlString(draft.seoTitle)}`);
+  }
+  if (draft.seoDescription) {
+    lines.push(`seoDescription: ${yamlString(draft.seoDescription)}`);
+  }
+
+  lines.push(`author: ${yamlString(draft.author || "Jarin Wadiwalla")}`);
+  lines.push(`publishDate: ${date}`);
+
+  // The editor has always collected a cover image and D1 has always stored it,
+  // but it was never written into the file, so every cover image set in Guru
+  // was silently dropped at publish.
+  if (draft.image) {
+    lines.push(`image: ${yamlString(draft.image)}`);
+  }
+
+  lines.push(`featured: ${featured}`);
+  lines.push("---", "", draft.body || "", "");
+
+  return lines.join("\n");
 }
 
 function utf8ToBase64(str) {
