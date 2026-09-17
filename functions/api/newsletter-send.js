@@ -94,6 +94,12 @@ export async function onRequestPost(context) {
     } else if (tier === "waitlist") {
       query += " AND tier = 'waitlist'";
       sendTier = "waitlist";
+    } else if (tier === "webinar") {
+      // Bought a webinar ticket or recording. Not excluded from the general
+      // "all" audience below, unlike donors and the waitlist, because these
+      // are customers rather than a separate list.
+      query += " AND tier = 'webinar'";
+      sendTier = "webinar";
     } else if (tier === "donor") {
       query += " AND tier = 'donor'";
       sendTier = "donor";

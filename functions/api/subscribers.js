@@ -17,6 +17,8 @@ export async function onRequestGet(context) {
     conditions.push("tier = 'founding'");
   } else if (filter === "donor") {
     conditions.push("tier = 'donor'");
+  } else if (filter === "webinar") {
+    conditions.push("tier = 'webinar'");
   } else if (filter === "active") {
     conditions.push("unsubscribed = 0");
   }

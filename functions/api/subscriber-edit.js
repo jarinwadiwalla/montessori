@@ -14,7 +14,7 @@ export async function onRequestPost(context) {
   // Tier decides who a send reaches, so an unknown value is refused rather
   // than stored: a blank tier would quietly drop someone out of a
   // Subscribers-only send, or lift them into a general one.
-  const TIERS = ["subscriber", "founding", "donor", "collective", "waitlist"];
+  const TIERS = ["subscriber", "founding", "donor", "collective", "waitlist", "webinar"];
   if (tier !== undefined && !TIERS.includes(tier)) {
     return Response.json(
       { error: `Unknown tier: ${JSON.stringify(tier)}` },
