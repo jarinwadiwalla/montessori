@@ -199,6 +199,31 @@ async function nlSendTest() {
   if (data) showToast(`Test sent to ${email}`, "success");
 }
 
+// Describes exactly who a send will reach. Every audience names itself; only
+// the general one uses the "all" count. An unrecognised tier falls back to
+// naming itself too — never to the general number, which is how a webinar
+// send once offered to go to all 15 subscribers.
+const NL_TIER_LABELS = {
+  founding: "founding members",
+  donor: "donors",
+  collective: "Collective members",
+  waitlist: "the Collective waitlist",
+  webinar: "webinar buyers",
+  subscriber: "subscribers",
+};
+
+function nlAudienceLabel(tier, countData, generalCount) {
+  if (!tier || tier === "all") {
+    return `${generalCount} subscribers (donors not included)`;
+  }
+  const name = NL_TIER_LABELS[tier] || `the ${tier} group`;
+  // The Collective audience comes from the membership table, not the tier
+  // column, so it is named without a count rather than given a wrong one.
+  if (tier === "collective") return name;
+  const n = countData && countData.byTier ? countData.byTier[tier] : undefined;
+  return n === undefined ? name : `${n} ${name}`;
+}
+
 async function nlSendToAudience() {
   const subject = document.getElementById("nl-subject").value.trim();
   const htmlBody = nlGetHtml();
@@ -210,13 +235,7 @@ async function nlSendToAudience() {
   const countData = await apiFetch("/api/subscriber-count");
   // "All Subscribers" excludes donors, so quote the general count, not the total.
   const count = countData ? countData.generalCount : "all";
-  // Only the general count is known here, so name the audience instead of
-  // quoting a total that does not apply to a single-tier send.
-  const tierLabel = tier === "founding" ? "founding members"
-    : tier === "donor" ? "donors"
-    : tier === "collective" ? "Collective members"
-    : tier === "waitlist" ? "the Collective waitlist"
-    : `${count} subscribers (donors not included)`;
+  const tierLabel = nlAudienceLabel(tier, countData, count);
 
   openModal("Send Newsletter", `Send "${subject}" to ${tierLabel}?${isAnnouncement ? " (announcement mode)" : ""} This cannot be undone.`, async () => {
     const data = await apiFetch("/api/newsletter-send", {
@@ -240,17 +259,9 @@ function nlUpdateAudienceInfo() {
 async function nlLoadSubscriberCount() {
   const data = await apiFetch("/api/subscriber-count");
   if (!data) return;
-  // Only the "All Subscribers" audience has a count here, and it excludes
-  // donors. For a single-tier audience, show nothing rather than a number
-  // that does not describe who would be sent to.
   const audience = document.getElementById("nl-audience").value;
   const el = document.getElementById("nl-subscriber-count");
-  if (audience === "all") {
-    const n = data.generalCount;
-    el.textContent = `${n} active subscriber${n !== 1 ? "s" : ""} (donors not included)`;
-  } else {
-    el.textContent = "";
-  }
+  el.textContent = nlAudienceLabel(audience, data, data.generalCount);
 }
 
 // ── Templates ──
