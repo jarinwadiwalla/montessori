@@ -78,6 +78,16 @@ const addOnGroups = [
   description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
 >
   <script type="application/ld+json" set:html={serviceJsonLd} />
+
+  <section class="intro-banner">
+    <div class="container">
+      <p class="intro-statement">
+        No matter where you are at in the process of starting a Center for
+        Study and Work for Adolescents, we will help you along the way.
+      </p>
+    </div>
+  </section>
+
   <div class="container">
 
     <div class="offer-columns">
@@ -127,6 +137,28 @@ const addOnGroups = [
 </PageLayout>
 
 <style>
+  /* --- opening statement --- */
+
+  .intro-banner {
+    background: var(--color-earth-dark);
+    padding-block: var(--space-2xl);
+    text-align: center;
+    /* The hero sits directly above, so pull the page's own top padding back
+       and let the two meet cleanly instead of showing a cream seam. */
+    margin-top: calc(var(--space-3xl) * -1);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .intro-statement {
+    max-width: 34ch;
+    margin: 0 auto;
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--color-cream);
+  }
+
   /* --- book a call --- */
 
   .call-section { margin-top: var(--space-3xl); }
