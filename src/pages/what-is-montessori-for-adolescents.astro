@@ -41,7 +41,7 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
 
   <div class="container container--narrow">
     <section class="page-section">
-      <h2>What adolescents need</h2>
+      <h2 class="needs-heading">Adolescents thrive with this support:</h2>
       <div class="dimensions">
         <div class="dimension">
           <h3>Intellectual</h3>
@@ -119,6 +119,11 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     font-size: var(--text-3xl);
     margin-bottom: var(--space-lg);
     color: var(--color-earth);
+  }
+
+  /* Centred over the five boxes, which are themselves centre-justified. */
+  .page-section h2.needs-heading {
+    text-align: center;
   }
 
   .page-section p {
