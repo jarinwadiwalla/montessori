@@ -2,6 +2,13 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import CallScheduler from '../components/shared/CallScheduler.astro';
 import ArchPanels from '../components/shared/ArchPanels.astro';
+import { getCollection } from 'astro:content';
+
+// Read from the team content rather than repeating the bio here, so editing
+// Jarin's profile updates Our Team and this page together instead of letting
+// two copies drift apart.
+const team = await getCollection('partners');
+const jarin = team.find((p) => p.id === 'jarin-wadiwalla')?.data;
 
 // One offer, month to month.
 const siteUrl = 'https://montessoriforadolescents.com';
@@ -143,21 +150,16 @@ const addOnGroups = [
     <div class="container meet-inner">
       <img
         class="meet-photo"
-        src="/images/jarin-headshot.jpg"
-        alt="Jarin Wadiwalla"
+        src={jarin?.photo ?? '/images/jarin-headshot.jpg'}
+        alt={jarin?.name ?? 'Jarin Wadiwalla'}
         width="800" height="800"
         loading="lazy" decoding="async"
       />
       <div class="meet-text">
         <p class="meet-eyebrow">Who you'll be speaking with</p>
-        <h2 class="meet-name">Jarin Wadiwalla</h2>
-        <p class="meet-role">Director of Montessori for Adolescents</p>
-        <p class="meet-bio">
-          Jarin has spent the last eight years working in Montessori education,
-          drawn to it by a deep recognition that Montessori is a holistic
-          practice, one that sees the whole person and honors their natural
-          development.
-        </p>
+        <h2 class="meet-name">{jarin?.name ?? 'Jarin Wadiwalla'}</h2>
+        <p class="meet-role">{jarin?.title}</p>
+        <p class="meet-bio">{jarin?.bio}</p>
         <p class="meet-bio">
           Our team all carry the AMI 12&ndash;18 Adolescent Diploma and have
           worked in adolescent communities around the globe.
