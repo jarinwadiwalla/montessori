@@ -185,11 +185,23 @@ const addOnGroups = [
 <style>
   /* --- who you'll be speaking with --- */
 
+  /* A terracotta band between the two chocolate ones, so the page reads
+     chocolate, cream, terracotta, chocolate rather than repeating itself.
+     Only --color-earth-dark clears 4.5:1 on terracotta, so every piece of
+     text in here is chocolate; the usual body and muted tones would sit at
+     3.81 and 1.89. */
+  .meet {
+    background: var(--color-terracotta);
+    padding-block: var(--space-2xl);
+  }
+
   .meet-inner {
     display: flex;
     align-items: flex-start;
     gap: var(--space-xl);
-    max-width: 760px;
+    /* Matches the arch grid above it, so the two line up rather than the
+       bio sitting in a narrower column of its own. */
+    max-width: 900px;
     margin: 0 auto;
   }
 
@@ -199,22 +211,26 @@ const addOnGroups = [
 
   .meet-photo {
     flex: none;
-    width: 140px;
-    height: 140px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--color-terracotta);
+    /* Cream, not terracotta: a terracotta ring on a terracotta band is
+       invisible. */
+    border: 3px solid var(--color-cream);
   }
 
   /* Without this the text column refuses to shrink past its content and
      pushes the page into a horizontal scroll on a phone. */
   .meet-text { flex: 1 1 0; min-width: 0; }
 
-  .meet-eyebrow {
+  /* Qualified with .meet: the page's `.page-section p` rule is more specific
+     than a bare class and was silently winning these colours. */
+  .meet .meet-eyebrow {
     font-size: var(--text-xs);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-earth);
+    color: var(--color-earth-dark);
     margin: 0 0 var(--space-xs);
   }
 
@@ -225,23 +241,23 @@ const addOnGroups = [
     margin: 0;
   }
 
-  .meet-role {
+  .meet .meet-role {
     font-size: var(--text-sm);
-    color: var(--color-text-light);
+    color: var(--color-earth-dark);
     margin: 0 0 var(--space-md);
   }
 
-  .meet-bio {
+  .meet .meet-bio {
     line-height: var(--leading-relaxed);
+    color: var(--color-earth-dark);
     margin: 0 0 var(--space-md);
   }
 
   .meet-link {
-    color: #96552B;
-    text-decoration: none;
+    color: var(--color-earth-dark);
+    text-decoration: underline;
     font-weight: 600;
   }
-  .meet-link:hover { text-decoration: underline; }
 
   /* --- opening statement --- */
 
