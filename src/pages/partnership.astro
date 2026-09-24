@@ -147,7 +147,9 @@ const addOnGroups = [
   </div>
 
   <section class="page-section meet">
-    <div class="container meet-inner">
+    <div class="container">
+      <h2 class="meet-heading">Who you'll be speaking with</h2>
+      <div class="meet-inner">
       <img
         class="meet-photo"
         src={jarin?.photo ?? '/images/jarin-headshot.jpg'}
@@ -156,15 +158,16 @@ const addOnGroups = [
         loading="lazy" decoding="async"
       />
       <div class="meet-text">
-        <p class="meet-eyebrow">Who you'll be speaking with</p>
-        <h2 class="meet-name">{jarin?.name ?? 'Jarin Wadiwalla'}</h2>
-        <p class="meet-role">{jarin?.title}</p>
+        <p class="meet-name-line">
+          <strong>{jarin?.name ?? 'Jarin Wadiwalla'}</strong>, {jarin?.title}
+        </p>
         <p class="meet-bio">{jarin?.bio}</p>
         <p class="meet-bio">
           Our team all carry the AMI 12&ndash;18 Adolescent Diploma and have
           worked in adolescent communities around the globe.
         </p>
         <a class="meet-link" href="/our-team/">Meet the whole team &rarr;</a>
+      </div>
       </div>
     </div>
   </section>
@@ -224,27 +227,37 @@ const addOnGroups = [
      pushes the page into a horizontal scroll on a phone. */
   .meet-text { flex: 1 1 0; min-width: 0; }
 
+  .meet-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    text-align: center;
+    margin: 0 0 var(--space-sm);
+  }
+
+  /* Chocolate, not terracotta: a terracotta rule on a terracotta band is
+     invisible. */
+  .meet-heading::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-2xl);
+    background: var(--color-earth-dark);
+    opacity: 0.45;
+  }
+
   /* Qualified with .meet: the page's `.page-section p` rule is more specific
      than a bare class and was silently winning these colours. */
-  .meet .meet-eyebrow {
-    font-size: var(--text-xs);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+  .meet .meet-name-line {
     color: var(--color-earth-dark);
-    margin: 0 0 var(--space-xs);
-  }
-
-  .meet-name {
-    font-family: var(--font-heading);
-    font-size: var(--text-2xl);
-    color: var(--color-earth-dark);
-    margin: 0;
-  }
-
-  .meet .meet-role {
-    font-size: var(--text-sm);
-    color: var(--color-earth-dark);
+    line-height: var(--leading-relaxed);
     margin: 0 0 var(--space-md);
+  }
+
+  .meet .meet-name-line strong {
+    font-family: var(--font-heading);
+    font-weight: 600;
   }
 
   .meet .meet-bio {
