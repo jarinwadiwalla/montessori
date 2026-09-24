@@ -89,8 +89,8 @@ const addOnGroups = [
 
       <ArchPanels
         items={[
-          'Become confident in the daily structure.',
-          'Access to teaching materials and support through the Collective.',
+          'Become confident in the daily rhythm.',
+          'Lifetime access to resource library and community through the Collective.',
           'GED Plan for your students.',
         ]}
       />
@@ -103,6 +103,10 @@ const addOnGroups = [
     <section class="page-section">
       <article class="offer-card">
         <h2 class="offer-title">{plan.name}</h2>
+        <p class="offer-terms">
+          Month&#8209;to&#8209;Month until you are ready to open your Center for
+          Study and Work.
+        </p>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
           {plan.included.map((item) => <li>{item}</li>)}
@@ -236,6 +240,22 @@ const addOnGroups = [
 
 
 
+
+  /* Larger than the list beneath it: the commitment is the thing people
+     want to know before they read what is included. */
+  /* Qualified with .offer-card on purpose: the `.page-section p` rule above
+     is more specific than a bare `.offer-terms`, and silently won the colour. */
+  .offer-card .offer-terms {
+    max-width: 30ch;
+    margin: 0 auto var(--space-lg);
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    line-height: 1.35;
+    /* Not --color-terracotta-dark: it is 3.74:1 on white, short of 4.5 at
+       this size. This shade of the same hue is 5.78:1. */
+    color: #96552B;
+  }
 
   .plan-included-label {
     font-family: var(--font-body);
