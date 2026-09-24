@@ -1,0 +1,588 @@
+---
+// Inline calendar + 30-minute slot picker for an introductory phone call.
+//
+// Availability is defined once, below, in Jarin's own local time. Everything
+// the visitor sees is converted into THEIR timezone, because these calls are
+// with schools in Malaysia, Spain, France and Mexico and a bare "9:00 am"
+// is how people miss calls.
+//
+// When Jarin moves to Mexico in December, change HOST_TZ and the two blocks
+// in SLOT_TIMES. Nothing else needs touching: the slots are resolved to
+// absolute instants at render time, so daylight saving on the visitor's side
+// is handled by the browser rather than by arithmetic here.
+
+interface Props {
+  /** Where the booking is emailed from, for the subject line. */
+  about?: string;
+}
+const { about = 'Partnership' } = Astro.props;
+
+/** Jarin's timezone. Asia/Makassar is Bali: UTC+8, no daylight saving. */
+const HOST_TZ = 'Asia/Makassar';
+/** A friendly name for that zone, shown next to her time. */
+const HOST_LABEL = 'Bali';
+/** Days she takes calls, in HER timezone. 0 = Sunday, 2 = Tue, 4 = Thu. */
+const OPEN_WEEKDAYS = [2, 4];
+/** Start times in HER local time. An early block and an evening block: the
+    early one lands in the Americas' afternoon, the evening one in Europe's. */
+const SLOT_TIMES = ['06:00', '07:00', '20:00', '21:00'];
+const SLOT_MINUTES = 30;
+/** Don't offer anything sooner than this, so a booking is never a surprise. */
+const LEAD_DAYS = 2;
+/** How far ahead the calendar goes. */
+const WEEKS_AHEAD = 8;
+
+const config = {
+  hostTz: HOST_TZ,
+  hostLabel: HOST_LABEL,
+  openWeekdays: OPEN_WEEKDAYS,
+  slotTimes: SLOT_TIMES,
+  slotMinutes: SLOT_MINUTES,
+  leadDays: LEAD_DAYS,
+  weeksAhead: WEEKS_AHEAD,
+};
+---
+
+<div class="cs" id="call-scheduler" data-config={JSON.stringify(config)} data-about={about}>
+  <div class="cs-grid">
+    <!-- Calendar -->
+    <div class="cs-cal">
+      <div class="cs-head">
+        <button type="button" class="cs-nav" id="cs-prev" aria-label="Previous month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <span class="cs-month" id="cs-month" aria-live="polite"></span>
+        <button type="button" class="cs-nav" id="cs-next" aria-label="Next month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+      </div>
+      <div class="cs-dow" aria-hidden="true">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cs-days" id="cs-days"></div>
+      <p class="cs-tz" id="cs-tz"></p>
+    </div>
+
+    <!-- Slots + form -->
+    <div class="cs-panel">
+      <p class="cs-empty" id="cs-empty">Choose a date to see the times available.</p>
+
+      <div id="cs-slots-wrap" hidden>
+        <p class="cs-slots-label">Times on <span id="cs-chosen-date"></span></p>
+        <div class="cs-slot-list" id="cs-slots"></div>
+      </div>
+
+      <form class="cs-form" id="cs-form" hidden novalidate>
+        <p class="cs-chosen" id="cs-chosen-summary"></p>
+        <input type="hidden" name="slotIso" id="cs-slot-iso" />
+        <input type="hidden" name="slotVisitor" id="cs-slot-visitor" />
+        <input type="hidden" name="slotHost" id="cs-slot-host" />
+        <input type="hidden" name="visitorTz" id="cs-visitor-tz" />
+        <input type="hidden" name="about" value={about} />
+        <!-- Bots fill this in; people never see it. -->
+        <input type="text" name="website" class="cs-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="cs-pair">
+          <label class="cs-field">
+            <span>Your name</span>
+            <input name="name" type="text" required autocomplete="name" />
+          </label>
+          <label class="cs-field">
+            <span>Phone <small>(with country code)</small></span>
+            <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 555 123 4567" />
+          </label>
+        </div>
+        <label class="cs-field">
+          <span>Email</span>
+          <input name="email" type="email" required autocomplete="email" />
+        </label>
+        <label class="cs-field">
+          <span>Anything you'd like me to know first? <small>(optional)</small></span>
+          <textarea name="note" rows="3"></textarea>
+        </label>
+
+        <button type="submit" class="cs-submit" id="cs-submit">Book this call</button>
+        <p class="cs-error" id="cs-error" hidden role="alert"></p>
+      </form>
+
+      <div class="cs-done" id="cs-done" hidden role="status">
+        <p class="cs-done-title">You're booked.</p>
+        <p id="cs-done-detail"></p>
+        <p class="cs-done-note">A confirmation is on its way to your inbox. If anything changes, just reply to it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.getElementById('call-scheduler');
+  if (root) {
+    const cfg = JSON.parse(root.dataset.config || '{}');
+
+    // --- timezone helpers -------------------------------------------------
+    // How far the given instant's wall-clock time in `tz` sits from UTC.
+    function offsetMs(utcMs, tz) {
+      const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      });
+      const p = {};
+      for (const part of dtf.formatToParts(new Date(utcMs))) p[part.type] = part.value;
+      const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, (+p.hour) % 24, +p.minute, +p.second);
+      return asUtc - utcMs;
+    }
+
+    // The absolute instant of a wall-clock time in `tz`. Resolved twice so a
+    // slot that falls near a daylight-saving change still lands correctly.
+    function zonedToUtc(y, m, d, hh, mm, tz) {
+      const guess = Date.UTC(y, m - 1, d, hh, mm);
+      const first = guess - offsetMs(guess, tz);
+      const second = guess - offsetMs(first, tz);
+      return second;
+    }
+
+    // Y/M/D as seen in `tz` for a given instant.
+    function partsIn(utcMs, tz) {
+      const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+      });
+      const p = {};
+      for (const part of dtf.formatToParts(new Date(utcMs))) p[part.type] = part.value;
+      return { y: +p.y || +p.year, m: +p.month, d: +p.day };
+    }
+
+    const visitorTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    const sameZone = visitorTz === cfg.hostTz;
+
+    const timeFmt = (tz) => new Intl.DateTimeFormat(undefined, {
+      timeZone: tz, hour: 'numeric', minute: '2-digit',
+    });
+    const visitorTime = timeFmt(visitorTz);
+    const hostTime = timeFmt(cfg.hostTz);
+
+    // --- build the slot list ---------------------------------------------
+    // Walk forward day by day in Jarin's timezone, take the open weekdays,
+    // and turn each of her local start times into an absolute instant.
+    const now = Date.now();
+    const earliest = now + cfg.leadDays * 86400000;
+    const slots = [];
+    {
+      const cursor = partsIn(now, cfg.hostTz);
+      const walk = new Date(Date.UTC(cursor.y, cursor.m - 1, cursor.d));
+      for (let i = 0; i < cfg.weeksAhead * 7 + 7; i++) {
+        const y = walk.getUTCFullYear(), m = walk.getUTCMonth() + 1, d = walk.getUTCDate();
+        // getUTCDay on this bare date gives the weekday of Jarin's calendar day.
+        if (cfg.openWeekdays.includes(walk.getUTCDay())) {
+          for (const t of cfg.slotTimes) {
+            const [hh, mm] = t.split(':').map(Number);
+            const ts = zonedToUtc(y, m, d, hh, mm, cfg.hostTz);
+            if (ts >= earliest) slots.push(ts);
+          }
+        }
+        walk.setUTCDate(walk.getUTCDate() + 1);
+      }
+      slots.sort((a, b) => a - b);
+    }
+
+    // Group by the VISITOR's calendar date, so the calendar they see is
+    // their own. A late-evening slot in Bali can be the previous day for
+    // someone in Mexico, and it should appear on the day they'd live it.
+    const byDate = new Map();
+    for (const ts of slots) {
+      const p = partsIn(ts, visitorTz);
+      const key = `${p.y}-${String(p.m).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`;
+      if (!byDate.has(key)) byDate.set(key, []);
+      byDate.get(key).push(ts);
+    }
+
+    // --- elements ---------------------------------------------------------
+    const monthEl = document.getElementById('cs-month');
+    const daysEl = document.getElementById('cs-days');
+    const prevBtn = document.getElementById('cs-prev');
+    const nextBtn = document.getElementById('cs-next');
+    const tzEl = document.getElementById('cs-tz');
+    const emptyEl = document.getElementById('cs-empty');
+    const slotsWrap = document.getElementById('cs-slots-wrap');
+    const slotsEl = document.getElementById('cs-slots');
+    const chosenDateEl = document.getElementById('cs-chosen-date');
+    const form = document.getElementById('cs-form');
+    const summaryEl = document.getElementById('cs-chosen-summary');
+    const errorEl = document.getElementById('cs-error');
+    const submitBtn = document.getElementById('cs-submit');
+    const doneEl = document.getElementById('cs-done');
+    const doneDetail = document.getElementById('cs-done-detail');
+
+    document.getElementById('cs-visitor-tz').value = visitorTz;
+    tzEl.textContent = sameZone
+      ? `Times shown in your timezone (${visitorTz.replace(/_/g, ' ')}).`
+      : `Times shown in your timezone (${visitorTz.replace(/_/g, ' ')}), with ${cfg.hostLabel} alongside.`;
+
+    const firstKey = [...byDate.keys()].sort()[0];
+    const first = firstKey ? firstKey.split('-').map(Number) : null;
+    let view = first
+      ? new Date(first[0], first[1] - 1, 1)
+      : new Date();
+    let selectedKey = null;
+
+    function keyOf(y, m, d) {
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+
+    function renderCalendar() {
+      monthEl.textContent = view.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      prevBtn.disabled = !!first && view.getFullYear() === first[0] && view.getMonth() === first[1] - 1;
+
+      daysEl.innerHTML = '';
+      const firstOfMonth = new Date(view.getFullYear(), view.getMonth(), 1);
+      const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+
+      for (let i = 0; i < firstOfMonth.getDay(); i++) {
+        daysEl.appendChild(document.createElement('span'));
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const key = keyOf(view.getFullYear(), view.getMonth() + 1, d);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cs-day';
+        btn.textContent = String(d);
+        if (byDate.has(key)) {
+          btn.classList.add('is-open');
+          if (key === selectedKey) btn.classList.add('is-selected');
+          btn.addEventListener('click', () => { selectedKey = key; renderCalendar(); renderSlots(key); });
+        } else {
+          btn.disabled = true;
+        }
+        daysEl.appendChild(btn);
+      }
+    }
+
+    function renderSlots(key) {
+      const list = byDate.get(key) || [];
+      emptyEl.hidden = true;
+      slotsWrap.hidden = false;
+      form.hidden = true;
+      doneEl.hidden = true;
+      const [y, m, d] = key.split('-').map(Number);
+      chosenDateEl.textContent = new Date(y, m - 1, d)
+        .toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+      slotsEl.innerHTML = '';
+      for (const ts of list) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cs-slot';
+        const mine = visitorTime.format(new Date(ts));
+        btn.innerHTML = sameZone
+          ? `<strong>${mine}</strong>`
+          : `<strong>${mine}</strong><small>${hostTime.format(new Date(ts))} in ${cfg.hostLabel}</small>`;
+        btn.addEventListener('click', () => {
+          slotsEl.querySelectorAll('.cs-slot').forEach((b) => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+          chooseSlot(ts);
+        });
+        slotsEl.appendChild(btn);
+      }
+    }
+
+    function longLabel(ts, tz) {
+      return new Intl.DateTimeFormat(undefined, {
+        timeZone: tz, weekday: 'long', month: 'long', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+      }).format(new Date(ts));
+    }
+
+    function chooseSlot(ts) {
+      const visitorLabel = longLabel(ts, visitorTz);
+      const hostLabel = longLabel(ts, cfg.hostTz);
+      document.getElementById('cs-slot-iso').value = new Date(ts).toISOString();
+      document.getElementById('cs-slot-visitor').value = `${visitorLabel} (${visitorTz})`;
+      document.getElementById('cs-slot-host').value = `${hostLabel} (${cfg.hostTz})`;
+      summaryEl.innerHTML = `<strong>${visitorLabel}</strong><br><span>${cfg.slotMinutes} minutes, by phone${sameZone ? '' : ` · ${hostLabel} for Jarin`}</span>`;
+      form.hidden = false;
+      errorEl.hidden = true;
+      form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Slots someone else already holds. Fetched rather than assumed: the
+    // page is static, so without this two people can book the same time.
+    async function dropTakenSlots() {
+      try {
+        const res = await fetch('/api/book-call');
+        if (!res.ok) return;
+        const { taken } = await res.json();
+        if (!Array.isArray(taken) || !taken.length) return;
+        const gone = new Set(taken.map((t) => new Date(t).getTime()));
+        for (const [key, list] of byDate) {
+          const left = list.filter((ts) => !gone.has(ts));
+          if (left.length) byDate.set(key, left);
+          else byDate.delete(key);
+        }
+        if (selectedKey && !byDate.has(selectedKey)) {
+          selectedKey = null;
+          slotsWrap.hidden = true;
+          emptyEl.hidden = false;
+        }
+        renderCalendar();
+        if (selectedKey) renderSlots(selectedKey);
+      } catch {
+        // Offline or the endpoint is down: show everything rather than
+        // nothing. A clash is caught server-side on submit anyway.
+      }
+    }
+
+    prevBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCalendar(); });
+    nextBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCalendar(); });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.slotIso) { show('Please choose a time first.'); return; }
+      if (!data.name || !data.phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(data.email || ''))) {
+        show('Please fill in your name, phone number and a valid email.');
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Booking…';
+      try {
+        const res = await fetch('/api/book-call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.status === 409) {
+          show('Sorry, someone just took that time. Please choose another.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Book this call';
+          await dropTakenSlots();
+          return;
+        }
+        if (!res.ok) throw new Error(await res.text());
+        slotsWrap.hidden = true;
+        form.hidden = true;
+        doneDetail.textContent = data.slotVisitor;
+        doneEl.hidden = false;
+        doneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        show('Something went wrong booking that. Please try again, or use the enquiry form below.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Book this call';
+      }
+    });
+
+    function show(msg) { errorEl.textContent = msg; errorEl.hidden = false; }
+
+    renderCalendar();
+    dropTakenSlots();
+  }
+</script>
+
+<style>
+  .cs-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .cs-grid { grid-template-columns: 1fr; }
+  }
+
+  .cs-cal {
+    background: var(--color-white);
+    border: 1px solid var(--color-terracotta);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+  }
+
+  .cs-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+  }
+
+  .cs-month {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-earth-dark);
+  }
+
+  .cs-nav {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-earth-dark);
+    padding: 0.25rem 0.4rem;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .cs-nav:disabled { opacity: 0.3; cursor: default; }
+
+  .cs-dow, .cs-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cs-dow {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-light);
+    text-align: center;
+    margin-bottom: var(--space-xs);
+  }
+
+  /* The day buttons are created in JavaScript, so Astro never stamps them
+     with a scope attribute. Anchor on .cs-days, which is in the template and
+     does carry one, then go :global for the children. */
+  .cs-days :global(.cs-day) {
+    aspect-ratio: 1;
+    border: none;
+    background: none;
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    cursor: default;
+  }
+  .cs-days :global(.cs-day:disabled) { opacity: 0.35; }
+  .cs-days :global(.cs-day.is-open) {
+    background: var(--color-cream);
+    color: var(--color-earth-dark);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .cs-days :global(.cs-day.is-open:hover) { background: var(--color-terracotta-light); }
+  .cs-days :global(.cs-day.is-selected) {
+    background: var(--color-terracotta);
+    color: var(--color-earth-dark);
+  }
+
+  .cs-tz {
+    margin: var(--space-md) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    line-height: var(--leading-normal);
+  }
+
+  .cs-empty {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .cs-slots-label {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-md);
+  }
+
+  .cs-slot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-sm);
+  }
+
+  /* Same again: the slot buttons are built in JavaScript. */
+  .cs-slot-list :global(.cs-slot) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.6rem 0.75rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-terracotta);
+    border-radius: var(--radius-md);
+    color: var(--color-earth-dark);
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+  .cs-slot-list :global(.cs-slot small) { font-size: var(--text-xs); color: var(--color-text-light); }
+  .cs-slot-list :global(.cs-slot:hover) { background: var(--color-cream); }
+  .cs-slot-list :global(.cs-slot.is-selected) { background: var(--color-terracotta); }
+  .cs-slot-list :global(.cs-slot.is-selected small) { color: var(--color-earth-dark); }
+
+  .cs-form { margin-top: var(--space-xl); }
+
+  .cs-chosen {
+    background: var(--color-cream);
+    border-left: 3px solid var(--color-terracotta);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: var(--space-md);
+    margin: 0 0 var(--space-lg);
+    color: var(--color-earth-dark);
+    line-height: var(--leading-normal);
+  }
+  .cs-chosen span { font-size: var(--text-sm); color: var(--color-text-light); }
+
+  .cs-pair {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+  /* Without this a flex item refuses to shrink past its content and pushes
+     the page into a horizontal scroll on a phone. */
+  .cs-pair .cs-field { flex: 1 1 0; min-width: 0; }
+
+  .cs-field { display: block; margin-bottom: var(--space-md); }
+  .cs-field > span {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-earth-dark);
+    margin-bottom: var(--space-xs);
+  }
+  .cs-field small { color: var(--color-text-light); font-size: var(--text-xs); }
+  .cs-field input,
+  .cs-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font: inherit;
+    color: var(--color-text);
+    background: var(--color-white);
+  }
+  .cs-field input:focus,
+  .cs-field textarea:focus {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 1px;
+  }
+
+  .cs-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  .cs-submit {
+    background: var(--color-terracotta);
+    color: var(--color-earth-dark);
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 2rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .cs-submit:disabled { opacity: 0.6; cursor: default; }
+
+  .cs-error {
+    margin: var(--space-md) 0 0;
+    color: #96552B;
+    font-size: var(--text-sm);
+  }
+
+  .cs-done {
+    background: var(--color-cream);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+  .cs-done-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-sm);
+  }
+  .cs-done p { margin: 0 0 var(--space-sm); color: var(--color-text); }
+  .cs-done-note { font-size: var(--text-sm); color: var(--color-text-light); }
+</style>

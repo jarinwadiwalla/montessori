@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import InterestForm from '../components/shared/InterestForm.astro';
+import CallScheduler from '../components/shared/CallScheduler.astro';
 
 // One offer, month to month.
 const siteUrl = 'https://montessoriforadolescents.com';
@@ -118,6 +119,17 @@ const addOnGroups = [
   <div class="container container--narrow">
   </div>
 
+  <section class="page-section call-section">
+    <div class="container">
+      <h2 class="call-heading">Book a call</h2>
+      <p class="call-lede">
+        Thirty minutes on the phone, no charge and no obligation. Tell me what
+        you are building and I will tell you honestly whether I can help.
+      </p>
+      <CallScheduler about="Partnership" />
+    </div>
+  </section>
+
   <section class="ready-banner">
     <div class="container ready-inner">
       <p class="ready-eyebrow">Ready to begin?</p>
@@ -132,6 +144,35 @@ const addOnGroups = [
 </PageLayout>
 
 <style>
+  /* --- book a call --- */
+
+  .call-section { margin-top: var(--space-3xl); }
+
+  .call-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    text-align: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .call-heading::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-lg);
+    background: var(--color-terracotta);
+  }
+
+  .call-lede {
+    text-align: center;
+    max-width: 52ch;
+    margin: 0 auto var(--space-xl);
+    color: var(--color-text-light);
+    line-height: var(--leading-relaxed);
+  }
+
   /* --- the offer --- */
 
   .offer-card {

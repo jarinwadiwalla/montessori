@@ -107,3 +107,23 @@ CREATE TABLE IF NOT EXISTS newsletter_templates (
   body TEXT DEFAULT '',
   updatedAt TEXT NOT NULL
 );
+
+-- Introductory 30-minute partnership calls booked from /partnership/.
+-- The unique index is partial so a cancelled booking keeps its history
+-- while freeing the slot for someone else.
+CREATE TABLE IF NOT EXISTS call_bookings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slot_iso TEXT NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT DEFAULT '',
+  note TEXT DEFAULT '',
+  visitor_tz TEXT DEFAULT '',
+  slot_visitor TEXT DEFAULT '',
+  slot_host TEXT DEFAULT '',
+  about TEXT DEFAULT '',
+  status TEXT DEFAULT 'booked',
+  created_at TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_call_bookings_slot_booked
+  ON call_bookings(slot_iso) WHERE status = 'booked';
