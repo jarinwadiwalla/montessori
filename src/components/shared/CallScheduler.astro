@@ -379,21 +379,28 @@ const config = {
 </script>
 
 <style>
+  /* One centred column: the calendar sits in the middle under the centred
+     heading, with the times and the form stacked beneath it. */
   .cs-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: var(--space-xl);
-    align-items: start;
-  }
-  @media (max-width: 720px) {
-    .cs-grid { grid-template-columns: 1fr; }
   }
 
   .cs-cal {
+    width: 100%;
+    max-width: 340px;
+    box-sizing: border-box;
     background: var(--color-white);
     border: 1px solid var(--color-terracotta);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
+  }
+
+  .cs-panel {
+    width: 100%;
+    max-width: 520px;
   }
 
   .cs-head {
@@ -461,6 +468,7 @@ const config = {
   }
 
   .cs-tz {
+    text-align: center;
     margin: var(--space-md) 0 0;
     font-size: var(--text-xs);
     color: var(--color-text-light);
@@ -468,21 +476,26 @@ const config = {
   }
 
   .cs-empty {
+    text-align: center;
     color: var(--color-text-light);
     font-size: var(--text-sm);
     margin: 0;
   }
 
   .cs-slots-label {
+    text-align: center;
     font-family: var(--font-heading);
     font-size: var(--text-lg);
     color: var(--color-earth-dark);
     margin: 0 0 var(--space-md);
   }
 
+  /* Centred rather than stretched: four slots should sit as a tidy group in
+     the middle, not spread to the full width of the panel. */
   .cs-slot-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-sm);
   }
 
@@ -490,6 +503,8 @@ const config = {
   .cs-slot-list :global(.cs-slot) {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    min-width: 130px;
     gap: 2px;
     padding: 0.6rem 0.75rem;
     background: var(--color-white);
@@ -498,7 +513,7 @@ const config = {
     color: var(--color-earth-dark);
     font: inherit;
     cursor: pointer;
-    text-align: left;
+    text-align: center;
   }
   .cs-slot-list :global(.cs-slot small) { font-size: var(--text-xs); color: var(--color-text-light); }
   .cs-slot-list :global(.cs-slot:hover) { background: var(--color-cream); }
@@ -555,6 +570,8 @@ const config = {
   .cs-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
   .cs-submit {
+    display: block;
+    margin: 0 auto;
     background: var(--color-terracotta);
     color: var(--color-earth-dark);
     border: none;
@@ -567,12 +584,14 @@ const config = {
   .cs-submit:disabled { opacity: 0.6; cursor: default; }
 
   .cs-error {
+    text-align: center;
     margin: var(--space-md) 0 0;
     color: #96552B;
     font-size: var(--text-sm);
   }
 
   .cs-done {
+    text-align: center;
     background: var(--color-cream);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
