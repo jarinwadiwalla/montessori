@@ -1,5 +1,5 @@
 ---
-// Inline calendar + 30-minute slot picker for an introductory phone call.
+// Inline calendar + 30-minute slot picker for an introductory video call.
 //
 // Availability is defined once, below, in Jarin's own local time. Everything
 // the visitor sees is converted into THEIR timezone, because these calls are
@@ -14,8 +14,10 @@
 interface Props {
   /** Where the booking is emailed from, for the subject line. */
   about?: string;
+  /** 'dark' when the scheduler sits on the chocolate banner. */
+  variant?: 'light' | 'dark';
 }
-const { about = 'Partnership' } = Astro.props;
+const { about = 'Partnership', variant = 'light' } = Astro.props;
 
 /** Jarin's timezone. Asia/Makassar is Bali: UTC+8, no daylight saving. */
 const HOST_TZ = 'Asia/Makassar';
@@ -43,7 +45,7 @@ const config = {
 };
 ---
 
-<div class="cs" id="call-scheduler" data-config={JSON.stringify(config)} data-about={about}>
+<div class:list={['cs', `cs--${variant}`]} id="call-scheduler" data-config={JSON.stringify(config)} data-about={about}>
   <div class="cs-grid">
     <!-- Calendar -->
     <div class="cs-cal">
@@ -88,8 +90,8 @@ const config = {
             <input name="name" type="text" required autocomplete="name" />
           </label>
           <label class="cs-field">
-            <span>Phone <small>(with country code)</small></span>
-            <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 555 123 4567" />
+            <span>Phone <small>(optional, in case video fails)</small></span>
+            <input name="phone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567" />
           </label>
         </div>
         <label class="cs-field">
@@ -108,7 +110,7 @@ const config = {
       <div class="cs-done" id="cs-done" hidden role="status">
         <p class="cs-done-title">You're booked.</p>
         <p id="cs-done-detail"></p>
-        <p class="cs-done-note">A confirmation is on its way to your inbox. If anything changes, just reply to it.</p>
+        <p class="cs-done-note">A confirmation with the Google Meet link is on its way to your inbox. If anything changes, just reply to it.</p>
       </div>
     </div>
   </div>
@@ -299,7 +301,7 @@ const config = {
       document.getElementById('cs-slot-iso').value = new Date(ts).toISOString();
       document.getElementById('cs-slot-visitor').value = `${visitorLabel} (${visitorTz})`;
       document.getElementById('cs-slot-host').value = `${hostLabel} (${cfg.hostTz})`;
-      summaryEl.innerHTML = `<strong>${visitorLabel}</strong><br><span>${cfg.slotMinutes} minutes, by phone${sameZone ? '' : ` · ${hostLabel} for Jarin`}</span>`;
+      summaryEl.innerHTML = `<strong>${visitorLabel}</strong><br><span>${cfg.slotMinutes} minutes on Google Meet${sameZone ? '' : ` · ${hostLabel} for Jarin`}</span>`;
       form.hidden = false;
       errorEl.hidden = true;
       form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -339,8 +341,8 @@ const config = {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       if (!data.slotIso) { show('Please choose a time first.'); return; }
-      if (!data.name || !data.phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(data.email || ''))) {
-        show('Please fill in your name, phone number and a valid email.');
+      if (!data.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(data.email || ''))) {
+        show('Please fill in your name and a valid email.');
         return;
       }
       submitBtn.disabled = true;
@@ -379,6 +381,17 @@ const config = {
 </script>
 
 <style>
+  /* On the chocolate banner only the text that sits directly on it needs to
+     change: the calendar card, the slot buttons and the inputs are white and
+     read as cards against it. Cream on chocolate is 10:1. */
+  .cs--dark .cs-empty,
+  .cs--dark .cs-slots-label,
+  .cs--dark .cs-field > span {
+    color: var(--color-cream);
+  }
+  .cs--dark .cs-field small { color: var(--color-terracotta-light); }
+  .cs--dark .cs-error { color: var(--color-terracotta-light); }
+
   /* One centred column: the calendar sits in the middle under the centred
      heading, with the times and the form stacked beneath it. */
   .cs-grid {
@@ -542,7 +555,9 @@ const config = {
      the page into a horizontal scroll on a phone. */
   .cs-pair .cs-field { flex: 1 1 0; min-width: 0; }
 
-  .cs-field { display: block; margin-bottom: var(--space-md); }
+  /* The banner centres its text, which would centre these labels over their
+     inputs. Left-aligned is easier to scan while filling a form in. */
+  .cs-field { display: block; margin-bottom: var(--space-md); text-align: left; }
   .cs-field > span {
     display: block;
     font-size: var(--text-sm);

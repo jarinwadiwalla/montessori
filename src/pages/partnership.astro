@@ -1,6 +1,5 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import InterestForm from '../components/shared/InterestForm.astro';
 import CallScheduler from '../components/shared/CallScheduler.astro';
 
 // One offer, month to month.
@@ -119,25 +118,14 @@ const addOnGroups = [
   <div class="container container--narrow">
   </div>
 
-  <section class="page-section call-section">
+  <section class="ready-banner call-section">
     <div class="container">
       <h2 class="call-heading">Book a call</h2>
       <p class="call-lede">
         A free face-to-face conversation to meet one another, and for me to
         hear about your unique situation. Let's see how we can work together!
       </p>
-      <CallScheduler about="Partnership" />
-    </div>
-  </section>
-
-  <section class="ready-banner">
-    <div class="container ready-inner">
-      <p class="ready-eyebrow">Ready to begin?</p>
-      <h2 class="ready-title">
-        Tell us where you are and what your vision is. We can't wait to bring
-        it to life, together!
-      </h2>
-      <InterestForm about="Partnership" variant="dark" />
+      <CallScheduler about="Partnership" variant="dark" />
     </div>
   </section>
 
@@ -151,7 +139,7 @@ const addOnGroups = [
   .call-heading {
     font-family: var(--font-heading);
     font-size: var(--text-3xl);
-    color: var(--color-earth-dark);
+    color: var(--color-cream);
     text-align: center;
     margin-bottom: var(--space-sm);
   }
@@ -169,7 +157,7 @@ const addOnGroups = [
     text-align: center;
     max-width: 52ch;
     margin: 0 auto var(--space-xl);
-    color: var(--color-text-light);
+    color: var(--color-cream);
     line-height: var(--leading-relaxed);
   }
 
@@ -370,25 +358,6 @@ const addOnGroups = [
     background: var(--color-earth-dark);
     padding-block: var(--space-2xl);
     text-align: center;
-  }
-
-  .ready-eyebrow {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-terracotta-light);
-    margin-bottom: var(--space-md);
-  }
-
-  .ready-title {
-    max-width: 30ch;
-    margin: 0 auto var(--space-lg);
-    font-family: var(--font-heading);
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
-    font-weight: 300;
-    line-height: 1.3;
-    color: var(--color-cream);
   }
 
 
