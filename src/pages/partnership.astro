@@ -80,10 +80,7 @@ const addOnGroups = [
   <script type="application/ld+json" set:html={serviceJsonLd} />
   <div class="container">
 
-    <p class="credential">
-      Every consultant holds the AMI 12&ndash;18 Adolescent Diploma and has
-      built programs from the ground up.
-    </p>
+    <p class="credential-badge">AMI 12&ndash;18 Diploma</p>
 
     <div class="offer-columns">
     <section class="page-section">
@@ -245,14 +242,21 @@ const addOnGroups = [
     margin-bottom: var(--space-lg);
   }
 
-  .credential {
-    max-width: 52ch;
-    margin: var(--space-lg) auto;
-    text-align: center;
+  /* A quiet credential mark rather than a bold sentence: same pill language
+     as the join and sponsor buttons elsewhere on the site. */
+  .credential-badge {
+    width: fit-content;
+    margin: var(--space-lg) auto var(--space-2xl);
+    padding: 0.4rem 1.1rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-terracotta);
+    border-radius: 999px;
+    font-size: var(--text-xs);
     font-weight: 600;
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--color-earth-dark);
+    white-space: nowrap;
   }
 
   /* Side by side, so the whole offer is visible at once rather than
