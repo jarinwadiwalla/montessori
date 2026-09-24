@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import CallScheduler from '../components/shared/CallScheduler.astro';
+import ArchPanels from '../components/shared/ArchPanels.astro';
 
 // One offer, month to month.
 const siteUrl = 'https://montessoriforadolescents.com';
@@ -85,6 +86,14 @@ const addOnGroups = [
         No matter where you are at in the process of starting a Center for
         Study and Work for Adolescents, we will help you along the way.
       </p>
+
+      <ArchPanels
+        items={[
+          'Become confident in the daily structure.',
+          'Access to teaching materials and support through the Collective.',
+          'GED Plan for your students.',
+        ]}
+      />
     </div>
   </section>
 
@@ -139,6 +148,13 @@ const addOnGroups = [
 <style>
   /* --- opening statement --- */
 
+  /* The arch grid ships a 3xl bottom margin for standalone use mid-page.
+     Inside the band the section padding already provides that, so cancel it
+     or the chocolate runs on well past the arches. */
+  .intro-banner :global(.stage-grid) {
+    margin-bottom: 0;
+  }
+
   .intro-banner {
     background: var(--color-earth-dark);
     padding-block: var(--space-2xl);
@@ -151,7 +167,7 @@ const addOnGroups = [
 
   .intro-statement {
     max-width: 34ch;
-    margin: 0 auto;
+    margin: 0 auto var(--space-2xl);
     font-family: var(--font-heading);
     font-size: clamp(1.25rem, 2.4vw, 1.7rem);
     font-weight: 300;
