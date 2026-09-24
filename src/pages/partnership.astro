@@ -34,7 +34,7 @@ const plan = {
     'Written call notes and action items after each session',
     'Custom monthly checklist and planning document',
     'Email support between calls',
-    'Membership to the Montessori Adolescent Collective, including access to the online resource library',
+    'Membership to the <a href="/collective/">Montessori Adolescent Collective</a>, including access to the online resource library',
     'Cancel any time, for any reason',
   ],
 };
@@ -109,8 +109,11 @@ const addOnGroups = [
         </p>
         <p class="plan-included-label">Every month includes</p>
         <ul class="plan-list">
-          {plan.included.map((item) => <li>{item}</li>)}
+          {/* set:html so one item can carry a link; the strings are authored
+              here, never user input. */}
+          {plan.included.map((item) => <li set:html={item} />)}
         </ul>
+        <p class="plan-note">We'll talk through pricing on our call.</p>
       </article>
     </section>
     <section class="page-section">
@@ -136,6 +139,34 @@ const addOnGroups = [
   <div class="container container--narrow">
   </div>
 
+  <section class="page-section meet">
+    <div class="container meet-inner">
+      <img
+        class="meet-photo"
+        src="/images/jarin-headshot.jpg"
+        alt="Jarin Wadiwalla"
+        width="800" height="800"
+        loading="lazy" decoding="async"
+      />
+      <div class="meet-text">
+        <p class="meet-eyebrow">Who you'll be speaking with</p>
+        <h2 class="meet-name">Jarin Wadiwalla</h2>
+        <p class="meet-role">Director of Montessori for Adolescents</p>
+        <p class="meet-bio">
+          Jarin has spent the last eight years working in Montessori education,
+          drawn to it by a deep recognition that Montessori is a holistic
+          practice, one that sees the whole person and honors their natural
+          development.
+        </p>
+        <p class="meet-bio">
+          Our team all carry the AMI 12&ndash;18 Adolescent Diploma and have
+          worked in adolescent communities around the globe.
+        </p>
+        <a class="meet-link" href="/our-team/">Meet the whole team &rarr;</a>
+      </div>
+    </div>
+  </section>
+
   <section class="ready-banner call-section">
     <div class="container">
       <h2 class="call-heading">Book a call</h2>
@@ -150,6 +181,66 @@ const addOnGroups = [
 </PageLayout>
 
 <style>
+  /* --- who you'll be speaking with --- */
+
+  .meet-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xl);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 640px) {
+    .meet-inner { flex-direction: column; align-items: center; text-align: center; }
+  }
+
+  .meet-photo {
+    flex: none;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-terracotta);
+  }
+
+  /* Without this the text column refuses to shrink past its content and
+     pushes the page into a horizontal scroll on a phone. */
+  .meet-text { flex: 1 1 0; min-width: 0; }
+
+  .meet-eyebrow {
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .meet-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-earth-dark);
+    margin: 0;
+  }
+
+  .meet-role {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin: 0 0 var(--space-md);
+  }
+
+  .meet-bio {
+    line-height: var(--leading-relaxed);
+    margin: 0 0 var(--space-md);
+  }
+
+  .meet-link {
+    color: #96552B;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .meet-link:hover { text-decoration: underline; }
+
   /* --- opening statement --- */
 
   /* The arch grid ships a 3xl bottom margin for standalone use mid-page.
@@ -255,6 +346,17 @@ const addOnGroups = [
     /* Not --color-terracotta-dark: it is 3.74:1 on white, short of 4.5 at
        this size. This shade of the same hue is 5.78:1. */
     color: #96552B;
+  }
+
+  .offer-card .plan-note {
+    margin: var(--space-lg) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  .plan-list a {
+    color: #96552B;
+    text-decoration: underline;
   }
 
   .plan-included-label {
