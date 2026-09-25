@@ -28,8 +28,9 @@ const Element = href ? 'a' : 'div';
     display: flex;
     flex-direction: column;
     background: var(--color-white);
-    border-top: 2px solid #d0905b;
-    border-radius: 2px 2px var(--radius-lg) var(--radius-lg);
+    /* The softened arch used by the panels and the Where-to-next band, so
+       the three sit in the same family as the rest of the site. */
+    border-radius: 60px 60px var(--radius-lg) var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-md);
     transition: transform 0.25s, box-shadow 0.25s;
