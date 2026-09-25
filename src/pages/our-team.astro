@@ -2,6 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import PartnerCard from '../components/partners/PartnerCard.astro';
 import { getCollection } from 'astro:content';
+import NextSteps from '../components/shared/NextSteps.astro';
 
 const partners = (await getCollection('partners')).sort(
   (a, b) => a.data.order - b.data.order
@@ -32,6 +33,17 @@ const partners = (await getCollection('partners')).sort(
     </div>
 
   </div>
+
+  <NextSteps
+    tone="terracotta"
+    title="Where to next"
+    items={[
+      { label: 'Partnership', href: '/partnership/', blurb: 'Work with us month to month.' },
+      { label: 'What is Montessori for Adolescents?', href: '/what-is-montessori-for-adolescents/', blurb: 'The thinking behind the work.' },
+      { label: 'Get in Touch', href: '/contact/', blurb: 'Tell us about your programme.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

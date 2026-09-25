@@ -6,6 +6,7 @@ import AnxiousGenFAQ from '../components/home/AnxiousGenFAQ.astro';
 import DonationSection from '../components/home/DonationSection.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <BaseLayout
@@ -38,6 +39,17 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     author="Maria Montessori"
     source="From Childhood to Adolescence"
   />
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'What is Montessori for Adolescents?', href: '/what-is-montessori-for-adolescents/', blurb: 'Education built for the third plane of development.' },
+      { label: 'Guidance and Support', href: '/guidance/', blurb: 'Webinars, resources, and one-to-one partnership.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community for adolescent practitioners.' },
+    ]}
+  />
+
 </BaseLayout>
 
 <style>

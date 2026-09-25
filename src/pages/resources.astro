@@ -3,6 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import ResourceCard from '../components/resources/ResourceCard.astro';
 import WebinarCard from '../components/webinars/WebinarCard.astro';
 import { getCollection } from 'astro:content';
+import NextSteps from '../components/shared/NextSteps.astro';
 
 const resources = (await getCollection('resources'))
   .filter((r) => !r.data.hidden)
@@ -108,6 +109,17 @@ const formatEventDate = (date: Date) =>
     )}
 
   </div>
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'The Collective', href: '/collective/', blurb: 'Share resources with other guides.' },
+      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance for your programme.' },
+      { label: 'The Blog', href: '/blog/', blurb: 'Reflections from work with adolescents.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

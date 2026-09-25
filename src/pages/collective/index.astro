@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import LandingContent from '../../components/collective/LandingContent.astro';
+import NextSteps from '../../components/shared/NextSteps.astro';
 
 // The Collective isn't open to the public yet, so this page collects a
 // waitlist instead. Flip to true and the full landing page comes back
@@ -71,6 +72,17 @@ const description = OPEN
 
     </div>
   )}
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'What is Montessori for Adolescents?', href: '/what-is-montessori-for-adolescents/', blurb: 'The thinking behind the work.' },
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+      { label: 'Get in Touch', href: '/contact/', blurb: 'Questions about joining?' },
+    ]}
+  />
+
 </PageLayout>
 
 {!OPEN && (

@@ -2,6 +2,7 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import BlogCard from '../../components/blog/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import NextSteps from '../../components/shared/NextSteps.astro';
 
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
@@ -51,6 +52,17 @@ const [featured, ...rest] = posts;
     )}
 
   </div>
+
+  <NextSteps
+    tone="terracotta"
+    title="Where to next"
+    items={[
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community of practitioners.' },
+      { label: 'Subscribe', href: '/subscribe/', blurb: 'New writing, straight to your inbox.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

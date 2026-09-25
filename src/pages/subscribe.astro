@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <BaseLayout
@@ -50,6 +51,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </section>
 
   </div>
+
+  <NextSteps
+    tone="terracotta"
+    title="While you are here"
+    items={[
+      { label: 'The Blog', href: '/blog/', blurb: 'Reflections from work with adolescents.' },
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community of practitioners.' },
+    ]}
+  />
+
 </BaseLayout>
 
 <script>

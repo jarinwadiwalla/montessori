@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import ContactForm from '../components/contact/ContactForm.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <PageLayout
@@ -33,6 +34,17 @@ import ContactForm from '../components/contact/ContactForm.astro';
 
     </div>
   </div>
+
+  <NextSteps
+    tone="chocolate"
+    title="You might also want"
+    items={[
+      { label: 'Partnership', href: '/partnership/', blurb: 'Book a free thirty-minute call.' },
+      { label: 'Guidance and Support', href: '/guidance/', blurb: 'Webinars, resources and partnership.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community of practitioners.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

@@ -4,6 +4,7 @@ import ArchPanels from '../components/shared/ArchPanels.astro';
 import Button from '../components/shared/Button.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <PageLayout
@@ -60,6 +61,17 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     author="Maria Montessori"
     source="From Childhood to Adolescence"
   />
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance, and a free call to start.' },
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'Think alongside other adolescent guides.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

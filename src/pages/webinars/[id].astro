@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import NextSteps from '../../components/shared/NextSteps.astro';
 
 export async function getStaticPaths() {
   const webinars = await getCollection('webinars', ({ data }) => !data.hidden);
@@ -268,6 +269,17 @@ const eventJsonLd = JSON.stringify({
       </div>
     </section>
   </div>
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'All Resources', href: '/resources/', blurb: 'More webinars and downloadable guides.' },
+      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance for your programme.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community of practitioners.' },
+    ]}
+  />
+
 </BaseLayout>
 
 <style>

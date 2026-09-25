@@ -3,6 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import ArchPanels from '../components/shared/ArchPanels.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <PageLayout
@@ -72,6 +73,17 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     text="The greatest sign of success for a teacher is to be able to say, 'The children are now working as if I did not exist.'"
     author="Maria Montessori"
   />
+
+  <NextSteps
+    tone="terracotta"
+    title="Where to next"
+    items={[
+      { label: 'Guidance and Support', href: '/guidance/', blurb: 'How we help you build it.' },
+      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance for your programme.' },
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

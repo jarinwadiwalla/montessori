@@ -2,6 +2,7 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import BlogComments from '../../components/blog/BlogComments.astro';
 import { getCollection, render } from 'astro:content';
+import NextSteps from '../../components/shared/NextSteps.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -74,6 +75,17 @@ const postJsonLd = JSON.stringify({
       </div>
     </article>
   </div>
+
+  <NextSteps
+    tone="terracotta"
+    title="Keep reading"
+    items={[
+      { label: 'All Posts', href: '/blog/', blurb: 'Everything we have written.' },
+      { label: 'Resources', href: '/resources/', blurb: 'Webinars and downloadable guides.' },
+      { label: 'Subscribe', href: '/subscribe/', blurb: 'New writing, straight to your inbox.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

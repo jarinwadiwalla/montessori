@@ -3,6 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import SponsorTiers from '../components/shared/SponsorTiers.astro';
 import QuoteBanner from '../components/shared/QuoteBanner.astro';
 import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 ---
 
 <PageLayout
@@ -176,6 +177,17 @@ import PhotoCarousel from '../components/shared/PhotoCarousel.astro';
     text="Education is the most powerful weapon which you can use to change the world."
     author="Nelson Mandela"
   />
+
+  <NextSteps
+    tone="chocolate"
+    title="Where to next"
+    items={[
+      { label: 'The Collective', href: '/collective/', blurb: 'The community your sponsorship opens up.' },
+      { label: 'Our Team', href: '/our-team/', blurb: 'The guides behind this work.' },
+      { label: 'Get in Touch', href: '/contact/', blurb: 'Talk to us about sponsoring a membership.' },
+    ]}
+  />
+
 </PageLayout>
 
 <style>

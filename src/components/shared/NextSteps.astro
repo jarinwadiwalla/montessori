@@ -1,0 +1,134 @@
+---
+// The band at the foot of a page that says where to go next.
+//
+// Most pages on the site ended in nothing: read to the bottom and the only
+// way on was the header. This gives every page two or three onward routes,
+// which is better for a reader who isn't ready to act yet, and gives search
+// engines something to follow.
+//
+// Full-bleed, so it must sit outside any .container.
+
+type Item = { label: string; href: string; blurb?: string };
+
+interface Props {
+  /** Heading above the links. */
+  title?: string;
+  /** Two or three onward routes. Four fits, but reads as a sitemap. */
+  items: Item[];
+  /** Which band colour. Alternate against whatever sits above it. */
+  tone?: 'chocolate' | 'terracotta' | 'cream';
+}
+
+const { title = 'Where to next', items, tone = 'chocolate' } = Astro.props;
+---
+
+<section class:list={['next', `next--${tone}`]}>
+  <div class="container">
+    <h2 class="next-title">{title}</h2>
+    <div class="next-grid">
+      {items.map((item) => (
+        <a class="next-card" href={item.href}>
+          <span class="next-label">{item.label}</span>
+          {item.blurb && <span class="next-blurb">{item.blurb}</span>}
+          <span class="next-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .next {
+    padding-block: var(--space-2xl);
+  }
+
+  /* Only --color-earth-dark clears 4.5:1 on terracotta, so the terracotta
+     tone writes in chocolate while the chocolate tone writes in cream. */
+  .next--chocolate { background: var(--color-earth-dark); }
+  .next--chocolate .next-title { color: var(--color-cream); }
+  .next--chocolate .next-title::after { background: var(--color-terracotta); }
+
+  .next--terracotta { background: var(--color-terracotta); }
+  .next--terracotta .next-title { color: var(--color-earth-dark); }
+  .next--terracotta .next-title::after { background: var(--color-earth-dark); opacity: 0.45; }
+
+  .next--cream { background: var(--color-cream); }
+  .next--cream .next-title { color: var(--color-earth-dark); }
+  .next--cream .next-title::after { background: var(--color-terracotta); }
+
+  .next-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    text-align: center;
+    margin: 0;
+  }
+
+  .next-title::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-2xl);
+  }
+
+  .next-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .next-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-lg);
+    background: var(--color-white);
+    /* The same softened arch as the panels elsewhere, at a smaller radius so
+       a row of them reads as navigation rather than as the main event. */
+    border-radius: 60px 60px var(--radius-lg) var(--radius-lg);
+    text-decoration: none;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .next-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+  }
+
+  .next-card:focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .next-card { transition: box-shadow 0.2s ease; }
+    .next-card:hover { transform: none; }
+  }
+
+  .next-label {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    line-height: 1.3;
+    color: var(--color-earth-dark);
+    margin-top: var(--space-sm);
+  }
+
+  .next-blurb {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--color-text-light);
+  }
+
+  .next-arrow {
+    margin-top: var(--space-sm);
+    font-size: var(--text-lg);
+    line-height: 1;
+    /* Not --color-terracotta-dark, which is 3.74:1 on white. This shade of
+       the same hue is 5.78:1. */
+    color: #96552B;
+  }
+</style>
