@@ -76,6 +76,22 @@ export const EMAIL_TEMPLATES = {
     </div>`,
   },
 
+  "event-rsvp": {
+    label: "Collective — RSVP confirmation",
+    description:
+      "Sent when a member RSVPs to a gathering. Carries the joining link when the event has one, and promises it by email when it does not.",
+    vars: ["greeting_name", "event_title", "event_when", "site"],
+    subject: "You're coming to {{event_title}}",
+    html: `${WRAP_OPEN}
+      <p>Hello{{greeting_name}},</p>
+      <p>You're on the list for <strong>{{event_title}}</strong>. Here are the details:</p>
+      {{when_block}}
+      {{join_block}}
+      <p ${MUTED}>Changed your mind? You can take your name off the list on the
+      <a href="{{site}}/collective/events/">Events page</a>, any time.</p>
+    </div>`,
+  },
+
   "member-new-message": {
     label: "Collective — new direct message",
     description:
