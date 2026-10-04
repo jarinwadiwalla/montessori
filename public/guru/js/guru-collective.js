@@ -72,12 +72,26 @@ async function colLoadEvents() {
         </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
+        ${e.calendar ? `<button class="btn btn-secondary btn-sm" data-calendar="${escapeHtml(e.calendar.google)}" onclick="colCopyCalendarLink(this)" title="A link that opens Google Calendar with this event filled in. Paste it behind a button in a campaign email.">Copy calendar link</button>` : ""}
         <button class="btn btn-secondary btn-sm" onclick="colShowRsvps('${e.id}')">Who's coming</button>
         ${e.status === "cancelled" ? "" : `<button class="btn btn-danger btn-sm" onclick="colCancelEvent('${e.id}', '${escapeHtml(e.title)}')">Cancel event</button>`}
       </div>
     </div>
     <div id="rsvps-${e.id}" style="display:none;"></div>
   `).join("");
+}
+
+// The "add to Google Calendar" link for an event, for pasting into a
+// campaign email. It carries the joining link, so it belongs only in
+// emails to members.
+async function colCopyCalendarLink(button) {
+  const link = button.dataset.calendar || "";
+  try {
+    await navigator.clipboard.writeText(link);
+    showToast("Calendar link copied. Paste it behind a button in your email.", "success");
+  } catch {
+    window.prompt("Copy this calendar link:", link);
+  }
 }
 
 // Who has RSVP'd, with their emails, so a joining link can be sent out.

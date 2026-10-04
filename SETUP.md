@@ -162,12 +162,23 @@ The site sends emails from: `Montessori for Adolescents <newsletter@montessorifo
 
 This works automatically once the domain is verified in Resend.
 
-### (Optional) Webhook for bounce/complaint handling
+### Delivery tracking (the Resend webhook)
 
-1. In Resend, go to **Webhooks > Add Webhook**
-2. URL: `https://montessoriforadolescents.com/api/resend-webhook`
-3. Events: `email.bounced`, `email.complained`
-4. Save
+Resend only reports what happened to an email (delivered, opened, clicked,
+bounced, marked as spam) if a webhook on their side points at
+`https://montessoriforadolescents.com/api/resend-webhook`.
+
+Open **Guru → Newsletter → Campaigns**. The **Delivery tracking** card says
+whether events are arriving. If they are not, press **Reconnect**: the site
+asks Resend what is registered, adds the webhook if it is missing, and
+adopts its signing secret. Nobody has to copy a secret by hand.
+
+To confirm it, send yourself a test email from Compose, wait a minute, and
+press **Check again**. The card should read "Working".
+
+Setting it up by hand still works (Resend → Webhooks → Add, then the
+`RESEND_WEBHOOK_SECRET` Pages secret), and a webhook signed with either
+secret is accepted.
 
 ## 7. DNS Migration (from GitHub Pages to Cloudflare Pages)
 

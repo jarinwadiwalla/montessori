@@ -6,6 +6,7 @@
 
 import { requireMember, generateId } from "../../lib/community-auth.js";
 import { requireAdminStrict } from "../../lib/auth.js";
+import { googleCalendarUrl, icsPath } from "../../lib/calendar.js";
 
 const KINDS = ["gathering", "presentation", "retreat"];
 
@@ -96,6 +97,12 @@ export async function onRequestGet(context) {
       status: e.status,
       rsvp_count: counts[e.id] || 0,
       going: mine.has(e.id),
+      // Only an event that is still on gets a calendar entry. The Google
+      // link works anywhere; the .ics path needs a member's session.
+      calendar:
+        e.status === "visible"
+          ? { google: googleCalendarUrl(e), ics: icsPath(e) }
+          : null,
     })),
     can_manage: !member || member.role === "admin",
   });

@@ -1,66 +1,67 @@
-const EVENT_PRIORITY = { complained: 6, clicked: 5, opened: 4, delivered: 3, bounced: 2, sent: 1, queued: 0 };
+// POST /api/resend-webhook — Resend tells us what happened to an email.
+//
+// Each event is appended to the email's row in resend_events, and a hard
+// bounce or a spam complaint unsubscribes the address. Requests are signed
+// (Svix); see functions/lib/svix.js. The signing secret can come from two
+// places — adopted from Resend by Guru's "Reconnect", or set by hand as the
+// RESEND_WEBHOOK_SECRET Pages secret — and a request signed with either is
+// accepted. See functions/lib/resend-webhooks.js for why both exist.
 
-async function verifySignature(request, secret) {
-  if (!secret) return true;
-
-  const msgId = request.headers.get("svix-id");
-  const timestamp = request.headers.get("svix-timestamp");
-  const signature = request.headers.get("svix-signature");
-
-  if (!msgId || !timestamp || !signature) return false;
-
-  // Check timestamp is within 5 minutes
-  const now = Math.floor(Date.now() / 1000);
-  const ts = parseInt(timestamp);
-  if (Math.abs(now - ts) > 300) return false;
-
-  // Decode the secret (whsec_ prefix + base64)
-  const secretKey = secret.startsWith("whsec_") ? secret.slice(6) : secret;
-  const keyBytes = Uint8Array.from(atob(secretKey), (c) => c.charCodeAt(0));
-
-  const toSign = `${msgId}.${timestamp}.`;
-  const body = await request.clone().text();
-  const payload = toSign + body;
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    keyBytes,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
-  const expected = btoa(String.fromCharCode(...new Uint8Array(sig)));
-
-  // Check against all signatures (comma-separated)
-  const sigs = signature.split(" ");
-  for (const s of sigs) {
-    const parts = s.split(",");
-    if (parts.length === 2 && parts[1] === expected) return true;
-  }
-  return false;
-}
+import { verifySvixSignature } from "../lib/svix.js";
+import {
+  signingSecrets,
+  recordWebhookReceived,
+  recordWebhookRejected,
+} from "../lib/resend-webhooks.js";
+import { EVENT_PRIORITY } from "../lib/delivery-stats.js";
 
 export async function onRequestPost(context) {
   const { env, request } = context;
 
-  // Verify webhook signature if secret is configured
-  if (env.RESEND_WEBHOOK_SECRET) {
-    const valid = await verifySignature(request, env.RESEND_WEBHOOK_SECRET);
+  const body = await request.text();
+  const secrets = await signingSecrets(env);
+
+  // With no secret configured anywhere there is nothing to check against;
+  // that is the documented "optional" setup and it stays permissive. Once a
+  // secret exists, an unsigned or wrongly signed request is refused.
+  if (secrets.length > 0) {
+    const id = request.headers.get("svix-id");
+    const timestamp = request.headers.get("svix-timestamp");
+    const signatureHeader = request.headers.get("svix-signature");
+
+    let valid = false;
+    for (const secret of secrets) {
+      if (await verifySvixSignature({ id, timestamp, signatureHeader, body, secret })) {
+        valid = true;
+        break;
+      }
+    }
+
     if (!valid) {
+      // Only a request that carries Svix headers looks like Resend. Noting
+      // those is how Guru can tell "Resend is calling with the wrong
+      // secret" from "Resend is not calling"; anything else is noise.
+      if (id && timestamp && signatureHeader) {
+        await recordWebhookRejected(env, "signature");
+      }
       return Response.json({ error: "Invalid signature" }, { status: 401 });
     }
   }
 
   let payload;
   try {
-    payload = await request.json();
+    payload = JSON.parse(body);
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const eventType = payload.type;
   const data = payload.data;
+  const eventName = eventType ? eventType.replace("email.", "") : "unknown";
+
+  // A genuine, signed call arrived: tracking is alive even if this
+  // particular event carries nothing we store.
+  await recordWebhookReceived(env, eventName);
 
   if (!data || !data.email_id) {
     return Response.json({ ok: true, message: "No email_id, skipping" });
@@ -69,7 +70,6 @@ export async function onRequestPost(context) {
   const emailId = data.email_id;
   const toAddresses = Array.isArray(data.to) ? data.to : [data.to];
   const email = toAddresses[0] || "";
-  const eventName = eventType ? eventType.replace("email.", "") : "unknown";
   const now = new Date().toISOString();
   const eventTimestamp = data.created_at || payload.created_at || now;
 
@@ -94,7 +94,7 @@ export async function onRequestPost(context) {
     const events = [{ type: eventName, timestamp: eventTimestamp }];
     await env.SITE_DB.prepare(
       "INSERT INTO resend_events (emailId, email, last_event, events, updated_at) VALUES (?, ?, ?, ?, ?)"
-    ).bind(emailId, email.toLowerCase().trim(), eventName, JSON.stringify(events), now).run();
+    ).bind(emailId, String(email).toLowerCase().trim(), eventName, JSON.stringify(events), now).run();
   }
 
   // Handle bounces and complaints by unsubscribing

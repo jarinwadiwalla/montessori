@@ -372,8 +372,84 @@ async function nlRemoveTemplate(id) {
   });
 }
 
+// ── Delivery tracking ──
+// Whether Resend is actually telling us what happens to sent emails. For a
+// long time it was not, and nothing here said so; this says so.
+const NL_TRACKING_LABEL = {
+  live: ["Working", "status-approved"],
+  waiting: ["Connected, no events yet", "status-pending"],
+  unknown: ["Not confirmed", "status-pending"],
+  "not-registered": ["Not connected", "status-failed"],
+  rejecting: ["Events refused", "status-failed"],
+  disabled: ["Switched off in Resend", "status-failed"],
+  "no-secret": ["Not connected", "status-failed"],
+};
+
+function nlRenderWebhookStatus(st) {
+  const box = document.getElementById("webhook-status");
+  if (!box) return;
+  if (!st) {
+    box.innerHTML = '<p style="font-size:13px;color:var(--gray-500);">Could not check delivery tracking.</p>';
+    return;
+  }
+
+  const [label, cls] = NL_TRACKING_LABEL[st.verdict] || [st.verdict, "status-pending"];
+  const h = st.health || {};
+  const facts = [];
+  if (h.lastReceivedAt) {
+    facts.push(`Last event from Resend: ${escapeHtml(h.lastEventType || "event")}, ${new Date(h.lastReceivedAt).toLocaleString()} (${h.receivedCount} in total).`);
+  } else {
+    facts.push("No event has ever arrived from Resend.");
+  }
+  if (h.lastRejectedAt) {
+    facts.push(`Last refused: ${new Date(h.lastRejectedAt).toLocaleString()}.`);
+  }
+  if (st.resend && !st.resend.reachable && st.resend.error) {
+    facts.push(`Could not ask Resend: ${escapeHtml(st.resend.error)}`);
+  }
+  const strays = ((st.resend && st.resend.webhooks) || []).filter((w) => !w.isOurs);
+  if (strays.length) {
+    facts.push(`Resend also has ${strays.length} other webhook${strays.length === 1 ? "" : "s"}: ${strays.map((w) => escapeHtml(w.endpoint)).join(", ")}.`);
+  }
+
+  box.innerHTML = `
+    <p style="margin:0 0 8px;"><span class="status ${cls}">${escapeHtml(label)}</span></p>
+    <p style="font-size:13px;margin:0 0 6px;">${escapeHtml(st.advice || "")}</p>
+    <p style="font-size:12px;color:var(--gray-500);margin:0 0 10px;">${facts.join(" ")}</p>
+    <div style="display:flex;gap:6px;">
+      ${st.verdict === "live" ? "" : '<button class="btn btn-sm btn-outline" onclick="nlReconnectWebhook(this)">Reconnect</button>'}
+      <button class="btn btn-sm btn-secondary" onclick="nlLoadWebhookStatus()">Check again</button>
+    </div>
+  `;
+}
+
+async function nlLoadWebhookStatus() {
+  nlRenderWebhookStatus(await apiFetch("/api/resend-webhook-status"));
+}
+
+async function nlReconnectWebhook(button) {
+  button.disabled = true;
+  button.textContent = "Reconnecting…";
+  const data = await apiFetch("/api/resend-webhook-status", {
+    method: "POST",
+    body: JSON.stringify({ action: "reconnect" }),
+  });
+  if (data && data.ok) {
+    showToast(
+      data.result.action === "created"
+        ? "Connected: a new webhook was registered with Resend."
+        : "Connected: the existing webhook's signing secret was adopted.",
+      "success"
+    );
+    nlRenderWebhookStatus(data.status);
+  } else {
+    nlLoadWebhookStatus();
+  }
+}
+
 // ── Campaigns ──
 async function nlLoadCampaigns() {
+  nlLoadWebhookStatus();
   const data = await apiFetch("/api/newsletter-campaigns");
   const container = document.getElementById("campaigns-list");
   if (!data || !data.campaigns || data.campaigns.length === 0) {
@@ -404,6 +480,38 @@ async function nlLoadCampaigns() {
   `;
 }
 
+// Who got it, one line each. "Delivered" means the recipient's mail
+// provider accepted it — not that it reached the inbox rather than Spam or
+// Promotions, which no sender is told.
+const NL_EVENT_LABEL = {
+  queued: "Queued", sent: "Sent", delivered: "Delivered", opened: "Opened",
+  clicked: "Clicked", bounced: "Bounced", complained: "Marked as spam",
+  delivery_delayed: "Delayed", failed: "Failed", suppressed: "Suppressed",
+};
+
+function nlRecipientRows(details) {
+  if (!details || !details.length) return "";
+  const rows = details
+    .slice()
+    .sort((a, b) => String(a.to).localeCompare(String(b.to)))
+    .map((d) => `
+      <tr>
+        <td>${escapeHtml(d.to || "")}</td>
+        <td>${escapeHtml(NL_EVENT_LABEL[d.last_event] || d.last_event || "")}</td>
+      </tr>`)
+    .join("");
+  return `
+    <div class="table-wrapper" style="margin-top:14px;max-height:240px;overflow-y:auto;">
+      <table>
+        <thead><tr><th>Recipient</th><th>Latest</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--gray-500);margin-top:8px;">
+      Delivered means their mail provider accepted it. It may still be under Promotions or Spam.
+    </p>`;
+}
+
 // ── Campaign Stats ──
 async function nlViewCampaignStats(campaignId) {
   showToast("Loading stats...", "info");
@@ -432,6 +540,7 @@ async function nlViewCampaignStats(campaignId) {
           Resend to ${s.total - s.delivered} undelivered
         </button>
       ` : '<p style="font-size:13px;color:var(--green-600);">All emails delivered!</p>'}
+      ${nlRecipientRows(data.eventDetails)}
     </div>
   `;
 
