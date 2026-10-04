@@ -150,6 +150,25 @@ export const EMAIL_TEMPLATES = {
     </div>`,
   },
 
+  "recording-access-link": {
+    label: "Webinar recording — link to watch",
+    description:
+      "Sent when someone buys a webinar recording, and again whenever a buyer asks for a fresh link from the webinar's page.",
+    vars: ["title", "link", "expires_in", "recording_page"],
+    subject: "Your link to watch the webinar recording",
+    html: `${WRAP_OPEN}
+      <p>Hello,</p>
+      <p>Thank you for purchasing <strong>{{title}}</strong>. Here is your
+      personal link to watch it:</p>
+      <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Watch the recording</a></p>
+      <p ${MUTED}>The link works for {{expires_in}}, and the device you open
+      it on stays signed in. For a fresh link at any time, enter this email
+      address at {{recording_page}}</p>
+      <p ${MUTED}>This link is yours, so please keep it to yourself. If you
+      didn't ask for it, you can safely ignore this email.</p>
+    </div>`,
+  },
+
   "subscriber-welcome": {
     label: "Newsletter — welcome",
     description:

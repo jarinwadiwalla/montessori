@@ -8,6 +8,7 @@
 
 import { requireAdminStrict } from "../lib/auth.js";
 import { classifyPayment, recordPayment } from "../lib/payments.js";
+import { grantRecordingsForCheckout } from "../lib/webinar-access.js";
 import { normalizeEmail } from "../lib/community-auth.js";
 
 export async function onRequestGet(context) {
@@ -92,6 +93,10 @@ export async function onRequestPost(context) {
         stripe_customer_id: typeof session.customer === "string" ? session.customer : "",
         created_at: new Date(session.created * 1000).toISOString(),
       });
+      // A recording sale the webhook missed is caught up here too, so the
+      // buyer can ask for their link. Quietly: this is not the moment to
+      // email anyone.
+      await grantRecordingsForCheckout(context, session, items, { source: "sync" }).catch(() => {});
       return true;
     }
   );

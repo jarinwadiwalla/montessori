@@ -16,6 +16,7 @@ import { generateId, normalizeEmail, createLoginToken } from "../../lib/communit
 import { ensureSubscriber } from "../../lib/community-list.js";
 import { ensureHandle } from "../../lib/community-mentions.js";
 import { classifyPayment, recordPayment } from "../../lib/payments.js";
+import { grantRecordingsForCheckout } from "../../lib/webinar-access.js";
 import { getTemplate, renderTemplate, greetingName } from "../../lib/email-templates.js";
 
 const SITE = "https://montessoriforadolescents.com";
@@ -112,6 +113,10 @@ async function handleCheckout(context, event) {
       ? new Date(session.created * 1000).toISOString()
       : new Date().toISOString(),
   });
+
+  // A recording purchase opens that recording to the buyer's email and
+  // sends them their link. It must never be what breaks this webhook.
+  await grantRecordingsForCheckout(context, session, items, { notify: true }).catch(() => {});
 
   if (kind !== "collective") {
     return Response.json({ received: true, skipped: "not a Collective purchase" });

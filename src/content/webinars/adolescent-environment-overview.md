@@ -17,7 +17,6 @@ stripePaymentLink: "https://buy.stripe.com/9B6eVdfDEb06dwc8oj4sE07"
 recordingAvailable: true
 recordingPrice: 45
 stripeRecordingLink: "https://buy.stripe.com/fZu8wPfDE4BI3VCdID4sE08"
-recordingEmbedUrl: "https://www.youtube.com/embed/u1yOYSjLbDE"
 topics:
   - What Maria Montessori envisioned for the adolescent environment
   - What a weekly flow could look like

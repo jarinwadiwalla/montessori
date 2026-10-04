@@ -55,10 +55,12 @@ const webinars = defineCollection({
     featured: z.boolean().default(false),
     hidden: z.boolean().default(false),
     // --- Recording (for past webinars sold on demand) ---
+    // The player's address is deliberately not a field here: this repo and
+    // the built site are public. It lives in the `webinar_recordings` table
+    // (schema/webinar-recordings.sql) and is served only to buyers.
     recordingAvailable: z.boolean().default(false),
     recordingPrice: z.number().optional(),
     stripeRecordingLink: z.string().optional(),
-    recordingEmbedUrl: z.string().optional(),
   }),
 });
 

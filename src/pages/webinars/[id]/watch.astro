@@ -13,9 +13,10 @@ export async function getStaticPaths() {
   }));
 }
 
+// This builds only the frame. The player is put in, for buyers only, by
+// functions/webinars/[id]/watch.js, which answers this address before the
+// static file does. The video's address is not in this repo or this build.
 const { webinar } = Astro.props;
-const embedUrl = webinar.data.recordingEmbedUrl ?? '';
-const hasVideo = embedUrl.startsWith('http');
 ---
 
 <PageLayout
@@ -28,23 +29,7 @@ const hasVideo = embedUrl.startsWith('http');
   <div class="container watch-wrap">
     <h2 class="watch-title">{webinar.data.title}</h2>
 
-    {hasVideo ? (
-      <div class="video-frame">
-        <iframe
-          src={embedUrl}
-          title={webinar.data.title}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-        ></iframe>
-      </div>
-    ) : (
-      <div class="watch-pending">
-        <p>The recording is being prepared and will appear here shortly. If you’ve
-        just purchased and it isn’t ready yet, <a href="/contact/">get in touch</a>
-        and we’ll send it to you right away.</p>
-      </div>
-    )}
+    <!--recording-player-->
 
     <p class="watch-note">
       This is your personal viewing page — please keep the link to yourself.
@@ -69,7 +54,10 @@ const hasVideo = embedUrl.startsWith('http');
     margin-bottom: var(--space-xl);
   }
 
-  .video-frame {
+  /* The player and the "being prepared" notice are put in by the function,
+     so they never carry this component's scope attribute: reach them with
+     :global(), anchored to an element that does. */
+  .watch-wrap :global(.video-frame) {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -79,7 +67,7 @@ const hasVideo = embedUrl.startsWith('http');
     background: #000;
   }
 
-  .video-frame iframe {
+  .watch-wrap :global(.video-frame iframe) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -87,7 +75,7 @@ const hasVideo = embedUrl.startsWith('http');
     border: 0;
   }
 
-  .watch-pending {
+  .watch-wrap :global(.watch-pending) {
     background: var(--color-white);
     border: 1px solid var(--color-border);
     border-top: 3px solid var(--color-purple);
@@ -105,7 +93,7 @@ const hasVideo = embedUrl.startsWith('http');
     line-height: var(--leading-normal);
   }
 
-  .watch-pending a,
+  .watch-wrap :global(.watch-pending a),
   .watch-note a {
     color: var(--color-terracotta-dark);
     text-decoration: underline;

@@ -8,7 +8,14 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const SCHEMA_FILES = ["init.sql", "migrate-newsletter.sql", "community.sql", "email-templates.sql"];
+const SCHEMA_FILES = [
+  "init.sql",
+  "migrate-newsletter.sql",
+  "community.sql",
+  "email-templates.sql",
+  "payments.sql",
+  "webinar-recordings.sql",
+];
 
 function statements(sql) {
   return sql
@@ -20,19 +27,23 @@ function statements(sql) {
     .filter(Boolean);
 }
 
-export function createDb() {
-  const db = new DatabaseSync(":memory:");
-  for (const file of SCHEMA_FILES) {
-    const sql = readFileSync(path.join(ROOT, "schema", file), "utf8");
-    for (const stmt of statements(sql)) {
-      try {
-        db.exec(stmt);
-      } catch (err) {
-        // The migration file re-adds columns init.sql already declares.
-        if (!/duplicate column name|already exists/i.test(String(err.message))) throw err;
-      }
+// Run one schema file against the raw database, as `wrangler d1 execute
+// --file` would. Exported so a test can re-run a migration over data.
+export function applySchema(db, file) {
+  const sql = readFileSync(path.join(ROOT, "schema", file), "utf8");
+  for (const stmt of statements(sql)) {
+    try {
+      db.exec(stmt);
+    } catch (err) {
+      // The migration file re-adds columns init.sql already declares.
+      if (!/duplicate column name|already exists/i.test(String(err.message))) throw err;
     }
   }
+}
+
+export function createDb() {
+  const db = new DatabaseSync(":memory:");
+  for (const file of SCHEMA_FILES) applySchema(db, file);
 
   return {
     raw: db,
