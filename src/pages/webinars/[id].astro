@@ -142,6 +142,30 @@ const eventJsonLd = JSON.stringify({
 
   <!-- ===== Body ===== -->
   <div class="container webinar-page">
+    {isRecording && (
+      <section class="access-box" id="access" data-webinar={webinar.id} hidden>
+        <div class="access-copy">
+          <p class="access-heading">Already purchased?</p>
+          <p class="access-text" id="access-text"></p>
+        </div>
+        <div class="access-action">
+          <form class="access-form" id="access-form">
+            <input
+              type="email"
+              id="access-email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              aria-label="The email you used at checkout"
+              required
+            />
+            <button type="submit" id="access-btn">Email me my link</button>
+          </form>
+          <p class="access-message" id="access-message" role="status"></p>
+        </div>
+      </section>
+    )}
+
     <div class="webinar-layout">
 
       <div class="webinar-main">
@@ -249,6 +273,13 @@ const eventJsonLd = JSON.stringify({
             Secure checkout powered by Stripe. Questions?
             <a href="/contact/">Get in touch</a>.
           </p>
+
+          {isRecording && (
+            <p class="register-note">
+              Already purchased?
+              <a href={`/webinars/${webinar.id}/watch/`}>Watch your recording</a>.
+            </p>
+          )}
         </div>
       </aside>
 
@@ -281,6 +312,65 @@ const eventJsonLd = JSON.stringify({
   />
 
 </BaseLayout>
+
+<script>
+  // "Already purchased?" — a buyer asks for a fresh link to the recording.
+  // The watch page sends people here when it can't tell that they bought
+  // it, with the reason in ?access=, and only then is the form shown.
+  const box = document.getElementById('access');
+  const reasons: Record<string, string> = {
+    needed:
+      'To watch the recording, enter the email you used at checkout and we’ll send your personal link. Just bought it? Your link is on its way to your inbox too.',
+    expired:
+      'That link has expired. Enter the email you used at checkout and we’ll send you a fresh one.',
+    unconfirmed:
+      'We couldn’t confirm that purchase just now. Enter the email you used at checkout and we’ll send your link to watch.',
+  };
+  const why = new URLSearchParams(window.location.search).get('access') ?? '';
+  const reason = Object.hasOwn(reasons, why) ? reasons[why] : '';
+
+  if (box && reason) {
+    const text = document.getElementById('access-text') as HTMLParagraphElement;
+    const form = document.getElementById('access-form') as HTMLFormElement;
+    const emailInput = document.getElementById('access-email') as HTMLInputElement;
+    const button = document.getElementById('access-btn') as HTMLButtonElement;
+    const message = document.getElementById('access-message') as HTMLParagraphElement;
+
+    text.textContent = reason;
+    box.hidden = false;
+    // The #access in the address pointed at something hidden until now, so
+    // the browser did not go there itself. Jump, as it would have.
+    box.scrollIntoView({ behavior: 'instant' });
+
+    const setMessage = (body: string, ok = false) => {
+      message.textContent = body;
+      message.className = `access-message${body ? (ok ? ' access-message--ok' : ' access-message--error') : ''}`;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setMessage('');
+      button.disabled = true;
+      button.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/webinar-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webinar: box.dataset.webinar, email: emailInput.value }),
+        });
+        const data = await res.json();
+        if (res.ok) setMessage(data.message, true);
+        else setMessage(data.error || 'Something went wrong. Please try again.');
+      } catch {
+        setMessage('Something went wrong. Please try again.');
+      }
+
+      button.disabled = false;
+      button.textContent = 'Email me my link';
+    });
+  }
+</script>
 
 <style>
   /* ===== Hero ===== */
@@ -763,6 +853,103 @@ const eventJsonLd = JSON.stringify({
     text-decoration: underline;
   }
 
+  /* ===== Already purchased? ===== */
+  .access-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: var(--space-xl) var(--space-3xl);
+    align-items: center;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-purple);
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    /* Scrolled to on arrival: stay clear of the sticky header. */
+    scroll-margin-top: calc(var(--header-height) + var(--space-lg));
+  }
+
+  .access-box[hidden] {
+    display: none;
+  }
+
+  .access-heading {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-purple);
+    margin-bottom: var(--space-sm);
+  }
+
+  .access-text {
+    font-size: var(--text-base);
+    color: var(--color-earth-dark);
+    line-height: var(--leading-normal);
+    max-width: 52ch;
+  }
+
+  .access-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .access-form input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background: var(--color-white);
+  }
+
+  .access-form input:focus {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 1px;
+  }
+
+  .access-form button {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    background: var(--color-purple);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .access-form button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .access-message {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .access-message--ok,
+  .access-message--error {
+    margin-top: var(--space-md);
+  }
+
+  .access-message--ok {
+    color: var(--color-sage-dark);
+  }
+
+  .access-message--error {
+    color: var(--color-terracotta-dark);
+  }
+
   /* ===== Bottom CTA band ===== */
   .cta-band {
     margin-top: var(--space-3xl);
@@ -825,9 +1012,14 @@ const eventJsonLd = JSON.stringify({
       max-width: 440px;
     }
 
-    .webinar-layout {
+    .webinar-layout,
+    .access-box {
       grid-template-columns: 1fr;
       gap: var(--space-2xl);
+    }
+
+    .access-box {
+      gap: var(--space-lg);
     }
 
     .webinar-aside {

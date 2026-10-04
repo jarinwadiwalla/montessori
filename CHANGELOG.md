@@ -1,5 +1,68 @@
 # Changelog
 
+## [1.6.0] - 2026-10-04
+
+### Fixed
+- **The paid webinar recording could be watched without paying.**
+  `/webinars/<id>/watch/` was an ordinary static page: anyone with the
+  address got the video, and the video's address was also written in this
+  public repository. The page is now answered by a function that shows the
+  player only to someone who can prove they bought the recording. Everyone
+  else is sent to the sales page.
+- The player's address is no longer in the repo or in the built site. It
+  lives in a new `webinar_recordings` table and is served only through the
+  gate. `recordingEmbedUrl` is gone from the webinar content files, and a
+  test fails if a player address is ever written into one again.
+
+### Added
+- **Three ways to prove a purchase.** Arriving from Stripe checkout with
+  `?session_id=` (checked with Stripe: complete, paid, and for one of that
+  recording's products); arriving from a link we emailed; or coming back on
+  a browser that has done either, which stays signed in for a year.
+- **"Already purchased?"** on the recording's sales page. A buyer enters the
+  email they used at checkout and is sent a fresh link, good for 30 days.
+  The reply is the same whether or not that address bought anything, and
+  nothing is sent to an address that did not.
+- **Buyers are emailed their link when they pay**, by the Stripe webhook, so
+  the purchase no longer depends on the buyer staying on the page Stripe
+  sends them back to. The email is editable in Guru → Newsletter → System
+  emails ("Webinar recording — link to watch").
+- Guru → Payments → **Sync from Stripe** now also catches up recording
+  access for any sale the webhook missed.
+- Three tables in `schema/webinar-recordings.sql`: `webinar_recordings`
+  (what is on sale), `webinar_access` (who bought what) and
+  `webinar_access_tokens` (emailed links and browser sessions, stored as
+  hashes). Deleting someone's `webinar_access` row, after a refund for
+  instance, stops their links and their browsers at once.
+
+### Unchanged
+- Recordings are still **not** included with Collective membership (1.4.0).
+  Being signed in to the Collective opens nothing here.
+- Everyone who paid before today keeps access: the schema file copies every
+  `webinar` payment in the mirror into `webinar_access`, live tickets
+  included. They get back in with "Already purchased?".
+
+### Notes
+- **Before this is merged**, the recording's row in `webinar_recordings`
+  needs its Stripe product id (`stripe_product_ids`). Without it no new
+  purchase can be recognised. See the pull request for the command.
+- **The old video is still exposed.** Its address was public in this repo's
+  history and on the open page, and an unlisted YouTube video can be watched
+  by anyone holding the address. Re-upload it (or make it private and
+  upload a copy), then put the new address in `webinar_recordings`. Until
+  then this release stops new people finding it; it cannot stop people who
+  already have it.
+- The Stripe payment link should send buyers back to
+  `/webinars/<id>/watch/?session_id={CHECKOUT_SESSION_ID}`. Until that is
+  changed in Stripe, a buyer lands on the sales page and uses the link in
+  their email instead.
+- An unlisted YouTube video has no per-viewer control: a buyer can still
+  read the address out of the player and pass it on. A host with signed or
+  domain-restricted embeds is the next step if that matters.
+- **Selling the next recording:** set `recordingAvailable`, `recordingPrice`
+  and `stripeRecordingLink` in its content file as before, and add its row
+  to `webinar_recordings` (the schema file shows how).
+
 ## [1.5.0] - 2026-10-04
 
 ### Added
