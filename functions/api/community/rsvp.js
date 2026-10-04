@@ -3,6 +3,7 @@
 
 import { requireMember } from "../../lib/community-auth.js";
 import { getTemplate, renderTemplate, greetingName } from "../../lib/email-templates.js";
+import { inviteForEmail } from "../../lib/calendar.js";
 
 const SITE = "https://montessoriforadolescents.com";
 const FROM = "Montessori Adolescent Collective <newsletter@montessoriforadolescents.com>";
@@ -52,20 +53,41 @@ async function sendRsvpEmail(env, member, event) {
         `<a href="${esc(event.link)}" style="color:#3f265b;word-break:break-all;">${esc(event.link)}</a></p>`
       : `<p>We will email you the joining link before we meet.</p>`;
 
+    // The invite rides in the join block rather than its own placeholder,
+    // so a template already edited in Guru gains it without being touched.
+    const { calendarBlock, attachments } = inviteForEmail(event);
+
     const { subject, html } = renderTemplate(
       tpl,
       { greeting_name: greetingName(member.name), event_title: event.title, event_when: when, site: SITE },
-      { when_block: whenBlock, join_block: joinBlock }
+      { when_block: whenBlock, join_block: joinBlock + calendarBlock }
     );
 
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ from: FROM, to: [member.email], subject, html }),
-    });
+    const send = (withInvite) =>
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: FROM,
+          to: [member.email],
+          subject,
+          html,
+          ...(withInvite && attachments ? { attachments } : {}),
+        }),
+      });
+
+    // The invite is a nicety; the confirmation is the point. If Resend
+    // will not take the attachment, send the email without it rather than
+    // not at all. The Google Calendar link in the body still works.
+    let res = await send(true);
+    if (!res.ok && attachments) {
+      console.error("rsvp confirmation refused with invite attached", res.status);
+      res = await send(false);
+    }
+    if (!res.ok) console.error("rsvp confirmation not sent", res.status);
   } catch (err) {
     console.error("rsvp confirmation failed", err);
   }
@@ -81,7 +103,9 @@ export async function onRequestPost(context) {
   if (!eventId) return Response.json({ error: "Missing event id." }, { status: 400 });
 
   const event = await env.SITE_DB.prepare(
-    "SELECT id, capacity, status, title, starts_at, timezone_note, link FROM community_events WHERE id = ?"
+    `SELECT id, capacity, status, title, description, starts_at, ends_at,
+            timezone_note, location, link, updated_at
+     FROM community_events WHERE id = ?`
   )
     .bind(eventId)
     .first();

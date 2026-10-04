@@ -1,7 +1,14 @@
 import { requireAdmin } from "../lib/auth.js";
+import { shouldRefresh, strongerEvent, tally } from "../lib/delivery-stats.js";
 
-const EVENT_PRIORITY = { complained: 6, clicked: 5, opened: 4, delivered: 3, bounced: 2, sent: 1, queued: 0 };
-const DELIVERED_EVENTS = new Set(["delivered", "opened", "clicked"]);
+// GET /api/campaign-stats?id=<campaign id>
+//
+// Per-recipient delivery status for one campaign. Rows the webhook keeps
+// current are read straight from D1; anything missing, or stored as a stale
+// snapshot, is asked for from Resend (see functions/lib/delivery-stats.js).
+
+const API_BATCH_SIZE = 2;      // Resend allows two requests a second
+const API_BATCH_DELAY_MS = 1000;
 
 export async function onRequestGet(context) {
   const authErr = requireAdmin(context);
@@ -32,50 +39,47 @@ export async function onRequestGet(context) {
     });
   }
 
-  const stats = { total: emailIds.length, delivered: 0, clicked: 0, bounced: 0, complained: 0 };
-  const eventDetails = [];
-  let webhookHits = 0;
-  let apiHits = 0;
-  let apiErrors = 0;
-  let rateLimitHit = false;
-
-  // Check D1 for webhook-stored events first
+  // What is already stored.
   const placeholders = emailIds.map(() => "?").join(",");
   const { results: storedEvents } = await env.SITE_DB.prepare(
     `SELECT * FROM resend_events WHERE emailId IN (${placeholders})`
   ).bind(...emailIds).all();
 
-  const eventMap = new Map();
-  for (const evt of storedEvents) {
-    eventMap.set(evt.emailId, evt);
-  }
+  const stored = new Map();
+  for (const evt of storedEvents) stored.set(evt.emailId, evt);
 
-  // Process webhook events
+  // Per email: the status we will report, the address, and where it came from.
+  const resolved = new Map();
+  const toAsk = [];
+  let webhookHits = 0;
+  let cachedHits = 0;
+
   for (const id of emailIds) {
-    const evt = eventMap.get(id);
-    if (evt) {
-      webhookHits++;
-      const lastEvent = evt.last_event;
-      if (DELIVERED_EVENTS.has(lastEvent)) stats.delivered++;
-      if (lastEvent === "clicked") stats.clicked++;
-      if (lastEvent === "bounced") stats.bounced++;
-      if (lastEvent === "complained") stats.complained++;
-      eventDetails.push({ id, to: evt.email, last_event: lastEvent, source: "webhook" });
+    const row = stored.get(id);
+    if (!row) {
+      toAsk.push(id);
+    } else if (shouldRefresh(row, campaign.sentAt)) {
+      // Keep the stored value in hand: it stands if Resend can't be asked.
+      resolved.set(id, { to: row.email, last_event: row.last_event, source: "cached" });
+      toAsk.push(id);
+    } else {
+      const fromWebhook = row.events && row.events !== "[]";
+      if (fromWebhook) webhookHits++;
+      else cachedHits++;
+      resolved.set(id, { to: row.email, last_event: row.last_event, source: fromWebhook ? "webhook" : "cached" });
     }
   }
 
-  // Fallback to Resend API for IDs without webhook data
-  const missingIds = emailIds.filter((id) => !eventMap.has(id));
+  let apiHits = 0;
+  let apiErrors = 0;
+  let rateLimitHit = false;
 
-  if (missingIds.length > 0 && env.RESEND_API_KEY) {
-    const BATCH_SIZE = 2;
-    const BATCH_DELAY = 1000;
-
-    for (let i = 0; i < missingIds.length; i += BATCH_SIZE) {
-      if (i > 0) await new Promise((r) => setTimeout(r, BATCH_DELAY));
+  if (toAsk.length > 0 && env.RESEND_API_KEY) {
+    for (let i = 0; i < toAsk.length; i += API_BATCH_SIZE) {
+      if (i > 0) await new Promise((r) => setTimeout(r, API_BATCH_DELAY_MS));
       if (rateLimitHit) break;
 
-      const batch = missingIds.slice(i, i + BATCH_SIZE);
+      const batch = toAsk.slice(i, i + API_BATCH_SIZE);
       const results = await Promise.allSettled(
         batch.map(async (id) => {
           const res = await fetch(`https://api.resend.com/emails/${id}`, {
@@ -97,23 +101,34 @@ export async function onRequestGet(context) {
         }
         apiHits++;
         const data = result.value;
-        const lastEvent = data.last_event || "queued";
-        if (DELIVERED_EVENTS.has(lastEvent)) stats.delivered++;
-        if (lastEvent === "clicked") stats.clicked++;
-        if (lastEvent === "bounced") stats.bounced++;
-        if (lastEvent === "complained") stats.complained++;
+        const previous = stored.get(data.id);
+        const lastEvent = strongerEvent(previous?.last_event, data.last_event || "queued");
+        const to = (Array.isArray(data.to) ? data.to[0] : data.to) || previous?.email || "";
 
-        const to = Array.isArray(data.to) ? data.to[0] : data.to;
-        eventDetails.push({ id: data.id, to, last_event: lastEvent, source: "api" });
+        resolved.set(data.id, { to, last_event: lastEvent, source: "api" });
 
-        // Cache the result in D1 for future lookups
+        // Store it as a snapshot. The WHERE keeps this from overwriting a
+        // row the webhook filled in while we were asking.
         const now = new Date().toISOString();
         await env.SITE_DB.prepare(
-          "INSERT OR REPLACE INTO resend_events (emailId, email, last_event, events, updated_at) VALUES (?, ?, ?, ?, ?)"
-        ).bind(data.id, to || "", lastEvent, "[]", now).run();
+          `INSERT INTO resend_events (emailId, email, last_event, events, updated_at)
+           VALUES (?, ?, ?, '[]', ?)
+           ON CONFLICT(emailId) DO UPDATE SET
+             last_event = excluded.last_event,
+             updated_at = excluded.updated_at
+           WHERE resend_events.events = '[]'`
+        ).bind(data.id, to, lastEvent, now).run();
       }
     }
   }
+
+  const eventDetails = [];
+  for (const id of emailIds) {
+    const r = resolved.get(id);
+    if (r) eventDetails.push({ id, to: r.to, last_event: r.last_event, source: r.source });
+  }
+
+  const stats = tally(eventDetails.map((d) => d.last_event), emailIds.length);
 
   // Use cached stats as floor to prevent flickering
   const cached = JSON.parse(campaign.cachedStats || "{}");
@@ -130,6 +145,6 @@ export async function onRequestGet(context) {
     success: true,
     stats,
     eventDetails,
-    debug: { totalIds: emailIds.length, webhookHits, apiHits, apiErrors, rateLimitHit },
+    debug: { totalIds: emailIds.length, webhookHits, cachedHits, apiHits, apiErrors, rateLimitHit },
   });
 }

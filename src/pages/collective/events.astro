@@ -268,6 +268,26 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     }
 
     if (actions.children.length) card.appendChild(actions);
+
+    // Put it on a calendar. Google gets a link that opens with the event
+    // filled in; everything else gets the .ics, which a phone opens
+    // straight into its calendar.
+    if (e.calendar && when === 'upcoming') {
+      const cal = el('p', 'e-cal', 'Add to your calendar: ');
+      const google = document.createElement('a');
+      google.href = e.calendar.google;
+      google.target = '_blank';
+      google.rel = 'noopener noreferrer';
+      google.textContent = 'Google';
+      cal.appendChild(google);
+      cal.appendChild(document.createTextNode(' · '));
+      const ics = document.createElement('a');
+      ics.href = e.calendar.ics;
+      ics.textContent = 'Apple or Outlook';
+      cal.appendChild(ics);
+      card.appendChild(cal);
+    }
+
     return card;
   }
 
@@ -571,6 +591,18 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     background: none;
     border: 1px solid var(--color-earth-dark);
     color: var(--color-earth-dark);
+  }
+
+  #list :global(.e-cal) {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  #list :global(.e-cal a) {
+    color: var(--color-earth-dark);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   #list :global(.e-link) {

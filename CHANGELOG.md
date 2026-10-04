@@ -1,5 +1,58 @@
 # Changelog
 
+## [1.5.0] - 2026-10-04
+
+### Added
+- **Calendar invites for gatherings.** An RSVP confirmation now carries an
+  "add to Google Calendar" link and an attached invite that opens in Apple
+  Calendar and Outlook. The members' Events page has the same two options
+  under every upcoming event. Both are built from the stored event, so the
+  time on the calendar cannot drift from the time on the page, and both
+  include the joining link and reminders a day and an hour before. An event
+  with no end time is given an hour.
+- **A calendar link for campaign emails.** Guru → Collective → Events has a
+  "Copy calendar link" button on each event. Paste it behind a button in an
+  invitation email so members can put the gathering on their calendar in
+  one click, without signing in first. It carries the joining link, so it
+  belongs only in emails to members.
+- **Delivery tracking, visible.** Guru → Newsletter → Campaigns opens with a
+  card that says whether Resend is reporting what happens to sent emails,
+  when the last event arrived, and what is wrong if it is not. "Reconnect"
+  repairs it: it registers the webhook with Resend if it is missing and
+  adopts its signing secret, with no secret to copy by hand.
+- **Who got it.** Campaign Stats now lists each recipient with their latest
+  status, and says what "Delivered" does and does not mean: the recipient's
+  mail provider accepted it, which is not the same as reaching the inbox
+  rather than Promotions or Spam.
+- A test suite (`npm test`): the request handlers run against an in-memory
+  copy of the database built from `schema/`, with Resend's API stubbed.
+
+### Fixed
+- **The Resend webhook had never recorded an event.** Every delivery status
+  on record came from pressing "Stats", none from Resend. The endpoint was
+  healthy and refusing unsigned requests, so either no webhook was
+  registered or its secret did not match; nothing in Guru said so. Requests
+  signed with the adopted secret or the `RESEND_WEBHOOK_SECRET` Pages secret
+  are now both accepted, refusals are noted, and the card above shows which
+  of the two faults it is. **After this deploys, press Reconnect once.**
+- **Campaign stats froze at the first look.** The first time anyone opened a
+  campaign's stats, each recipient's status was stored and never asked for
+  again, so someone who clicked an hour later stayed "delivered" for ever.
+  A stored status is now re-checked with Resend once it is ten minutes old,
+  for campaigns sent in the last thirty days.
+- A failed, suppressed or delayed email is no longer hidden behind an
+  earlier "sent".
+
+### Changed
+- An RSVP confirmation that Resend refuses with the invite attached is sent
+  again without it, rather than not at all.
+
+### Notes
+- Once events flow, the behaviour the webhook was always meant to have
+  switches on: a hard bounce or a spam complaint unsubscribes that address.
+- This file had no entries between 1.4.1 (27 August) and this one; the
+  changes in between are in the commit history only.
+
 ## [1.4.1] - 2026-08-27
 
 ### Added

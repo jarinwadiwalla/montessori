@@ -49,6 +49,11 @@ montessoriforadolescents@gmail.com
 
 ## Set Up Resend Webhook
 
+The easy way: **Guru → Newsletter → Campaigns → Delivery tracking →
+Reconnect**. That registers the webhook with Resend if it is missing and
+adopts its signing secret, with no secret to copy. The steps below are the
+manual alternative; a webhook signed with either secret is accepted.
+
 In the Resend dashboard (https://resend.com/webhooks):
 
 1. Add endpoint URL: `https://montessoriforadolescents.com/api/resend-webhook`
