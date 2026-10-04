@@ -77,6 +77,20 @@ Newsletter templates are **live rows in D1**. The `schema/seed-template-*.sql`
 files are stale snapshots — read the database, not those files, if you need to
 know what a template currently looks like.
 
+### Photo guideline: prefer photos without children's faces
+
+**Going forward, prefer photos that don't show children's or adolescents'
+faces** in new social posts (Facebook, Instagram, Metricool) and new blog
+content. Decided 2026-10-04. It's a preference, not a ban: existing photos on
+the site and Facebook stay as they are, and an occasional photo with faces is
+okay.
+
+- First choice: hands, backs of heads, silhouettes, distant figures, the land,
+  animals, food, materials and work in progress. Logos and graphics are fine.
+- Adults' faces (guides and staff headshots) are fine.
+- Many photos in `public/images/` (carousel, guidance, access) show students'
+  faces; reach for the face-free ones first when picking new imagery.
+
 ---
 
 ## 3. The Collective — what it is and why we built it
