@@ -127,3 +127,14 @@ CREATE TABLE IF NOT EXISTS call_bookings (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_call_bookings_slot_booked
   ON call_bookings(slot_iso) WHERE status = 'booked';
+
+-- Failed password sign-ins, for throttling. Only failures are recorded, so
+-- a member signing in normally never counts against themselves.
+CREATE TABLE IF NOT EXISTS community_login_attempts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip_address TEXT DEFAULT '',
+  email TEXT DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_ip ON community_login_attempts(ip_address, created_at);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_email ON community_login_attempts(email, created_at);
