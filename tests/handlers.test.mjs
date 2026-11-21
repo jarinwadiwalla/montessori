@@ -169,11 +169,16 @@ function seedCampaign(db, { sentAt, ids }) {
     .prepare("INSERT INTO campaigns (id, subject, sentAt, totalSent, totalRecipients, emailIds) VALUES ('c1','Hello',?,?,?,?)")
     .run(sentAt, ids.length, ids.length, JSON.stringify(ids));
 }
+// campaign-stats is behind requireAdmin, so these requests carry the
+// token the way Guru does.
+const statsReq = (id = "c1") =>
+  new Request(`${SITE}/api/campaign-stats?id=${id}`, { headers: { "X-Admin-Token": "admin" } });
+
 const seedEvent = (db, id, email, last, events, updated) =>
   db.raw.prepare("INSERT INTO resend_events (emailId, email, last_event, events, updated_at) VALUES (?,?,?,?,?)").run(id, email, last, events, updated);
 
 test("stats: a stale snapshot is asked for again, so a later click shows up", async (t) => {
-  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test" };
+  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test", ADMIN_TOKEN: "admin" };
   const days = (n) => new Date(Date.now() - n * 86400000).toISOString();
   seedCampaign(env.SITE_DB, { sentAt: days(3), ids: ["e1", "e2", "e3"] });
   seedEvent(env.SITE_DB, "e1", "alex@example.com", "delivered", "[]", days(3));             // stale snapshot
@@ -185,7 +190,7 @@ test("stats: a stale snapshot is asked for again, so a later click shows up", as
     if (url.endsWith("/emails/e3")) return { json: { id: "e3", to: ["nik@example.com"], last_event: "delivered" } };
   });
 
-  const res = await statsGet({ env, request: new Request(`${SITE}/api/campaign-stats?id=c1`) });
+  const res = await statsGet({ env, request: statsReq() });
   const json = await res.json();
 
   assert.deepEqual(calls.map((c) => c.url.split("/").pop()).sort(), ["e1", "e3"], "the webhook row is not re-asked");
@@ -198,28 +203,28 @@ test("stats: a stale snapshot is asked for again, so a later click shows up", as
 });
 
 test("stats: a fresh snapshot is trusted; Resend is not asked twice in ten minutes", async (t) => {
-  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test" };
+  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test", ADMIN_TOKEN: "admin" };
   seedCampaign(env.SITE_DB, { sentAt: new Date(Date.now() - 3600000).toISOString(), ids: ["e1"] });
   seedEvent(env.SITE_DB, "e1", "a@example.com", "delivered", "[]", new Date().toISOString());
   const calls = stubFetch(t, () => undefined);
-  const json = await (await statsGet({ env, request: new Request(`${SITE}/api/campaign-stats?id=c1`) })).json();
+  const json = await (await statsGet({ env, request: statsReq() })).json();
   assert.equal(calls.length, 0);
   assert.equal(json.stats.delivered, 1);
 });
 
 test("stats: when Resend cannot be asked, the stored value stands", async (t) => {
-  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test" };
+  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test", ADMIN_TOKEN: "admin" };
   const days = (n) => new Date(Date.now() - n * 86400000).toISOString();
   seedCampaign(env.SITE_DB, { sentAt: days(2), ids: ["e1"] });
   seedEvent(env.SITE_DB, "e1", "a@example.com", "delivered", "[]", days(2));
   stubFetch(t, () => ({ status: 429, json: {} }));
-  const json = await (await statsGet({ env, request: new Request(`${SITE}/api/campaign-stats?id=c1`) })).json();
+  const json = await (await statsGet({ env, request: statsReq() })).json();
   assert.equal(json.stats.delivered, 1);
   assert.equal(json.debug.rateLimitHit, true);
 });
 
 test("stats: asking Resend never overwrites a row the webhook has filled", async (t) => {
-  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test" };
+  const env = { SITE_DB: createDb(), RESEND_API_KEY: "re_test", ADMIN_TOKEN: "admin" };
   const days = (n) => new Date(Date.now() - n * 86400000).toISOString();
   seedCampaign(env.SITE_DB, { sentAt: days(2), ids: ["e1"] });
   seedEvent(env.SITE_DB, "e1", "a@example.com", "delivered", "[]", days(2));
@@ -230,7 +235,7 @@ test("stats: asking Resend never overwrites a row the webhook has filled", async
       .run();
     return { json: { id: "e1", to: ["a@example.com"], last_event: "delivered" } };
   });
-  await statsGet({ env, request: new Request(`${SITE}/api/campaign-stats?id=c1`) });
+  await statsGet({ env, request: statsReq() });
   const stored = row(env.SITE_DB, "SELECT last_event, events FROM resend_events WHERE emailId='e1'");
   assert.equal(stored.last_event, "complained");
   assert.notEqual(stored.events, "[]");
