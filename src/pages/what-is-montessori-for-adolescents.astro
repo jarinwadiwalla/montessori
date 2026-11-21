@@ -31,6 +31,46 @@ import NextSteps from '../components/shared/NextSteps.astro';
     ]} />
   </div>
 
+  <div class="container container--narrow">
+    <section class="page-section unique">
+      <h2 class="unique-heading">What makes Montessori education unique?</h2>
+
+      <details class="unique-item">
+        <summary class="unique-summary">
+          <span>Read the full answer</span>
+          <svg class="unique-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </summary>
+        <div class="unique-answer">
+          <p>
+            From the earliest years, Montessori students learn in environments designed to feel
+            comfortable and home-like. Each community brings together children across a three-year
+            age span (ages 3&ndash;6, 6&ndash;9, 9&ndash;12, and so on), so younger students learn
+            from older ones and older students grow through mentoring.
+          </p>
+          <p>
+            Within these communities, children practice living together and caring for one another.
+            They also begin to direct their own curiosity and manage their own time, choosing work
+            they&rsquo;ve been introduced to through lessons and are developmentally ready to take on.
+          </p>
+          <p>
+            This care for one another, for the environment, and for the natural world, along with
+            the habit of independent study, carries into the adolescent years on a larger scale.
+            Adolescents work alongside the wider community, and they gain more independence from
+            their families, often through overnight or residential experiences.
+          </p>
+          <p>
+            The result is young people who believe in their own abilities, because they&rsquo;ve
+            spent years doing real work in a real community that depends on them. Their learning has
+            been hands-on and autonomy-supportive, and they grow into independent thinkers who are
+            aware of and engaged with the world around them.
+          </p>
+        </div>
+      </details>
+    </section>
+  </div>
+
   <div class="carousel-section">
     <PhotoCarousel photos={[
       { src: '/images/whole-human-photo-1.jpg', alt: 'Adolescents at work in a Montessori environment' },
@@ -87,6 +127,65 @@ import NextSteps from '../components/shared/NextSteps.astro';
 </PageLayout>
 
 <style>
+  /* Same disclosure pattern as the homepage FAQ: a native <details> with a
+     chevron that turns. One pattern for this on the site, not two. */
+  .unique { margin-top: var(--space-2xl); }
+
+  .unique-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth);
+    text-align: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .unique-item {
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .unique-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-lg) 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 300;
+    color: var(--color-earth-dark);
+    transition: color 0.2s;
+  }
+
+  .unique-summary::-webkit-details-marker { display: none; }
+  .unique-summary::marker { content: ''; }
+  .unique-summary:hover { color: #96552B; }
+
+  .unique-icon {
+    flex-shrink: 0;
+    color: #96552B;
+    transition: transform 0.25s;
+  }
+
+  .unique-item[open] .unique-icon { transform: rotate(180deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .unique-icon { transition: none; }
+  }
+
+  .unique-answer { padding-bottom: var(--space-lg); }
+
+  .unique-answer p {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-md);
+  }
+
+  .unique-answer p:last-child { margin-bottom: 0; }
+
   /* The opening quote carries the page, so it is set at display size and
      given the width to breathe. */
   .opening-quote {
