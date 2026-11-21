@@ -32,6 +32,51 @@ const serviceJsonLd = JSON.stringify({
   },
 });
 
+/* Wellness Weeks are a second, separate offering, so they get their own
+   Service entry rather than being folded into the partnership one. The
+   description names the actual content: the soft title is for the top of the
+   page, not for the structured data a school searches with. No price here
+   either — the rate is quoted by hand and the repo is public. */
+const wellnessJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Adolescent Wellness Week',
+  serviceType: 'Adolescent health and wellness education',
+  description:
+    'A five-day wellness programme for Montessori adolescent communities, covering the adolescent brain, anatomy and the reproductive system, menstrual and hormonal cycles, nutrition, consent and healthy relationships, with daily yoga, mindfulness and sound healing.',
+  url: `${siteUrl}/partnership/#wellness-weeks`,
+  provider: { '@id': `${siteUrl}/#organization` },
+  areaServed: 'Worldwide',
+  audience: {
+    '@type': 'EducationalAudience',
+    educationalRole: 'student',
+    audienceType: 'Adolescents aged 12 to 15',
+  },
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${siteUrl}/partnership/`,
+  },
+});
+
+/* Curly apostrophes and real dashes rather than HTML entities: these render
+   through {item}, not set:html, so an entity would show as its own source. */
+const wellnessDays = [
+  'The adolescent brain',
+  'Anatomy and the reproductive system',
+  'Cycles, and eating across them',
+  'Consent and boundaries',
+  'Communication and dating',
+];
+
+const wellnessPractical = [
+  'Five days, in person or online',
+  'Two age groups: 12–13 and 14–15',
+  'Mixed sessions — boys need this as much as girls do',
+  'Each morning opens with yoga, mindfulness or a sound bath',
+  'Anonymous questions answered every morning',
+  'About 80 minutes of each student’s day, so your work cycle stays intact',
+];
+
 const plan = {
   name: 'Monthly Partnership',
   included: [
@@ -83,9 +128,10 @@ const addOnGroups = [
   heroTitle="Partnership"
   heroImage="/images/sunset-hero.jpg"
   heroImagePosition="center 42%"
-  description="Monthly Montessori adolescent consulting: guidance calls, planning documents and membership of the Montessori Adolescent Collective. Cancel any time."
+  description="Montessori adolescent consulting: monthly guidance calls, planning documents, Collective membership, and five-day Wellness Weeks for your students."
 >
   <script type="application/ld+json" set:html={serviceJsonLd} />
+  <script type="application/ld+json" set:html={wellnessJsonLd} />
 
   <section class="intro-banner">
     <div class="container">
@@ -139,11 +185,33 @@ const addOnGroups = [
     </div>
   </div>
 
-  <div class="container container--narrow">
-
-  </div>
-
-  <div class="container container--narrow">
+  <div class="container">
+    <section class="page-section wellness" id="wellness-weeks">
+      <h2>Wellness Weeks</h2>
+      <p class="wellness-lede">
+        Five days with your adolescent community, studying the transformation
+        they are living through.
+      </p>
+      <div class="wellness-grid">
+        <div class="addon-group">
+          <h3>The five days</h3>
+          <ul class="page-list">
+            {wellnessDays.map((day) => <li>{day}</li>)}
+          </ul>
+        </div>
+        <div class="addon-group">
+          <h3>How a week runs</h3>
+          <ul class="page-list">
+            {wellnessPractical.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+      <p class="wellness-note">
+        Led by Jarin: AMI 12&ndash;18 Adolescent Diploma, 200-hour yoga teacher,
+        certified sound bath practitioner. We&rsquo;ll talk through pricing on
+        our call.
+      </p>
+    </section>
   </div>
 
   <section class="page-section meet">
@@ -544,6 +612,51 @@ const addOnGroups = [
     background: var(--color-earth-dark);
     padding-block: var(--space-2xl);
     text-align: center;
+  }
+
+  /* --- wellness weeks --- */
+
+  /* After .page-section, which sets a smaller bottom margin: this one needs
+     room on both sides, sitting as it does between the white offer cards
+     above and the terracotta bio band below. */
+  .wellness {
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+  }
+
+  /* 900px to match the arch grid and the bio, so all three line up down the
+     page rather than each finding its own width. */
+  .wellness-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+    max-width: 900px;
+    margin: 0 auto;
+    /* Stretch, not start: these two are peers, and the ragged bottom edge of
+       unequal cards reads as one of them being unfinished. */
+  }
+
+  @media (max-width: 780px) {
+    .wellness-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* Qualified with .wellness on purpose: `.page-section p` is (0,1,1) and a
+     bare .wellness-lede is (0,1,0), so the generic rule would win both of
+     these outright. */
+  .wellness .wellness-lede {
+    max-width: 46ch;
+    margin: 0 auto var(--space-xl);
+    text-align: center;
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+  }
+
+  .wellness .wellness-note {
+    max-width: 62ch;
+    margin: var(--space-lg) auto 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
   }
 
 
