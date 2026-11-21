@@ -1,0 +1,416 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import CallScheduler from '../components/shared/CallScheduler.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
+
+const siteUrl = 'https://montessoriforadolescents.com';
+
+/* This Service lives here rather than on the Partnership page now that the
+   offering has a page of its own. The description names the actual content
+   rather than the soft title: "wellness week" is what reassures a parent,
+   but "menstrual cycle" and "consent education" are what a head of school
+   types into a search box. No price — quoted by hand, and the repo is
+   public. */
+const wellnessJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Adolescent Wellness Week',
+  serviceType: 'Adolescent health and wellness education',
+  description:
+    'A five-day wellness programme for adolescent communities, covering the adolescent brain, anatomy and the reproductive system, the menstrual cycle, emotional self-regulation, consent and healthy relationships, with daily awareness and reflection.',
+  url: `${siteUrl}/wellness-weeks/`,
+  provider: { '@id': `${siteUrl}/#organization` },
+  areaServed: 'Worldwide',
+  audience: {
+    '@type': 'EducationalAudience',
+    educationalRole: 'student',
+    audienceType: 'Adolescents aged 12 to 15',
+  },
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${siteUrl}/wellness-weeks/`,
+  },
+});
+
+const days = [
+  {
+    title: 'The adolescent brain',
+    text: 'Why you feel the way you do. What is actually changing, why it arrives so suddenly, and why none of it is a fault. This day goes first because it explains everything that follows.',
+  },
+  {
+    title: 'Anatomy and the reproductive system',
+    text: 'Correct names and correct function, including menstruation and ovulation. We look at the whole hormonal lifespan rather than stopping at fourteen, so the picture makes sense of the adults around them too.',
+  },
+  {
+    title: 'Journaling, mindfulness and self-regulation',
+    text: 'The practical day. Ways to notice a feeling before it arrives at full volume, and somewhere to put it once it has. This is the day that makes the two that follow possible.',
+  },
+  {
+    title: 'Consent and boundaries',
+    text: 'Not a lecture; consent does not transmit. The work is recognising your own discomfort and finding words for it, which is why it needs a day of its own before the conversation goes any further.',
+  },
+  {
+    title: 'Communication and healthy relationships',
+    text: 'Saying the thing. How to ask, how to decline, and how to hear a no without it being a catastrophe. The week closes with the students presenting what they have learned to the community.',
+  },
+];
+
+const practical = [
+  'Five days, in person or online',
+  'Two age groups: 12–13 and 14–15',
+  'Mixed sessions',
+  'Days begin with awareness and reflection',
+  'Anonymous questions answered every morning',
+  'One hour of each student’s day',
+];
+---
+
+<PageLayout
+  title="Wellness Weeks for Adolescents"
+  description="A five-day wellness week for adolescents aged 12 to 15: the brain, anatomy and the reproductive system, consent and healthy relationships. In person or online."
+  heroTitle="Wellness Weeks"
+  heroImage="/images/carousel/img-05.jpg"
+  heroImagePosition="center 40%"
+>
+  <script type="application/ld+json" set:html={wellnessJsonLd} />
+
+  <section class="intro-banner">
+    <div class="container">
+      <p class="intro-statement">
+        Five days with your adolescent community, studying the transformation
+        they are living through.
+      </p>
+    </div>
+  </section>
+
+  <div class="container container--narrow">
+    <section class="ww-section">
+      <p class="ww-lede">
+        Adolescence is the one subject every twelve&#8209;year&#8209;old is
+        already researching, usually alone and usually badly. A Wellness Week
+        puts the real material in front of them: how their body works, what
+        their brain is doing, how to recognise what they feel, and how to
+        speak plainly with the people around them.
+      </p>
+      <p class="ww-lede">
+        It is not an add&#8209;on to the curriculum. The adolescent is
+        undergoing the second great transformation of their life, and
+        understanding it is the most relevant study available to them.
+      </p>
+    </section>
+  </div>
+
+  <div class="container container--narrow">
+    <section class="ww-section">
+      <h2 class="ww-heading">The five days</h2>
+      <ol class="day-list">
+        {days.map((d, i) => (
+          <li class="day">
+            <span class="day-num">Day {i + 1}</span>
+            <h3 class="day-title">{d.title}</h3>
+            <p class="day-text">{d.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+
+  <div class="container container--narrow">
+    <section class="ww-section">
+      <h2 class="ww-heading">How a week runs</h2>
+      <ul class="ww-list">
+        {practical.map((item) => <li>{item}</li>)}
+      </ul>
+      <p class="ww-text">
+        A week costs a school five hours per student in total. Sessions sit
+        late morning or after lunch, so the protected work cycle stays intact
+        and the rest of the day carries on as it always does.
+      </p>
+      <p class="ww-text">
+        The body and relationship days are taught to each age group
+        separately, because a twelve&#8209;year&#8209;old starting puberty and
+        a fifteen&#8209;year&#8209;old through it are asking different
+        questions. The brain day and the practical day are taught to everyone
+        together.
+      </p>
+    </section>
+  </div>
+
+  <section class="band">
+    <div class="container container--narrow">
+      <h2 class="band-heading">The question box</h2>
+      <p class="band-text">
+        A written, anonymous box goes up on the first morning and is emptied
+        every day after that. The questions are answered at the start of the
+        next session.
+      </p>
+      <p class="band-text">
+        In a mixed group nobody asks the real question out loud. The box is
+        how we find out what your community actually needs, rather than
+        teaching to a syllabus and hoping &mdash; and by midweek it is usually
+        the part the adolescents care most about.
+      </p>
+    </div>
+  </section>
+
+  <div class="container container--narrow">
+    <section class="ww-section">
+      <h2 class="ww-heading">Who leads the week</h2>
+      <p class="ww-text">
+        Every week is led by Jarin, who holds the AMI 12&ndash;18 Adolescent
+        Diploma alongside a 200&#8209;hour yoga teaching qualification and
+        certification as a sound bath practitioner.
+      </p>
+      <p class="ww-text">
+        There are no outside specialists to book. The same person is with the
+        community all five days, which matters most on the days that ask them
+        to be honest.
+      </p>
+      <p class="ww-text">
+        <a class="ww-link" href="/our-team/">Meet the whole team &rarr;</a>
+      </p>
+    </section>
+  </div>
+
+  <div class="container container--narrow">
+    <section class="ww-section">
+      <h2 class="ww-heading">After the week</h2>
+      <p class="ww-text">
+        A week opens the material and makes it askable. It will not build a
+        practice habit, which takes months, and it will not catch the
+        questions that surface three weeks later &mdash; which are often the
+        important ones.
+      </p>
+      <p class="ww-text">
+        Schools usually follow a week either with a short series of online
+        sessions spread across the year, or with a focused return visit on a
+        single strand. We can talk through which suits your community.
+      </p>
+    </section>
+  </div>
+
+  <section class="ready-banner call-section">
+    <div class="container">
+      <h2 class="call-heading">Book a call</h2>
+      <p class="call-lede">
+        A free conversation to meet one another, and for me to hear what your
+        community needs. We can shape a week around it from there.
+      </p>
+      <CallScheduler about="Wellness Week" variant="dark" />
+    </div>
+  </section>
+
+  <NextSteps
+    tone="terracotta"
+    title="Where to next"
+    items={[
+      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance for building your programme.' },
+      { label: 'Guidance', href: '/guidance/', blurb: 'Education and support for adolescent guides.' },
+      { label: 'What is Montessori?', href: '/what-is-montessori-for-adolescents/', blurb: 'The thinking underneath all of it.' },
+    ]}
+  />
+
+</PageLayout>
+
+<style>
+  /* --- opening statement --- */
+
+  .intro-banner {
+    background: var(--color-earth-dark);
+    padding-block: var(--space-2xl);
+    text-align: center;
+    /* The hero sits directly above, so cancel the page's top padding and let
+       the two meet instead of showing a cream seam. */
+    margin-top: calc(var(--space-3xl) * -1);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .intro-statement {
+    max-width: 38ch;
+    margin: 0 auto;
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--color-cream);
+  }
+
+  /* --- body sections --- */
+
+  .ww-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .ww-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    text-align: center;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .ww-heading::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-xl);
+    background: var(--color-terracotta);
+  }
+
+  .ww-lede {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+  }
+
+  .ww-text {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+  }
+
+  .ww-link {
+    color: #96552B;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  /* --- the five days --- */
+
+  .day-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .day {
+    background: var(--color-white);
+    border: 1px solid var(--color-terracotta);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .day-num {
+    display: block;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-earth);
+    margin-bottom: var(--space-xs);
+  }
+
+  .day-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .day-text {
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  /* --- practical list --- */
+
+  .ww-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-xl);
+  }
+
+  .ww-list li {
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: 0.4rem;
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .ww-list li::before {
+    content: '';
+    position: absolute;
+    left: 1px;
+    top: 0.42em;
+    width: 0.32rem;
+    height: 0.62rem;
+    border: solid var(--color-terracotta);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  /* --- the question box band --- */
+
+  /* Terracotta, so it breaks up a long run of cream. Only
+     --color-earth-dark clears 4.5:1 on this background, so everything in
+     here is chocolate rather than the usual body tone. */
+  .band {
+    background: var(--color-terracotta);
+    padding-block: var(--space-2xl);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .band-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-earth-dark);
+    text-align: center;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .band-heading::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-xl);
+    background: var(--color-earth-dark);
+    opacity: 0.45;
+  }
+
+  .band-text {
+    line-height: var(--leading-relaxed);
+    color: var(--color-earth-dark);
+    margin: 0 0 var(--space-md);
+  }
+
+  /* --- book a call --- */
+
+  .ready-banner {
+    background: var(--color-earth-dark);
+    padding-block: var(--space-2xl);
+    text-align: center;
+  }
+
+  .call-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    color: var(--color-cream);
+    text-align: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .call-heading::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: var(--space-md) auto var(--space-lg);
+    background: var(--color-terracotta);
+  }
+
+  .call-lede {
+    text-align: center;
+    max-width: 52ch;
+    margin: 0 auto var(--space-xl);
+    color: var(--color-cream);
+    line-height: var(--leading-relaxed);
+  }
+</style>

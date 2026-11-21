@@ -32,33 +32,11 @@ const serviceJsonLd = JSON.stringify({
   },
 });
 
-/* Wellness Weeks are a second, separate offering, so they get their own
-   Service entry rather than being folded into the partnership one. The
-   description names the actual content: the soft title is for the top of the
-   page, not for the structured data a school searches with. No price here
-   either — the rate is quoted by hand and the repo is public. */
-const wellnessJsonLd = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Adolescent Wellness Week',
-  serviceType: 'Adolescent health and wellness education',
-  description:
-    'A five-day wellness programme for Montessori adolescent communities, covering the adolescent brain, anatomy and the reproductive system, the menstrual cycle, emotional self-regulation, consent and healthy relationships, with daily yoga, mindfulness and sound healing.',
-  url: `${siteUrl}/partnership/#wellness-weeks`,
-  provider: { '@id': `${siteUrl}/#organization` },
-  areaServed: 'Worldwide',
-  audience: {
-    '@type': 'EducationalAudience',
-    educationalRole: 'student',
-    audienceType: 'Adolescents aged 12 to 15',
-  },
-  availableChannel: {
-    '@type': 'ServiceChannel',
-    serviceUrl: `${siteUrl}/partnership/`,
-  },
-});
+/* The Wellness Week Service entry lives on /wellness-weeks/ now that the
+   offering has a page of its own: one entity, one canonical URL, rather than
+   the same service described in two places.
 
-/* Curly apostrophes and real dashes rather than HTML entities: these render
+   Curly apostrophes and real dashes rather than HTML entities: these render
    through {item}, not set:html, so an entity would show as its own source. */
 const wellnessDays = [
   'The adolescent brain',
@@ -72,6 +50,7 @@ const wellnessPractical = [
   'Five days, in person or online',
   'Two age groups: 12–13 and 14–15',
   'Mixed sessions',
+  'Days begin with awareness and reflection',
   'Anonymous questions answered every morning',
   'One hour of each student’s day, so your work cycle stays intact',
 ];
@@ -130,7 +109,6 @@ const addOnGroups = [
   description="Montessori adolescent consulting: monthly guidance calls, planning documents, Collective membership, and five-day Wellness Weeks for your students."
 >
   <script type="application/ld+json" set:html={serviceJsonLd} />
-  <script type="application/ld+json" set:html={wellnessJsonLd} />
 
   <section class="intro-banner">
     <div class="container">
@@ -209,6 +187,9 @@ const addOnGroups = [
         Led by Jarin: AMI 12&ndash;18 Adolescent Diploma, 200-hour yoga teacher,
         certified sound bath practitioner. We&rsquo;ll talk through pricing on
         our call.
+      </p>
+      <p class="wellness-more">
+        <a href="/wellness-weeks/">See what a week covers &rarr;</a>
       </p>
     </section>
   </div>
@@ -656,6 +637,18 @@ const addOnGroups = [
     text-align: center;
     font-size: var(--text-sm);
     color: var(--color-text-light);
+  }
+
+  .wellness .wellness-more {
+    margin: var(--space-md) 0 0;
+    text-align: center;
+  }
+
+  .wellness-more a {
+    /* Not --color-terracotta-dark, which is 3.74:1 on cream. */
+    color: #96552B;
+    text-decoration: underline;
+    font-weight: 600;
   }
 
 

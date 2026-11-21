@@ -7,15 +7,18 @@ type Item = string | { label: string; href: string };
 
 interface Props {
   items: Item[];
+  /** How many across on a wide screen. Four needs a wider grid than three,
+      and drops to 2x2 before it collapses to a column. */
+  columns?: 3 | 4;
 }
-const { items } = Astro.props;
+const { items, columns = 3 } = Astro.props;
 
 const norm = items.map((i) =>
   typeof i === 'string' ? { label: i, href: undefined } : i
 );
 ---
 
-<div class="stage-grid">
+<div class:list={['stage-grid', `stage-grid--${columns}`]}>
   {norm.map((item) =>
     item.href ? (
       <a class="stage stage--link" href={item.href}>
@@ -33,10 +36,28 @@ const norm = items.map((i) =>
 <style>
   .stage-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-xl);
-    max-width: 900px;
     margin: 0 auto var(--space-3xl);
+  }
+
+  .stage-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 900px;
+  }
+
+  /* Four arches need more room than three: at 900px each one is narrow
+     enough that the 150px dome eats the words. */
+  .stage-grid--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-lg);
+    max-width: 1140px;
+  }
+
+  @media (max-width: 1040px) {
+    .stage-grid--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 900px;
+    }
   }
 
   @media (max-width: 780px) {
