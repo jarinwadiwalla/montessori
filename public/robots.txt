@@ -15,6 +15,7 @@ Disallow: /collective/messages/
 Disallow: /collective/resources/
 Disallow: /collective/start-here/
 Disallow: /webinars/thank-you/
+Disallow: /webinars/adolescent-environment-overview/watch/
 Disallow: /community-media/
 
 Sitemap: https://montessoriforadolescents.com/sitemap-index.xml
