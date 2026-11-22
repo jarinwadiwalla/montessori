@@ -19,7 +19,7 @@ const siteUrl = 'https://montessoriforadolescents.com';
 const serviceJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'Monthly Montessori Adolescent Partnership',
+  name: 'Montessori Adolescent School Consulting',
   serviceType: 'Montessori adolescent program consulting',
   description:
     'Month-to-month guidance for schools and guides starting or strengthening a Montessori adolescent programme, delivered by consultants holding the AMI 12\u201318 Adolescent Diploma.',
@@ -32,7 +32,7 @@ const serviceJsonLd = JSON.stringify({
   },
 });
 
-/* The Wellness Week Service entry lives on /wellness-weeks/ now that the
+/* The Wellness Presentations Service entry lives on /wellness-weeks/ now that the
    offering has a page of its own: one entity, one canonical URL, rather than
    the same service described in two places.
 
@@ -56,7 +56,7 @@ const wellnessPractical = [
 ];
 
 const plan = {
-  name: 'Monthly Partnership',
+  name: 'Monthly School Consulting',
   included: [
     'Custom side-by-side partnership to help you navigate starting or optimizing your adolescent program, based on your needs right now',
     'Strategy where you need it most; chosen areas of focus for each week',
@@ -102,11 +102,11 @@ const addOnGroups = [
 ---
 
 <PageLayout
-  title="Partnership"
-  heroTitle="Partnership"
+  title="School Consulting"
+  heroTitle="School Consulting"
   heroImage="/images/sunset-hero.jpg"
   heroImagePosition="center 42%"
-  description="Montessori adolescent consulting: monthly guidance calls, planning documents, Collective membership, and five-day Wellness Weeks for your students."
+  description="Montessori adolescent consulting: monthly guidance calls, planning documents, Collective membership, and five-day Wellness Presentations for your students."
 >
   <script type="application/ld+json" set:html={serviceJsonLd} />
 
@@ -164,7 +164,7 @@ const addOnGroups = [
 
   <div class="container">
     <section class="page-section wellness" id="wellness-weeks">
-      <h2>Wellness Weeks</h2>
+      <h2>Wellness Presentations</h2>
       <p class="wellness-lede">
         Five days with your adolescent community, studying the transformation
         they are living through.
@@ -227,7 +227,7 @@ const addOnGroups = [
         A free face-to-face conversation to meet one another, and for me to
         hear about your unique situation. Let's see how we can work together!
       </p>
-      <CallScheduler about="Partnership" variant="dark" />
+      <CallScheduler about="School Consulting" variant="dark" />
     </div>
   </section>
 

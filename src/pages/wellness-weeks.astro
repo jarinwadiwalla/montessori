@@ -5,7 +5,7 @@ import NextSteps from '../components/shared/NextSteps.astro';
 
 const siteUrl = 'https://montessoriforadolescents.com';
 
-/* This Service lives here rather than on the Partnership page now that the
+/* This Service lives here rather than on the School Consulting page now that the
    offering has a page of its own. The description names the actual content
    rather than the soft title: "wellness week" is what reassures a parent,
    but "menstrual cycle" and "consent education" are what a head of school
@@ -14,7 +14,7 @@ const siteUrl = 'https://montessoriforadolescents.com';
 const wellnessJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'Adolescent Wellness Week',
+  name: 'Adolescent Wellness Presentations',
   serviceType: 'Adolescent health and wellness education',
   description:
     'A five-day wellness programme for adolescent communities, covering the adolescent brain, anatomy and the reproductive system, the menstrual cycle, emotional self-regulation, consent and healthy relationships, with daily awareness and reflection.',
@@ -66,9 +66,9 @@ const practical = [
 ---
 
 <PageLayout
-  title="Wellness Weeks for Adolescents"
-  description="A five-day wellness week for adolescents aged 12 to 15: the brain, anatomy and the reproductive system, consent and healthy relationships. In person or online."
-  heroTitle="Wellness Weeks"
+  title="Wellness Presentations for Adolescents"
+  description="Five-day Wellness Presentations for adolescents 12 to 15: the brain, anatomy, the reproductive system, consent and healthy relationships. In person or online."
+  heroTitle="Wellness Presentations"
   heroImage="/images/wellness-hero.jpg"
   heroImagePosition="center 30%"
 >
@@ -199,7 +199,7 @@ const practical = [
         A free conversation to meet one another, and for me to hear what your
         community needs. We can shape a week around it from there.
       </p>
-      <CallScheduler about="Wellness Week" variant="dark" />
+      <CallScheduler about="Wellness Presentations" variant="dark" />
     </div>
   </section>
 
@@ -207,7 +207,7 @@ const practical = [
     tone="terracotta"
     title="Where to next"
     items={[
-      { label: 'Partnership', href: '/partnership/', blurb: 'Month-to-month guidance for building your programme.' },
+      { label: 'School Consulting', href: '/partnership/', blurb: 'Month-to-month guidance for building your programme.' },
       { label: 'Guidance', href: '/guidance/', blurb: 'Education and support for adolescent guides.' },
       { label: 'What is Montessori?', href: '/what-is-montessori-for-adolescents/', blurb: 'The thinking underneath all of it.' },
     ]}
