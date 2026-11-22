@@ -2,6 +2,7 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import CallScheduler from '../components/shared/CallScheduler.astro';
 import ArchPanels from '../components/shared/ArchPanels.astro';
+import NextSteps from '../components/shared/NextSteps.astro';
 import { getCollection } from 'astro:content';
 
 // Read from the team content rather than repeating the bio here, so editing
@@ -230,6 +231,16 @@ const addOnGroups = [
       <CallScheduler about="School Consulting" variant="dark" />
     </div>
   </section>
+
+  <NextSteps
+    tone="terracotta"
+    title="Where to next"
+    items={[
+      { label: 'Wellness Presentations', href: '/wellness-weeks/', blurb: 'Five days with your students, in person or online.' },
+      { label: 'Guidance and Support', href: '/guidance/', blurb: 'Consulting, webinars and Wellness Presentations.' },
+      { label: 'The Collective', href: '/collective/', blurb: 'A private community of practitioners.' },
+    ]}
+  />
 
 </PageLayout>
 
