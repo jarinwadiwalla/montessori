@@ -8,7 +8,7 @@ publishDate: 2026-05-04
 featured: false
 ---
 
-For me, wellness is the foundation of education. At the beginning of each year, I share a core belief with parents: my starting point is the happy adolescent. By **"happiness,"** I am not referring to a state of constant bliss, but rather a form of stability and curiosity—the opposite of turmoil, fear, stress, and anxiety. I believe that with a stable ground of wellbeing, wholesome growth flows naturally.
+For me, wellness is the foundation of education. At the beginning of each year, I share a core belief with parents: my starting point is the happy adolescent. By **"happiness,"** I am not referring to a state of constant bliss, but rather a form of stability and curiosity, the opposite of turmoil, fear, stress, and anxiety. I believe that with a stable ground of wellbeing, wholesome growth flows naturally.
 
 
 > Montessori explains that adolescence involves a significant amount of doubt, hesitation, violent emotions, discouragement, and an unexpected decrease in intellectual capacity (Montessori, 1973). 
@@ -30,7 +30,7 @@ Emotional Intelligence (EI) is the extent to which an individual adequately resp
 
 Shining a light on the inner world of the adolescent allows us, as educators, to remember what education really boils down to. Montessori defined education as an “aid to life.” (1973) While broad, this definition widens our understanding of the environment we must provide. **We must consider the world these young people are entering and identify the essential skills needed to navigate these tumultuous times.** Let’s face it: life is uncertain. 
 
-Interdependencies and complex networks are difficult to grasp. One dimension of supporting adolescents is sharpening the intellect—the **"work of the head"**—through mathematical thinking, cultural understanding, and scientific observation. However, in this article, I am focusing on the **"work of the heart"**: its definition, its power, and its practice in the Montessori adolescent environment.
+Interdependencies and complex networks are difficult to grasp. One dimension of supporting adolescents is sharpening the intellect (the **"work of the head"**) through mathematical thinking, cultural understanding, and scientific observation. However, in this article, I am focusing on the **"work of the heart"**: its definition, its power, and its practice in the Montessori adolescent environment.
 
 
 ## The Power of Exemplification
@@ -42,7 +42,7 @@ Interdependencies and complex networks are difficult to grasp. One dimension of 
 > As a teacher, I find it vital to demonstrate that I haven't "figured it all out." 
 
 
-I share my own struggles with stress or my lack of patience when I am unwell. This allows us to connect through our common humanity—our shared feelings and needs. In my opinion, this is the first thing to embody. Research suggests that when teachers display moral behaviors, students are encouraged to follow (Sanderse, 2023). When adolescents see moral qualities and emotional regulation as attainable traits in the adults around them, they are more likely to strive for them themselves.
+I share my own struggles with stress or my lack of patience when I am unwell. This allows us to connect through our common humanity, our shared feelings and needs. In my opinion, this is the first thing to embody. Research suggests that when teachers display moral behaviors, students are encouraged to follow (Sanderse, 2023). When adolescents see moral qualities and emotional regulation as attainable traits in the adults around them, they are more likely to strive for them themselves.
 
 
 ## Explicit Practice: The Direct Path
@@ -72,13 +72,13 @@ We train in one practice for a week before moving to another, eventually revisit
 
 While we can nourish wellbeing directly, we must also do so indirectly. Research indicates that moral education is always happening in the classroom, whether the teacher is aware of it or not (Sanderse, 2023). 
 
-> Most of our day is spent in action—building community, purpose, and agency.
+> Most of our day is spent in action, building community, purpose, and agency.
 
 **Community:** This is built simply through acts like cooking together. When students define menus and prepare food with care, the act of eating together around a table of home-cooked food carries a special power of connection.
 
 **Purpose:** This can be abstract for an adolescent. In the Montessori view, we want students to find an inner drive, not just comply with instructions. We must give them the time to search and explore what truly "makes them tick." As adults, we often view life through a productive lens, but every time we "rescue" a student from boredom or the discomfort of not knowing, we remove a chance for them to find their own inspiration.
 
-**Agency:** We empower students by allowing them to directly influence their environment—whether through construction or organizing events. These opportunities confront them with reality, responsibility, and consequences. The more an adolescent experiences these moments of genuine influence, the more empowered they feel, nourishing a lifelong desire to contribute to the world.
+**Agency:** We empower students by allowing them to directly influence their environment, whether through construction or organizing events. These opportunities confront them with reality, responsibility, and consequences. The more an adolescent experiences these moments of genuine influence, the more empowered they feel, nourishing a lifelong desire to contribute to the world.
 
 
 

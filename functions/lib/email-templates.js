@@ -15,13 +15,13 @@ const MUTED = 'style="color:#6b5b7d;font-size:14px;"';
 
 export const EMAIL_TEMPLATES = {
   "member-welcome": {
-    label: "Collective — welcome (after payment)",
+    label: "Collective: welcome (after payment)",
     description:
       "Sent when someone joins the Collective through Stripe. Contains their first sign-in link.",
     vars: ["greeting_name", "link", "expires_in", "dues_note", "site"],
     subject: "Welcome to the Montessori Adolescent Collective",
     html: `${WRAP_OPEN}
-      <p>Welcome{{greeting_name}} — you're in.</p>
+      <p>Welcome{{greeting_name}}, you're in.</p>
       <p>The Montessori Adolescent Collective is a collaborative online community
       for all things third plane of development. Use the link below to sign in
       and set up your profile.</p>
@@ -35,7 +35,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "member-login-link": {
-    label: "Collective — sign-in link",
+    label: "Collective: sign-in link",
     description: "Sent when a member requests a magic sign-in link.",
     vars: ["greeting_name", "link", "expires_in"],
     subject: "Your sign-in link for the Collective",
@@ -49,7 +49,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "member-comped-welcome": {
-    label: "Collective — welcome (comped member)",
+    label: "Collective: welcome (comped member)",
     description:
       "Sent when an organiser adds someone by hand from Guru → Collective. Explains what the Collective is, that their membership is a gift with no dues, and carries their first sign-in link.",
     vars: ["greeting_name", "link", "expires_in", "site"],
@@ -77,7 +77,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "event-rsvp": {
-    label: "Collective — RSVP confirmation",
+    label: "Collective: RSVP confirmation",
     description:
       "Sent when a member RSVPs to a gathering. Carries the joining link when the event has one, and promises it by email when it does not.",
     vars: ["greeting_name", "event_title", "event_when", "site"],
@@ -93,9 +93,9 @@ export const EMAIL_TEMPLATES = {
   },
 
   "member-new-message": {
-    label: "Collective — new direct message",
+    label: "Collective: new direct message",
     description:
-      "Sent when a member receives a direct message. Only sent for a new conversation, or when they had already read everything before it — a back-and-forth doesn't email every line.",
+      "Sent when a member receives a direct message. Only sent for a new conversation, or when they had already read everything before it. A back-and-forth doesn't email every line.",
     vars: ["greeting_name", "sender_name", "excerpt", "link", "site"],
     subject: "{{sender_name}} sent you a message",
     html: `${WRAP_OPEN}
@@ -103,13 +103,13 @@ export const EMAIL_TEMPLATES = {
       <p><strong>{{sender_name}}</strong> sent you a message in the Collective:</p>
       <p style="border-left:3px solid #d0905b;padding-left:14px;color:#5c4a3a;">{{excerpt}}</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Read and reply</a></p>
-      <p ${MUTED}>Replies happen in the Collective, not by email — this address
+      <p ${MUTED}>Replies happen in the Collective, not by email. This address
       isn't monitored for conversations between members.</p>
     </div>`,
   },
 
   "member-login-suspended": {
-    label: "Collective — sign-in refused (membership paused)",
+    label: "Collective: sign-in refused (membership paused)",
     description:
       "Sent instead of a sign-in link when the membership is suspended.",
     vars: [],
@@ -122,7 +122,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "member-login-not-member": {
-    label: "Collective — sign-in requested by a non-member",
+    label: "Collective: sign-in requested by a non-member",
     description:
       "Sent when someone who isn't a member asks for a sign-in link, so a typo doesn't leave them waiting forever.",
     vars: ["site"],
@@ -137,13 +137,13 @@ export const EMAIL_TEMPLATES = {
   },
 
   "admin-login-link": {
-    label: "Collective — sign-in link sent by an admin",
+    label: "Collective: sign-in link sent by an admin",
     description:
       'Sent when an admin clicks "Send login link" in Guru for a member.',
     vars: ["greeting_name", "link", "expires_in", "site"],
     subject: "Your sign-in link for the Collective",
     html: `${WRAP_OPEN}
-      <p>Hello{{greeting_name}} — here's a fresh sign-in link:</p>
+      <p>Hello{{greeting_name}}, here's a fresh sign-in link:</p>
       <p style="margin:28px 0;"><a href="{{link}}" ${BTN}>Sign in to the Collective</a></p>
       <p ${MUTED}>This link works once and expires in {{expires_in}}.
       You can always request another at {{site}}/collective/login/</p>
@@ -151,7 +151,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "recording-access-link": {
-    label: "Webinar recording — link to watch",
+    label: "Webinar recording: link to watch",
     description:
       "Sent when someone buys a webinar recording, and again whenever a buyer asks for a fresh link from the webinar's page.",
     vars: ["title", "link", "expires_in", "recording_page"],
@@ -170,7 +170,7 @@ export const EMAIL_TEMPLATES = {
   },
 
   "subscriber-welcome": {
-    label: "Newsletter — welcome",
+    label: "Newsletter: welcome",
     description:
       "Sent when someone subscribes (or re-subscribes) to the newsletter. {{welcome_word}} is \"Welcome\" or \"Welcome back\".",
     vars: ["welcome_word", "first_name", "unsub_url", "site"],

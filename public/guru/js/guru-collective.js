@@ -216,8 +216,8 @@ async function colInvite() {
     data.created
       ? data.emailed
         ? "Member added and welcome email sent."
-        : "Member added, but the welcome email did not send — use Send login link."
-      : "Already a member — reactivated.",
+        : "Member added, but the welcome email did not send. Use Send login link."
+      : "Already a member, reactivated.",
     data.created && !data.emailed ? "error" : "success"
   );
   document.getElementById("col-invite-email").value = "";

@@ -92,7 +92,7 @@ export async function onRequestPost(context) {
     .first();
   if ((recent?.count || 0) >= 20) {
     return Response.json(
-      { error: "You're commenting quickly — please wait a moment." },
+      { error: "You're commenting quickly. Please wait a moment." },
       { status: 429 }
     );
   }

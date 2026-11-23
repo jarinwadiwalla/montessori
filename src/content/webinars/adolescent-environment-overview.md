@@ -1,6 +1,6 @@
 ---
 title: "An Overview of the Montessori Adolescent Environment and Q&A Session"
-description: "Join Montessori for Adolescents for a community presentation and overview of the Montessori adolescent environment, followed by a thorough Q&A. Our team all carry the AMI 12–18 Diploma and have worked in adolescent environments around the globe — from the U.S. to France, to Bali."
+description: "Join Montessori for Adolescents for a community presentation and overview of the Montessori adolescent environment, followed by a thorough Q&A. Our team all carry the AMI 12–18 Diploma and have worked in adolescent environments around the globe, from the U.S. to France, to Bali."
 seoTitle: "Adolescent Environment Webinar"
 seoDescription: "A live overview of the prepared Montessori adolescent environment, followed by a full Q&A with guides who hold the AMI 12–18 Diploma."
 presenter: "the Montessori for Adolescents team"
@@ -27,9 +27,9 @@ topics:
 featured: true
 ---
 
-Join Montessori for Adolescents for a community presentation and overview of the Montessori adolescent environment. Our team all carry the AMI 12–18 Diploma and have worked in adolescent environments around the globe — from the U.S. to France, to Bali.
+Join Montessori for Adolescents for a community presentation and overview of the Montessori adolescent environment. Our team all carry the AMI 12–18 Diploma and have worked in adolescent environments around the globe, from the U.S. to France, to Bali.
 
-We will leave about 15 minutes at the end for a thorough Q&A session — bring your questions about your own school, homeschool, or family.
+We will leave about 15 minutes at the end for a thorough Q&A session. Bring your questions about your own school, homeschool, or family.
 
 **This webinar is for you if you are:**
 

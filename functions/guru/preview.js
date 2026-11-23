@@ -250,7 +250,7 @@ function renderPreview(draft) {
   </style>
 </head>
 <body>
-  <div class="preview-banner">DRAFT PREVIEW &mdash; not yet published</div>
+  <div class="preview-banner">DRAFT PREVIEW: not yet published</div>
   <article>
     ${coverImage}
     <h1 class="post-title">${title}</h1>

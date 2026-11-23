@@ -207,7 +207,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
 
     if (!messages.length) {
       body.appendChild(
-        el('p', 'thread-empty', 'No messages yet — say the first thing.')
+        el('p', 'thread-empty', 'No messages yet. Say the first thing.')
       );
       return;
     }
@@ -288,7 +288,7 @@ import PortalNav from '../../components/collective/PortalNav.astro';
     btn.disabled = false;
 
     if (!ok) {
-      $('thread-error').textContent = data.error || "That didn't send — please try again.";
+      $('thread-error').textContent = data.error || "That didn't send. Please try again.";
       return;
     }
 
@@ -323,8 +323,8 @@ import PortalNav from '../../components/collective/PortalNav.astro';
       }),
     });
     $('thread-error').textContent = ok
-      ? 'Thank you — a person will look at this.'
-      : "That didn't send — please try again.";
+      ? 'Thank you. A person will look at this.'
+      : "That didn't send. Please try again.";
   }
 
   boot();

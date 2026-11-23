@@ -85,7 +85,7 @@ async function handleCheckout(context, event) {
        <code>npx wrangler pages secret put STRIPE_COLLECTIVE_PRODUCT_ID --project-name montessori</code>
        using the product id from Stripe → Product catalog → Montessori
        Adolescent Collective.`,
-      "Collective webhook is not configured — a checkout was ignored"
+      "Collective webhook is not configured: a checkout was ignored"
     );
     return Response.json({ received: true, skipped: "no product id configured" });
   }
@@ -234,12 +234,12 @@ async function handleCheckout(context, event) {
     await notifyAdmin(
       context,
       `<strong>${escapeHtml(name || email)}</strong> paid, but Stripe sent no subscription
-       with it — that price is probably set to <em>one-off</em> rather than
+       with it. That price is probably set to <em>one-off</em> rather than
        <em>recurring</em>. They've been given one year of access rather than
        permanent access, so nothing is broken for them, but the price should be
        fixed so it renews. Check Product catalog → Montessori Adolescent
        Collective in Stripe.`,
-      "Check your Stripe pricing — a payment arrived without a subscription"
+      "Check your Stripe pricing: a payment arrived without a subscription"
     );
   } else {
     await notifyAdmin(

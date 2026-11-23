@@ -52,6 +52,6 @@ export async function onRequestPost(context) {
   return Response.json({
     ok: true,
     message:
-      "Check your email — if that address bought the recording, your link to watch is on its way. Nothing after a few minutes? Try the address on your Stripe receipt, or get in touch.",
+      "Check your email. If that address bought the recording, your link to watch is on its way. Nothing after a few minutes? Try the address on your Stripe receipt, or get in touch.",
   });
 }

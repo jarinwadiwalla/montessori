@@ -252,8 +252,8 @@ const eventJsonLd = JSON.stringify({
             <div class="detail-row">
               <dt>{isRecording ? 'Format' : 'Where'}</dt>
               <dd>{isRecording
-                ? 'On-demand video — you’ll get the link to watch immediately after checkout'
-                : 'Online — the meeting link is emailed to you after registration'}</dd>
+                ? 'On-demand video: you’ll get the link to watch immediately after checkout'
+                : 'Online: the meeting link is emailed to you after registration'}</dd>
             </div>
             <div class="detail-row">
               <dt>Price</dt>
@@ -291,8 +291,8 @@ const eventJsonLd = JSON.stringify({
         <div class="cta-copy">
           <h2 class="cta-title">{isRecording ? 'Watch the full session, anytime' : `Join us live on ${dateDisplay}`}</h2>
           <p class="cta-sub">{isRecording
-            ? 'The complete recording — presentation plus the live Q&A.'
-            : 'Bring your questions — we\'re saving time at the end for a thorough Q&A.'}</p>
+            ? 'The complete recording: presentation plus the live Q&A.'
+            : 'Bring your questions. We\'re saving time at the end for a thorough Q&A.'}</p>
         </div>
         <a href={purchaseOpen ? buyLink : '#register'} class="cta-btn">
           {purchaseOpen ? buyLabel : soonLabel}

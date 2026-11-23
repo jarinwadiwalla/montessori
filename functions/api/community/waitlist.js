@@ -43,7 +43,7 @@ export async function onRequestPost(context) {
 
   if ((recent?.n || 0) >= 10) {
     return Response.json(
-      { error: "We're a bit busy right now — please try again in a minute." },
+      { error: "We're a bit busy right now. Please try again in a minute." },
       { status: 429 }
     );
   }
@@ -66,7 +66,7 @@ export async function onRequestPost(context) {
     }
     return Response.json({
       ok: true,
-      message: "You're on the list — we'll be in touch when the Collective opens.",
+      message: "You're on the list. We'll be in touch when the Collective opens.",
     });
   }
 
@@ -100,7 +100,7 @@ export async function onRequestPost(context) {
 
   return Response.json({
     ok: true,
-    message: "You're on the list — we'll be in touch when the Collective opens.",
+    message: "You're on the list. We'll be in touch when the Collective opens.",
   });
 }
 

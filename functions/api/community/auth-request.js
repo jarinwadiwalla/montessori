@@ -89,7 +89,7 @@ export async function onRequestPost(context) {
   // Identical response in every branch.
   return Response.json({
     ok: true,
-    message: "Check your email — if that address is in the Collective, a sign-in link is on its way.",
+    message: "Check your email. If that address is in the Collective, a sign-in link is on its way.",
   });
 }
 

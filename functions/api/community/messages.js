@@ -186,7 +186,7 @@ export async function onRequestPost(context) {
 
   const conversation = await ensureConversation(env, member.id, recipient.id);
   if (!conversation) {
-    return Response.json({ error: "That didn't send — please try again." }, { status: 500 });
+    return Response.json({ error: "That didn't send. Please try again." }, { status: 500 });
   }
 
   const now = new Date().toISOString();

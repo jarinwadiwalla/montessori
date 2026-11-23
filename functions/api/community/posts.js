@@ -160,7 +160,7 @@ export async function onRequestPost(context) {
     .first();
   if ((recent?.count || 0) >= 10) {
     return Response.json(
-      { error: "You're posting quickly — please wait a moment before posting again." },
+      { error: "You're posting quickly. Please wait a moment before posting again." },
       { status: 429 }
     );
   }

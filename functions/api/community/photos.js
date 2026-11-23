@@ -92,7 +92,7 @@ export async function onRequestPost(context) {
   const ext = IMAGE_TYPES[declared];
   if (!ext) {
     return Response.json(
-      { error: "Photos only — JPG, PNG, GIF or WebP." },
+      { error: "Photos only: JPG, PNG, GIF or WebP." },
       { status: 400 }
     );
   }

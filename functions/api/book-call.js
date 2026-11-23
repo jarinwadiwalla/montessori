@@ -132,7 +132,7 @@ export async function onRequestPost(context) {
       from: FROM,
       to: [HOST_EMAIL],
       reply_to: email,
-      subject: `${about} call booked — ${name}`,
+      subject: `${about} call booked: ${name}`,
       html: shell(`<h2 style="font-weight:normal;">A ${CALL_MINUTES}-minute call is booked</h2>${detail}
         <p style="font-size:14px;color:#6E5D50;">
           ${meetLink ? `On Google Meet: <a href="${esc(meetLink)}">${esc(meetLink)}</a>` : "No Google Meet link is configured yet, so send one to them."}
@@ -143,7 +143,7 @@ export async function onRequestPost(context) {
       from: FROM,
       to: [email],
       reply_to: HOST_EMAIL,
-      subject: `Your call is booked — ${slotVisitor || "confirmed"}`,
+      subject: `Your call is booked: ${slotVisitor || "confirmed"}`,
       html: shell(`
         <h2 style="font-weight:normal;">Your call is booked</h2>
         <p>Thank you for booking a ${CALL_MINUTES}-minute call. Here are the details:</p>

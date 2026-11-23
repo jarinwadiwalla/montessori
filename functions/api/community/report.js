@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
     );
   }
 
-  return Response.json({ ok: true, message: "Thank you — we'll take a look." });
+  return Response.json({ ok: true, message: "Thank you. We'll take a look." });
 }
 
 function escapeHtml(s) {

@@ -1,7 +1,7 @@
 ---
 title: "Rebuilding Adolescent Health"
 description: "Rebuilding adolescent health will require legal accountability, policy reform, and cultural courage. But it will also require rethinking the environments we build for young people every single day."
-seoDescription: "Adolescent health needs legal accountability, policy reform, and cultural courage — and a rethink of the environments we build for young people daily."
+seoDescription: "Adolescent health needs legal accountability, policy reform, and cultural courage, and a rethink of the environments we build for young people daily."
 author: "Jarin Wadiwalla"
 publishDate: 2026-04-12
 featured: false
@@ -12,20 +12,20 @@ This subject continues to weigh heavy on me. As I move through the world and see
 
 (Of course this problem is not only for young people - we are all suffering at the hands of social media... but today, we are just addressing the developing brains of the future lol.)
 
-**According to the several dozen studies I've read, specifically related to adolescents, the numbers are stark.** One in five U.S. teens now experiences a major depressive episode each year. Adolescent girls' suicide rates have reached levels higher than at any previously recorded point. Nearly half of all American teenagers aged 13–17 report using social media "almost constantly" throughout each day — and globally, the average person spends roughly 145 minutes on social platforms daily.
+**According to the several dozen studies I've read, specifically related to adolescents, the numbers are stark.** One in five U.S. teens now experiences a major depressive episode each year. Adolescent girls' suicide rates have reached levels higher than at any previously recorded point. Nearly half of all American teenagers aged 13–17 report using social media "almost constantly" throughout each day. Globally, the average person spends roughly 145 minutes on social platforms daily.
 
-A 2019 longitudinal study of 7,594 adolescents found that spending more than three hours per day on social media is associated with a significantly increased risk for internalizing problems — anxiety,
-depression, and withdrawal. Academic performance, sleep quality, exercise, and in-person friendships have all declined since the early 2010s — the same period smartphones became ubiquitous among young people.
+A 2019 longitudinal study of 7,594 adolescents found that spending more than three hours per day on social media is associated with a significantly increased risk for internalizing problems: anxiety,
+depression, and withdrawal. Academic performance, sleep quality, exercise, and in-person friendships have all declined since the early 2010s, the same period smartphones became ubiquitous among young people.
 
 
 > Today's adolescents are profoundly lonely despite being more "connected" than ever.
 
-Time spent with friends in person has dropped sharply since 2012. Teens are replacing real-world relationships — built through shared work, play, and face-to-face conversation — with shallow digital interactions that leave them feeling isolated and unseen. 
+Time spent with friends in person has dropped sharply since 2012. Teens are replacing real-world relationships (built through shared work, play, and face-to-face conversation) with shallow digital interactions that leave them feeling isolated and unseen. 
 
 Researchers and advocates are sounding the alarm. Among those leading the charge is social psychologist Jonathan Haidt, professor at NYU's Stern School of Business and author of The Anxious Generation. Haidt's research documents how the rise of
 smartphone-based childhood has coincided with a dramatic decline in adolescent mental health beginning in the early 2010s. 
 
-He identifies four foundational harms: social deprivation, attention fragmentation, and addiction — all driven by the shift from a play-based to a phone-based childhood.
+He identifies four foundational harms: social deprivation, attention fragmentation, and addiction, all driven by the shift from a play-based to a phone-based childhood.
 
 
 > "It's not just that teens are unhappy — it's that the social and neurological conditions for healthy development have been systematically disrupted." — Jonathan Haidt
@@ -34,9 +34,9 @@ He identifies four foundational harms: social deprivation, attention fragmentati
 
 Alongside researchers, a growing number of legal advocates are holding the industry accountable and supporting families that have been through unimaginabale tragedy, caused by their children's interaction with social media. 
 
-**Social Media Victims Law Center:** A U.S.-based legal organization representing families whose children have been harmed by social media — including cases of self-harm, suicide, and addiction. They provide free case evaluations and have filed hundreds of lawsuits against major platforms. Most recently, they won millions for a few clients, holding social media platforms accountable *for the first time ever.*
+**Social Media Victims Law Center:** A U.S.-based legal organization representing families whose children have been harmed by social media, including cases of self-harm, suicide, and addiction. They provide free case evaluations and have filed hundreds of lawsuits against major platforms. Most recently, they won millions for a few clients, holding social media platforms accountable *for the first time ever.*
 
-In 2023, 42 U.S. authorities filed coordinated lawsuits against Meta over the documented negative impacts of Facebook and Instagram on children's health — the largest collective legal action against a social media company to date.
+In 2023, 42 U.S. authorities filed coordinated lawsuits against Meta over the documented negative impacts of Facebook and Instagram on children's health, the largest collective legal action against a social media company to date.
 
 ###  The world is starting to act. Governments across the globe are moving from concern to legislation. 
 
@@ -50,7 +50,7 @@ In 2023, 42 U.S. authorities filed coordinated lawsuits against Meta over the do
 > Montessori education has been answering this question for over a hundred years.
 
 
-Maria Montessori understood that adolescents need meaningful work, real community, and a deep connection to the natural world. Her vision for the **Erdkinder** — a farm-based school for adolescents — directly counters the harms Haidt identifies. 
+Maria Montessori understood that adolescents need meaningful work, real community, and a deep connection to the natural world. Her vision for the **Erdkinder**, a farm-based school for adolescents, directly counters the harms Haidt identifies. 
 
 Where phones fragment attention, Montessori cultivates deep focus and presence. 
 
@@ -61,7 +61,7 @@ Where screen time displaces sleep and movement, Montessori grounds young people 
 > Montessori believed that "the chief symptom of adolescence is a state of expectation, a tendency towards creative work and a need for the strengthening of self-confidence." 
 
 
-Every element of the Montessori adolescent environment — from collaborative projects to real-world economic participation — is designed to meet precisely this need.
+Every element of the Montessori adolescent environment, from collaborative projects to real-world economic participation, is designed to meet precisely this need.
 
 ### Montessori's answer is not to lecture young people about phones, but to fill their lives so richly with purposeful activity, genuine community, and connection to nature that the devices become irrelevant.
 

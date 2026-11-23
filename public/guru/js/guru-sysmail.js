@@ -82,7 +82,7 @@ async function sysmailSave() {
     }),
   });
   if (data) {
-    showToast("Template saved — new emails use it immediately.", "success");
+    showToast("Template saved. New emails use it immediately.", "success");
     sysmailCloseEditor();
     sysmailLoad();
   }
